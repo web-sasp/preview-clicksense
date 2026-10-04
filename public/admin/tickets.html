@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Tickets | Panel de Administración | ClickSense RP</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/src/assets/admin.css">
+
+    <!-- Estilos específicos para la inmersión 3D del Acceso Denegado y el panel de Tickets -->
+    <style>
+        :root {
+            --tk-bg-card: var(--bg-card, #130d1c);
+            --tk-border: var(--border-color, rgba(239, 68, 68, 0.2));
+            --tk-muted: var(--text-muted, #9ca3af);
+            --tk-accent: var(--accent-red, #ef4444);
+            --adm-green: #10b981;
+            --adm-purple: #a855f7;
+            --adm-pink: #f472b6;
+            --adm-font-title: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Foco visible al navegar con teclado */
+        :where(a, button, select, [tabindex]):focus-visible {
+            outline: 2px solid var(--adm-pink);
+            outline-offset: 3px;
+        }
+
+        /* ======================================================== */
+        /* MÁXIMA ANIMACIÓN 3D E INMERSIÓN - ACCESO DENEGADO        */
+        /* ======================================================== */
+
+        @keyframes entry3DExplosion {
+            0% { opacity: 0; transform: scale(0.7) translateZ(-300px) rotateX(35deg); }
+            100% { opacity: 1; transform: scale(1) translateZ(0px) rotateX(0deg); }
+        }
+
+        @keyframes neonCycle3D {
+            0% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(239, 68, 68, 0.25), inset 0 0 25px rgba(239, 68, 68, 0.15); }
+            33% { border-color: rgba(168, 85, 247, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(168, 85, 247, 0.3), inset 0 0 25px rgba(168, 85, 247, 0.15); }
+            66% { border-color: rgba(236, 72, 153, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(236, 72, 153, 0.3), inset 0 0 25px rgba(236, 72, 153, 0.15); }
+            100% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(239, 68, 68, 0.25), inset 0 0 25px rgba(239, 68, 68, 0.15); }
+        }
+
+        @keyframes liquidShimmer3D {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes radarSpin3D {
+            0% { transform: rotate(0deg) rotateX(10deg); }
+            100% { transform: rotate(360deg) rotateX(10deg); }
+        }
+
+        @keyframes pulseCore3D {
+            0%, 100% { transform: scale(1) translateZ(40px); filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.7)); }
+            50% { transform: scale(1.1) translateZ(60px); filter: drop-shadow(0 0 40px rgba(239, 68, 68, 1)); }
+        }
+
+        @keyframes bgFloatingOrb1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(80px, -60px) scale(1.3); }
+        }
+
+        @keyframes bgFloatingOrb2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-90px, 70px) scale(1.4); }
+        }
+
+        /* Pantalla completa. Se muestra con display:flex desde el script.
+           Con "margin: auto" en la tarjeta queda centrada y, si la ventana es baja,
+           se puede desplazar sin que se corte la parte de arriba. */
+        .denied-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+            padding: 24px;
+            box-sizing: border-box;
+            background: radial-gradient(circle at 50% 25%, #160a2b 0%, #040207 92%);
+            font-family: var(--adm-font-title);
+            overflow-x: hidden;
+            overflow-y: auto;
+            perspective: 1600px;
+        }
+
+        /* Orbes lumínicos de fondo */
+        .denied-orb {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .denied-orb-1 {
+            top: 10vh; left: 15vw; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.09) 0%, transparent 70%);
+            animation: bgFloatingOrb1 9s infinite ease-in-out;
+        }
+        .denied-orb-2 {
+            bottom: 10vh; right: 15vw; width: 450px; height: 450px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.09) 0%, transparent 70%);
+            animation: bgFloatingOrb2 11s infinite ease-in-out;
+        }
+
+        /* Tarjeta principal 3D interactiva (se inclina siguiendo el ratón).
+           La animación de entrada usa "backwards": al terminar suelta el transform
+           y así la inclinación con el ratón puede aplicarse. */
+        .denied-card {
+            position: relative;
+            z-index: 2;
+            margin: auto;
+            width: 100%;
+            max-width: 660px;
+            box-sizing: border-box;
+            padding: 56px 46px 48px;
+            text-align: center;
+            border-radius: 34px;
+            border: 2px solid rgba(239, 68, 68, 0.6);
+            background: linear-gradient(155deg, rgba(24, 15, 40, 0.97) 0%, rgba(8, 5, 14, 0.99) 100%);
+            backdrop-filter: blur(30px);
+            transform-style: preserve-3d;
+            will-change: transform;
+            transition: transform 0.15s cubic-bezier(0.03, 0.98, 0.52, 0.99);
+            animation: entry3DExplosion 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards, neonCycle3D 7s infinite linear;
+        }
+
+        .denied-top-glow {
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(30px);
+            width: 200px;
+            height: 5px;
+            background: linear-gradient(90deg, transparent, #ec4899, #8b5cf6, transparent);
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 0 25px #ec4899;
+        }
+
+        .denied-tag {
+            transform: translateZ(25px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239, 68, 68, 0.14);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 7px 20px;
+            border-radius: 20px;
+            color: #f87171;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            margin-bottom: 44px;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.2);
+        }
+
+        .denied-emblem {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+            transform: translateZ(50px);
+        }
+        .denied-ring {
+            position: absolute;
+            border-radius: 50%;
+        }
+        .denied-ring-1 {
+            inset: -8px;
+            border: 2px dashed rgba(236, 72, 153, 0.5);
+            animation: radarSpin3D 10s linear infinite;
+        }
+        .denied-ring-2 {
+            inset: -18px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            animation: radarSpin3D 15s linear infinite reverse;
+        }
+        .denied-core {
+            width: 104px;
+            height: 104px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(168, 85, 247, 0.12));
+            color: #f87171;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            border: 1px solid rgba(239, 68, 68, 0.7);
+            animation: pulseCore3D 3s infinite ease-in-out;
+        }
+
+        .denied-title {
+            transform: translateZ(40px);
+            margin: 0 0 14px;
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 15%, #f472b6 45%, #c084fc 75%, #fff 100%);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: liquidShimmer3D 4s linear infinite;
+        }
+
+        .denied-text {
+            transform: translateZ(30px);
+            color: #94a3b8;
+            font-size: 16px;
+            line-height: 1.7;
+            max-width: 550px;
+            margin: 0 auto 34px;
+        }
+        .denied-flag {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.18);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+
+        .denied-options {
+            transform: translateZ(35px);
+            transform-style: preserve-3d;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            text-align: left;
+            margin-bottom: 38px;
+        }
+        .denied-option {
+            --opt: 168, 85, 247;
+            background: rgba(15, 10, 28, 0.9);
+            border: 1px solid rgba(var(--opt), 0.3);
+            border-radius: 18px;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+        }
+        .denied-option.is-blue { --opt: 59, 130, 246; }
+        .denied-option:hover {
+            border-color: rgba(var(--opt), 0.7);
+            background: rgba(22, 16, 44, 0.95);
+            transform: translateZ(10px) translateX(6px);
+        }
+        .denied-option-icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #c084fc;
+            background: rgba(var(--opt), 0.18);
+            border: 1px solid rgba(var(--opt), 0.45);
+            box-shadow: 0 0 20px rgba(var(--opt), 0.25);
+        }
+        .denied-option.is-blue .denied-option-icon { color: #60a5fa; }
+        .denied-option-text {
+            font-size: 14.5px;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+        .denied-option-text > strong:first-child {
+            color: #fff;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .denied-option-text .is-owner { color: var(--adm-pink); }
+
+        .denied-cta {
+            transform: translateZ(60px);
+            background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+            color: #fff;
+            text-decoration: none;
+            padding: 18px 42px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 15px 40px rgba(236, 72, 153, 0.5);
+            transition: transform 0.25s ease, filter 0.25s ease, box-shadow 0.25s ease;
+        }
+        .denied-cta:hover {
+            transform: translateZ(75px) scale(1.04);
+            filter: brightness(1.15);
+            box-shadow: 0 22px 55px rgba(236, 72, 153, 0.7);
+        }
+
+        @media (max-width: 600px) {
+            .denied-screen { padding: 16px; }
+            .denied-card { padding: 42px 22px 34px; border-radius: 26px; }
+            .denied-tag { font-size: 11px; letter-spacing: 1.2px; padding: 7px 14px; margin-bottom: 40px; }
+            .denied-title { font-size: 26px; }
+            .denied-text { font-size: 15px; margin-bottom: 28px; }
+            .denied-option { padding: 16px; gap: 14px; }
+            .denied-cta { padding: 16px 26px; font-size: 15px; }
+        }
+
+        /* ======================================================== */
+        /* CABECERA DEL PANEL                                        */
+        /* ======================================================== */
+
+        .top-btn.adm-back-btn {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color, rgba(239, 68, 68, 0.2));
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+        .top-btn.adm-back-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(239, 68, 68, 0.45);
+            transform: translateX(-2px);
+        }
+
+        .adm-welcome-icon {
+            background: rgba(239, 68, 68, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            flex-shrink: 0;
+            font-size: 24px;
+            color: #ef4444;
+        }
+        .adm-welcome-title {
+            color: #fff;
+            margin: 0 0 4px;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            font-family: var(--adm-font-title);
+        }
+        .adm-welcome-text {
+            margin: 0;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: var(--tk-muted);
+        }
+
+        /* Aviso de acceso concedido: una franja discreta en lugar de una tarjeta grande */
+        .admin-card.adm-access-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid rgba(16, 185, 129, 0.28);
+            border-radius: 14px;
+            padding: 16px 20px;
+        }
+        .adm-access-icon {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--adm-green);
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        .adm-access-card h3 {
+            margin: 0 0 2px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--adm-font-title);
+        }
+        .adm-access-card p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--tk-muted);
+        }
+        .adm-access-card code,
+        .tk-toolbar-title code {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 1px 6px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #e5e7eb;
+        }
+
+        /* ======================================================== */
+        /* TARJETA DE ACCESO A LA GESTIÓN DE NOVEDADES               */
+        /* ======================================================== */
+        .nv-admin-link {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-top: 20px;
+            padding: 22px 25px;
+            background: var(--tk-bg-card);
+            border: 1px solid var(--tk-border);
+            border-radius: 14px;
+            text-decoration: none;
+            color: #fff;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nv-admin-link:hover,
+        .nv-admin-link:focus-visible {
+            transform: translateY(-3px);
+            border-color: rgba(236, 72, 153, 0.6);
+            box-shadow: 0 12px 32px rgba(236, 72, 153, 0.22);
+        }
+
+        .nv-admin-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #f472b6;
+            background: rgba(236, 72, 153, 0.15);
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            flex-shrink: 0;
+        }
+
+        .nv-admin-link h3 { font-size: 16px; margin: 0 0 4px; font-family: var(--adm-font-title); }
+        .nv-admin-link p { font-size: 13px; margin: 0; line-height: 1.5; color: var(--tk-muted); }
+
+        .nv-admin-arrow {
+            margin-left: auto;
+            color: var(--tk-muted);
+            transition: transform 0.25s ease, color 0.25s ease;
+        }
+
+        .nv-admin-link:hover .nv-admin-arrow,
+        .nv-admin-link:focus-visible .nv-admin-arrow {
+            transform: translateX(6px);
+            color: #f472b6;
+        }
+
+        /* ======================================================== */
+        /* SISTEMA DE TICKETS - PANEL ADMIN                          */
+        /* ======================================================== */
+
+        .tickets-admin-card {
+            background: var(--tk-bg-card);
+            border: 1px solid var(--tk-border);
+            border-radius: 14px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        /* Título + estado de la última carga */
+        .tk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .tk-toolbar-title h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 5px;
+            font-family: var(--adm-font-title);
+        }
+
+        .tk-toolbar-title p {
+            margin: 0;
+            max-width: 68ch;
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--tk-muted);
+        }
+
+        .tk-refresh {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .tk-last-updated {
+            font-size: 12px;
+            color: var(--tk-muted);
+            white-space: nowrap;
+        }
+
+        /* Contadores: además de informar, sirven para filtrar por estado */
+        .tk-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .tk-metric-card {
+            --metric: 168, 85, 247;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--tk-border);
+            border-radius: 12px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+            color: inherit;
+            font-family: inherit;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+        }
+        .tk-metric-card.is-green { --metric: 16, 185, 129; }
+        .tk-metric-card.is-red { --metric: 239, 68, 68; }
+
+        .tk-metric-card:hover {
+            border-color: rgba(var(--metric), 0.5);
+            transform: translateY(-2px);
+        }
+        .tk-metric-card.is-active {
+            border-color: rgba(var(--metric), 0.75);
+            background: rgba(var(--metric), 0.08);
+            box-shadow: 0 0 0 1px rgba(var(--metric), 0.25), 0 8px 22px rgba(var(--metric), 0.12);
+        }
+
+        .tk-metric-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--tk-muted);
+        }
+        .tk-metric-title i { color: rgb(var(--metric)); }
+
+        .tk-metric-value {
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.1;
+            color: #fff;
+            font-family: var(--adm-font-title);
+            font-variant-numeric: tabular-nums;
+        }
+        .tk-metric-card.is-green .tk-metric-value { color: #10b981; }
+        .tk-metric-card.is-red .tk-metric-value { color: #ef4444; }
+
+        /* Aviso cuando el servidor no responde */
+        .tk-alert {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #fecaca;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .tk-alert[hidden] { display: none; }
+        .tk-alert i { color: #f87171; }
+        .tk-alert span { flex: 1 1 260px; }
+        .tk-alert button {
+            background: rgba(239, 68, 68, 0.18);
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .tk-alert button:hover { background: rgba(239, 68, 68, 0.32); }
+
+        .tk-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .tk-toolbar-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1 1 auto;
+        }
+
+        .tk-result-info {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--tk-muted);
+            white-space: nowrap;
+        }
+
+        .tk-search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            flex: 0 1 320px;
+        }
+
+        .tk-search-wrapper i {
+            position: absolute;
+            left: 12px;
+            color: var(--tk-muted);
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        .tk-search-input {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--tk-border);
+            border-radius: 9px;
+            padding: 10px 14px 10px 34px;
+            color: #fff;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+        .tk-search-input::placeholder { color: #6b7280; }
+
+        .tk-search-input:focus {
+            border-color: var(--tk-accent);
+            background: rgba(239, 68, 68, 0.03);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14);
+        }
+
+        .tk-filter-select {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--tk-border);
+            border-radius: 9px;
+            padding: 10px 12px;
+            color: #fff;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .tk-filter-select:focus {
+            border-color: var(--tk-accent);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14);
+        }
+
+        .tk-filter-select option {
+            background: #130d1c;
+        }
+
+        .tk-table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--tk-border);
+            border-radius: 12px;
+        }
+
+        .tk-table {
+            width: 100%;
+            min-width: 760px;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13.5px;
+        }
+
+        .tk-table th {
+            color: var(--tk-muted);
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--tk-border);
+            background: rgba(255,255,255,0.025);
+            white-space: nowrap;
+        }
+
+        .tk-table td {
+            padding: 13px 15px;
+            border-bottom: 1px solid rgba(239, 68, 68, 0.08);
+            color: #fff;
+            vertical-align: middle;
+        }
+        .tk-table tbody tr:last-child td { border-bottom: none; }
+
+        /* Toda la fila abre el expediente */
+        .tk-table tbody tr.tk-row { cursor: pointer; transition: background 0.15s ease; }
+        .tk-table tbody tr.tk-row:hover,
+        .tk-table tbody tr.tk-row:focus-visible {
+            background: rgba(255,255,255,0.04);
+        }
+        .tk-table tbody tr.tk-row:focus-visible { outline-offset: -2px; }
+
+        .tk-cell-id {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #e9d5ff;
+            white-space: nowrap;
+        }
+        .tk-cell-user small {
+            display: block;
+            margin-top: 2px;
+            color: var(--tk-muted);
+            font-size: 11px;
+        }
+        .tk-cell-subject {
+            max-width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .tk-table td.tk-cell-date { color: var(--tk-muted); white-space: nowrap; }
+
+        .tk-chip {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 7px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            font-size: 12px;
+            color: #e5e7eb;
+            white-space: nowrap;
+        }
+
+        .tk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tk-badge.activo {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .tk-badge.inactivo {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .tk-view-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--tk-border);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .tk-view-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        /* Botón de recarga: gira mientras se consulta el servidor */
+        .tk-view-btn.tk-reload-btn {
+            width: auto;
+            height: 34px;
+            padding: 0 12px;
+            gap: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+        @keyframes tkSpin { to { transform: rotate(360deg); } }
+        .tk-reload-btn.is-loading i { animation: tkSpin 0.8s linear infinite; }
+
+        .tk-empty-state {
+            text-align: center;
+            color: var(--tk-muted);
+            padding: 34px 20px;
+            font-size: 13.5px;
+            line-height: 1.6;
+        }
+        .tk-empty-state i {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 10px;
+            color: rgba(168, 85, 247, 0.6);
+        }
+        .tk-empty-state strong {
+            display: block;
+            color: #fff;
+            font-size: 14.5px;
+            font-family: var(--adm-font-title);
+        }
+        .tk-empty-state button {
+            margin-top: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--tk-border);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        .tk-empty-state button:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); }
+
+        /* ---------- Modal de detalle del ticket ---------- */
+        .tk-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 16px;
+            box-sizing: border-box;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .tk-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tk-modal-box {
+            background: var(--tk-bg-card);
+            border: 1px solid var(--tk-border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 640px;
+            box-sizing: border-box;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            max-height: 88vh;
+            overflow-y: auto;
+        }
+
+        .tk-modal-overlay.active .tk-modal-box {
+            transform: scale(1);
+        }
+
+        .tk-modal-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .tk-modal-top h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--adm-font-title);
+        }
+        .tk-modal-x {
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            border-radius: 9px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--tk-muted);
+            cursor: pointer;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+        .tk-modal-x:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #fff; }
+
+        /* Cabecera del expediente: ID, asunto y estado de un vistazo */
+        .tk-detail-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            background: rgba(168, 85, 247, 0.07);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+        }
+        .tk-detail-id {
+            display: block;
+            margin-bottom: 4px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: #d8b4fe;
+        }
+        .tk-detail-subject {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: #fff;
+            overflow-wrap: anywhere;
+            font-family: var(--adm-font-title);
+        }
+
+        .tk-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .tk-detail-grid .tk-field-row { margin-bottom: 0; }
+        @media (max-width: 520px) {
+            .tk-detail-grid { grid-template-columns: 1fr; }
+            .tk-detail-head { flex-direction: column; }
+        }
+
+        .tk-field-row {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--tk-border);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+        }
+
+        .tk-field-label {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--tk-muted);
+            display: block;
+            margin-bottom: 5px;
+        }
+        .tk-field-label i { margin-right: 4px; }
+
+        .tk-field-value {
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #fff;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .tk-conversation-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .tk-message-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--tk-border);
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+
+        .tk-message-author {
+            font-size: 12px;
+            font-weight: 700;
+            color: #f472b6;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .tk-message-author span:last-child { color: var(--tk-muted); font-weight: 400; white-space: nowrap; }
+
+        .modal-btn.tk-modal-close-wide {
+            width: 100%;
+            padding: 11px;
+            border-radius: 9px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color, rgba(239, 68, 68, 0.2));
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        .modal-btn.tk-modal-close-wide:hover { background: rgba(255,255,255,0.1); border-color: rgba(239, 68, 68, 0.45); }
+
+        @media (max-width: 640px) {
+            .tickets-admin-card { padding: 18px; }
+            .nv-admin-link { padding: 18px; gap: 14px; }
+            .tk-search-wrapper { flex: 1 1 100%; }
+            .tk-filter-select { flex: 1 1 auto; }
+            .tk-modal-box { padding: 20px 18px; }
+        }
+
+        /* ---------- Filtro por categoría (cabecera "Categoría" de la tabla) ---------- */
+        .tk-cat-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin: -5px -9px;
+            padding: 5px 9px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+        .tk-cat-btn i { font-size: 10px; transition: transform 0.2s ease; }
+        .tk-cat-btn:hover,
+        .tk-cat-btn.is-open {
+            background: rgba(255,255,255,0.06);
+            border-color: var(--tk-border);
+            color: #fff;
+        }
+        .tk-cat-btn.is-open i { transform: rotate(180deg); }
+        /* Con una categoría elegida, la cabecera muestra su nombre resaltado */
+        .tk-cat-btn.has-filter {
+            background: rgba(236, 72, 153, 0.12);
+            border-color: rgba(236, 72, 153, 0.45);
+            color: #f9a8d4;
+        }
+
+        .tk-cat-menu {
+            position: fixed;
+            z-index: 3000;
+            min-width: 240px;
+            max-width: calc(100vw - 24px);
+            max-height: 320px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            padding: 6px;
+            border-radius: 12px;
+            background: #160f22;
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 24px rgba(236, 72, 153, 0.12);
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .tk-cat-menu.show { opacity: 1; transform: none; pointer-events: auto; }
+        .tk-cat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            padding: 9px 12px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #e5e7eb;
+            font-family: inherit;
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .tk-cat-item:hover { background: rgba(236, 72, 153, 0.14); color: #fff; }
+        .tk-cat-item.is-active { background: rgba(236, 72, 153, 0.22); color: #fff; font-weight: 600; }
+        .tk-cat-count {
+            flex-shrink: 0;
+            padding: 1px 8px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.06);
+            color: var(--tk-muted);
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        /* ---------- Chat del ticket ---------- */
+        .tk-modal-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .tk-modal-actions > * { flex: 1 1 180px; }
+        .tk-chat-open-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px;
+            border: none;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(236, 72, 153, 0.3);
+            transition: filter 0.2s ease, transform 0.2s ease;
+        }
+        .tk-chat-open-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+        .tk-chat-overlay { z-index: 2100; }
+        .tk-modal-box.tk-chat-box {
+            display: flex;
+            flex-direction: column;
+            max-width: 680px;
+            height: min(720px, 88vh);
+            padding: 0;
+            overflow: hidden;
+        }
+        .tk-chat-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--tk-border);
+        }
+        .tk-chat-head-info { flex: 1; min-width: 0; }
+        .tk-chat-head-info h3 {
+            margin: 0;
+            font-size: 15.5px;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--adm-font-title);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .tk-chat-head-info small { display: block; margin-top: 2px; font-size: 12px; color: var(--tk-muted); }
+
+        .tk-chat-messages {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.18);
+        }
+        /* Usuario a la izquierda, staff a la derecha */
+        .tk-msg { max-width: 78%; display: flex; flex-direction: column; gap: 4px; align-self: flex-start; }
+        .tk-msg.is-staff { align-self: flex-end; align-items: flex-end; }
+        .tk-msg-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: var(--tk-muted); }
+        .tk-msg-meta strong { color: #e5e7eb; font-weight: 700; }
+        .tk-msg.is-staff .tk-msg-meta strong { color: var(--adm-pink); }
+        .tk-msg-tag {
+            padding: 0 7px;
+            border-radius: 999px;
+            background: rgba(236, 72, 153, 0.15);
+            border: 1px solid rgba(236, 72, 153, 0.35);
+            color: #f9a8d4;
+            font-size: 10.5px;
+            font-weight: 700;
+        }
+        .tk-msg-bubble {
+            padding: 10px 14px;
+            border-radius: 4px 14px 14px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 13.5px;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+        .tk-msg.is-staff .tk-msg-bubble {
+            border-radius: 14px 4px 14px 14px;
+            background: rgba(236, 72, 153, 0.14);
+            border-color: rgba(236, 72, 153, 0.35);
+        }
+        .tk-chat-empty { margin: auto; text-align: center; color: var(--tk-muted); font-size: 13.5px; line-height: 1.6; }
+        .tk-chat-empty i { display: block; font-size: 24px; margin-bottom: 8px; color: rgba(168, 85, 247, 0.6); }
+
+        .tk-chat-form { padding: 12px 16px 16px; border-top: 1px solid var(--tk-border); display: flex; flex-direction: column; gap: 8px; }
+        .tk-chat-form .tk-alert { margin-bottom: 0; }
+        .tk-chat-as { font-size: 12px; color: var(--tk-muted); }
+        .tk-chat-as strong { color: var(--adm-pink); }
+        .tk-chat-row { display: flex; align-items: flex-end; gap: 10px; }
+        .tk-chat-input {
+            flex: 1;
+            min-height: 44px;
+            max-height: 140px;
+            resize: none;
+            box-sizing: border-box;
+            padding: 11px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--tk-border);
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            font-size: 13.5px;
+            line-height: 1.5;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .tk-chat-input::placeholder { color: #6b7280; }
+        .tk-chat-input:focus { border-color: var(--adm-pink); box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.16); }
+        .tk-chat-input:disabled { opacity: 0.55; cursor: not-allowed; }
+        .tk-chat-send {
+            height: 44px;
+            padding: 0 18px;
+            flex-shrink: 0;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: filter 0.2s ease, opacity 0.2s ease;
+        }
+        .tk-chat-send:hover { filter: brightness(1.1); }
+        .tk-chat-send:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+        @media (max-width: 520px) {
+            .tk-msg { max-width: 90%; }
+            .tk-chat-send span { display: none; }
+        }
+
+        /* Quien prefiera menos movimiento: sin animaciones en bucle ni transiciones largas */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-background"></div>
+
+    <!-- CONTENEDOR DE ACCESO DENEGADO CON INMERSIÓN 3D MÁXIMA -->
+    <div id="accessDeniedContainer" class="denied-screen" style="display: none;">
+        
+        <!-- Orbes Lumínicos 3D de Fondo -->
+        <div class="denied-orb denied-orb-1"></div>
+        <div class="denied-orb denied-orb-2"></div>
+
+        <!-- TARJETA PRINCIPAL 3D INTERACTIVA -->
+        <div id="deniedCard3D" class="denied-card">
+
+            <div class="denied-top-glow"></div>
+
+            <div class="denied-tag">
+                <i class="fa-solid fa-triangle-exclamation"></i> Protocolo de Seguridad Activo
+            </div>
+
+            <div class="denied-emblem">
+                <div class="denied-ring denied-ring-1"></div>
+                <div class="denied-ring denied-ring-2"></div>
+                <div class="denied-core">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+            </div>
+
+            <h1 class="denied-title">ACCESO NO AUTORIZADO</h1>
+            
+            <p class="denied-text">
+                Tu perfil actual carece de privilegios o consta como <strong class="denied-flag">INACTIVO</strong> dentro de este sistema de control central.
+            </p>
+
+            <div class="denied-options">
+                <div class="denied-option">
+                    <div class="denied-option-icon">
+                        <i class="fa-solid fa-user-gear"></i>
+                    </div>
+                    <div class="denied-option-text">
+                        <strong>¿Eres miembro del equipo staff?</strong>
+                        Comunícate con el <strong class="is-owner">owner</strong> para que valide y configure tu acceso de manera oficial en el panel.
+                    </div>
+                </div>
+
+                <div class="denied-option is-blue">
+                    <div class="denied-option-icon">
+                        <i class="fa-solid fa-house-laptop"></i>
+                    </div>
+                    <div class="denied-option-text">
+                        <strong>¿Usuario general?</strong>
+                        Por motivos de seguridad, debes regresar de inmediato a la página principal del servidor.
+                    </div>
+                </div>
+            </div>
+
+            <a href="/home.html" class="denied-cta">
+                <i class="fa-solid fa-house"></i> Volver a la página principal
+            </a>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Menú Lateral Completo (Sidebar) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;" onerror="this.style.display='none'">
+                    <span class="server-main-title">ClickSense</span>
+                </div>
+                <button class="sidebar-toggle-icon" id="sidebarToggleBtn" title="Colapsar menú"><i class="fa-solid fa-bars"></i></button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Sección General -->
+                <div class="nav-category">General</div>
+                <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="/admin.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Panel Admin</a>
+                <a href="/admin/novedades.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> Novedades</a>
+                <a href="/admin/tickets.html" class="nav-item active"><i class="fa-solid fa-headset"></i> Gestión de tickets</a>
+                <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> Equipo</a>
+                <a href="/calendario.html" class="nav-item"><i class="fa-solid fa-calendar-days"></i> Calendario</a>
+                <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> Comercios</a>
+                <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> Postulaciones ilegales</a>
+
+                <!-- Espacio de trabajo -->
+                <div class="nav-category">Espacio de trabajo</div>
+                <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> Grupos</a>
+                <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> Documentos</a>
+                <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Whitelist</a>
+
+                <!-- Mi Cuenta -->
+                <div class="nav-category">Mi Cuenta</div>
+                <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> Mi Perfil</a>
+                <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> Historias personaje</a>
+                <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+
+                <!-- LSPD -->
+                <div class="nav-category">LSPD</div>
+                <a href="/lspd-academia.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Academia</a>
+
+                <!-- LSSD -->
+                <div class="nav-category">LSSD</div>
+                <a href="/lssd-academia.html" class="nav-item"><i class="fa-solid fa-star-badge"></i> Academia</a>
+
+                <!-- SAHP -->
+                <div class="nav-category">SAHP</div>
+                <a href="/sahp-academia.html" class="nav-item"><i class="fa-solid fa-shield"></i> Academia</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-mini" id="userProfileMini">
+                    <div class="avatar-placeholder" id="userAvatarContainer">
+                        <span id="userAvatarFallback">?</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">Usuario</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@tag</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Botón flotante para abrir el menú cuando está colapsado -->
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <header class="top-action-bar animate-fade-down">
+                <div class="breadcrumb">Administración / Tickets</div>
+                <div class="top-buttons">
+                    <a href="/admin.html" class="top-btn adm-back-btn"><i class="fa-solid fa-arrow-left"></i> Volver al panel</a>
+                </div>
+            </header>
+
+            <!-- ==================================================== -->
+            <!-- SISTEMA DE TICKETS (creados desde public/tickets.html) -->
+            <!-- ==================================================== -->
+            <div class="tickets-admin-card animate-fade-up" style="margin-top: 0;">
+
+                <!-- Título, descripción y estado de la última carga -->
+                <div class="tk-header">
+                    <div class="tk-toolbar-title">
+                        <h3><i class="fa-solid fa-ticket" style="color: var(--accent-red);"></i> Sistema de Tickets</h3>
+                        <p>Consulta los tickets abiertos por los usuarios desde <code>tickets.html</code>, filtra por usuario y revisa el detalle de cada solicitud.</p>
+                    </div>
+                    <div class="tk-refresh">
+                        <span class="tk-last-updated" id="tkLastUpdated" aria-live="polite"></span>
+                        <button class="tk-view-btn tk-reload-btn" id="tkReloadBtn" title="Recargar tickets" onclick="loadTicketsFromServer()">
+                            <i class="fa-solid fa-rotate"></i> <span>Recargar</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Contadores: al pulsarlos se filtra la tabla por ese estado -->
+                <div class="tk-metrics-grid" role="group" aria-label="Filtrar tickets por estado">
+                    <button type="button" class="tk-metric-card is-active" data-status="Todos" title="Ver todos los tickets">
+                        <span class="tk-metric-title"><i class="fa-solid fa-database"></i> Total de Tickets</span>
+                        <span class="tk-metric-value" id="tkMetricTotal">0</span>
+                    </button>
+                    <button type="button" class="tk-metric-card is-green" data-status="Activo" title="Ver solo los activos">
+                        <span class="tk-metric-title"><i class="fa-solid fa-circle-check"></i> Activos</span>
+                        <span class="tk-metric-value" id="tkMetricActivos">0</span>
+                    </button>
+                    <button type="button" class="tk-metric-card is-red" data-status="Inactivo" title="Ver solo los inactivos o cerrados">
+                        <span class="tk-metric-title"><i class="fa-solid fa-circle-xmark"></i> Inactivos / Cerrados</span>
+                        <span class="tk-metric-value" id="tkMetricInactivos">0</span>
+                    </button>
+                </div>
+
+                <!-- Aviso si el servidor no responde -->
+                <div class="tk-alert" id="tkLoadError" role="alert" hidden>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="tkLoadErrorText">No se ha podido conectar con el servidor.</span>
+                    <button type="button" onclick="loadTicketsFromServer()">Reintentar</button>
+                </div>
+
+                <div class="tk-toolbar">
+                    <div class="tk-toolbar-controls">
+                        <div class="tk-search-wrapper">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="tkSearchInput" class="tk-search-input" placeholder="Buscar por usuario, asunto o ID..." aria-label="Buscar tickets por usuario, asunto, ID de ticket o ID de Discord" oninput="renderTicketsTable()">
+                        </div>
+                    </div>
+                    <span class="tk-result-info" id="tkResultInfo"></span>
+                </div>
+
+                <div class="tk-table-responsive">
+                    <table class="tk-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuario</th>
+                                <th>Asunto</th>
+                                <th>
+                                    <!-- Al pulsar se despliegan todas las categorías para filtrar la tabla -->
+                                    <button type="button" class="tk-cat-btn" id="tkCatBtn" aria-haspopup="true" aria-expanded="false" title="Filtrar por categoría">
+                                        <span id="tkCatLabel">Categoría</span> <i class="fa-solid fa-chevron-down"></i>
+                                    </button>
+                                </th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th style="text-align: right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tkTableBody">
+                            <tr><td colspan="7" class="tk-empty-state"><i class="fa-solid fa-spinner fa-spin"></i>Cargando tickets...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de detalle del ticket -->
+    <div class="tk-modal-overlay" id="tkDetailModal">
+        <div class="tk-modal-box" role="dialog" aria-modal="true" aria-labelledby="tkModalTitle">
+            <div class="tk-modal-top">
+                <h3 id="tkModalTitle">
+                    <i class="fa-solid fa-ticket" style="color: var(--accent-red);"></i> Expediente del Ticket
+                </h3>
+                <button class="tk-modal-x" onclick="closeTicketModal()" title="Cerrar (Esc)" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="tkModalContent"></div>
+            <div class="tk-modal-actions">
+                <button type="button" class="tk-chat-open-btn" id="tkOpenChatBtn" onclick="openTicketChat()">
+                    <i class="fa-solid fa-comments"></i> <span id="tkOpenChatLabel">Abrir chat</span>
+                </button>
+                <button class="modal-btn modal-btn-cancel tk-modal-close-wide" onclick="closeTicketModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat del ticket: mensajes del usuario y respuestas del staff (se guardan en /api/tickets) -->
+    <div class="tk-modal-overlay tk-chat-overlay" id="tkChatModal">
+        <div class="tk-modal-box tk-chat-box" role="dialog" aria-modal="true" aria-labelledby="tkChatTitle">
+            <div class="tk-chat-head">
+                <button type="button" class="tk-modal-x" onclick="backToTicketDetails()" title="Volver al expediente" aria-label="Volver al expediente"><i class="fa-solid fa-arrow-left"></i></button>
+                <div class="tk-chat-head-info">
+                    <h3 id="tkChatTitle">Chat del ticket</h3>
+                    <small id="tkChatSubtitle"></small>
+                </div>
+                <span id="tkChatStatus"></span>
+                <button type="button" class="tk-modal-x" onclick="closeTicketChat()" title="Cerrar (Esc)" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="tk-chat-messages" id="tkChatMessages" aria-live="polite"></div>
+            <div class="tk-chat-form">
+                <div class="tk-alert" id="tkChatError" role="alert" hidden>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="tkChatErrorText"></span>
+                </div>
+                <div class="tk-chat-as" id="tkChatAs"></div>
+                <div class="tk-chat-row">
+                    <textarea class="tk-chat-input" id="tkChatInput" rows="1" placeholder="Escribe una respuesta..." aria-label="Mensaje para el usuario"></textarea>
+                    <button type="button" class="tk-chat-send" id="tkChatSendBtn" onclick="sendTicketChatMessage()">
+                        <i class="fa-solid fa-paper-plane"></i> <span>Enviar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menú de categorías (fuera de la tabla para que no lo recorte el desplazamiento horizontal) -->
+    <div class="tk-cat-menu" id="tkCatMenu" role="menu"></div>
+
+    <!-- Scripts de interactividad (Sidebar, sesión de Discord y panel) -->
+    <script>
+        // Inicialización y Validación Principal.
+        // El único criterio de acceso es checkUserPermissions() (definido en
+        // /src/views/permissions.js), que valida contra /api/staff por
+        // discordId y exige status "Activo". Ya no se depende de claves de
+        // localStorage como 'staff_data' que nunca se rellenaban de verdad.
+        document.addEventListener('DOMContentLoaded', async () => {
+            const hasAccess = await checkUserPermissions();
+
+            if (!hasAccess) {
+                // Ocultar la aplicación principal y mostrar el panel denegado 3D
+                const appContainer = document.querySelector('.app-container');
+                if (appContainer) appContainer.style.display = 'none';
+
+                const deniedContainer = document.getElementById('accessDeniedContainer');
+                if (deniedContainer) {
+                    deniedContainer.style.display = 'flex';
+
+                    // Iniciar efecto interactivo de inclinación en la tarjeta.
+                    // Solo con ratón y si el usuario no ha pedido reducir el movimiento.
+                    const deniedCard = document.getElementById('deniedCard3D');
+                    const conRaton = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+                    const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    if (deniedCard && conRaton && !menosMovimiento) {
+                        // Inclinación máxima en grados, para que el texto siga siendo legible
+                        const MAX_TILT = 9;
+                        const limitar = v => Math.max(-MAX_TILT, Math.min(MAX_TILT, v));
+                        document.addEventListener('mousemove', (e) => {
+                            const rect = deniedCard.getBoundingClientRect();
+                            const x = e.clientX - rect.left - rect.width / 2;
+                            const y = e.clientY - rect.top - rect.height / 2;
+                            const rotateX = limitar(-y / 18);
+                            const rotateY = limitar(x / 18);
+                            deniedCard.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                        });
+                        document.documentElement.addEventListener('mouseleave', () => {
+                            deniedCard.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                        });
+                    }
+                }
+                return; // Detener la ejecución del resto del código si se deniega el acceso
+            }
+
+            // Si pasa la validación, cargar interfaz normal
+            loadDiscordSessionData();
+            initSidebar();
+            loadTicketsFromServer();
+            initTicketGlobalHandlers();
+
+            // Refresco periódico: los tickets los crean los usuarios desde
+            // otros navegadores, así que no hay ningún evento local que
+            // avise al staff — hay que comprobar el servidor de vez en cuando.
+            setInterval(loadTicketsFromServer, 20000);
+            window.addEventListener('focus', loadTicketsFromServer);
+        });
+
+        // Cargar datos de la sesión de Discord guardada en localStorage
+        async function loadDiscordSessionData() {
+            const storedUser = localStorage.getItem('discord_user');
+            const avatarContainer = document.getElementById('userAvatarContainer');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userHandleDisplay = document.getElementById('userHandleDisplay');
+
+            if (!storedUser) return;
+
+            try {
+                const discordUser = JSON.parse(storedUser);
+                if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+                if (userHandleDisplay) userHandleDisplay.textContent = `@${discordUser.username || "discord"}`;
+                if (avatarContainer && discordUser.avatarUrl) {
+                    avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                }
+            } catch (e) {
+                console.error("Error al cargar la sesión de Discord", e);
+            }
+        }
+
+        // Control del menú lateral (Colapsar y Expandir)
+        function initSidebar() {
+            const toggleBtn = document.getElementById('sidebarToggleBtn');
+            const revealBtn = document.getElementById('sidebarRevealBtn');
+            const sidebar = document.getElementById('sidebar');
+
+            if (toggleBtn && revealBtn && sidebar) {
+                toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+                revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+            }
+        }
+
+        /**
+         * ------------------------------------------------------------------
+         * SISTEMA DE TICKETS
+         * Fuente: /api/tickets (mismo patrón que /api/staff y /api/whitelist).
+         * Los tickets se crean desde public/tickets.html, que debe hacer un
+         * GET para traer la lista actual, añadir el nuevo ticket y hacer un
+         * POST con la lista completa, igual que hace whitelist.html.
+         * ------------------------------------------------------------------
+         */
+        let ticketsList = [];
+        let ticketsLoadedOnce = false;   // ya hubo al menos una carga correcta
+        let ticketsLoadFailed = false;   // la última carga falló
+        let tkStatusValue = 'Todos';     // filtro de estado (se cambia con los contadores)
+        let tkCategoryValue = 'Todas';   // filtro de categoría (se cambia desde la cabecera "Categoría")
+
+        // Categorías que deben salir SIEMPRE en el desplegable, aunque todavía no haya tickets de ellas.
+        // Pon aquí las mismas que ofrece tickets.html, por ejemplo: ['Soporte general', 'Reportes', 'Donaciones'].
+        // Las que aparezcan en los tickets se añaden solas.
+        const TK_CATEGORIAS_BASE = [];
+
+        // Los tickets los escriben los usuarios: todo su texto se escapa antes de pintarlo
+        const tkEsc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        // Lectura tolerante de los campos (acepta también los nombres en inglés que usa Home)
+        const tkAsunto = t => t.asunto || t.title || '';
+        const tkCategoria = t => t.categoria || t.category || '';
+        const tkEstadoRaw = t => t.estado || t.status || '';
+        const tkCatDe = t => String(tkCategoria(t) || 'General');
+        const tkMensaje = t => t.mensaje || t.descripcion || t.description || t.message || '';
+
+        async function loadTicketsFromServer() {
+            const reloadBtn = document.getElementById('tkReloadBtn');
+            if (reloadBtn) reloadBtn.classList.add('is-loading');
+
+            let ok = false;
+            let motivo = '';
+            try {
+                const response = await fetch('/api/tickets');
+                if (response.ok) {
+                    const data = await response.json();
+                    ticketsList = Array.isArray(data) ? data : [];
+                    ok = true;
+                } else {
+                    motivo = 'el servidor respondió con el error ' + response.status;
+                }
+            } catch (e) {
+                console.error("Error al cargar los tickets desde /api/tickets:", e);
+                motivo = 'no hay conexión con el servidor';
+            }
+
+            if (reloadBtn) reloadBtn.classList.remove('is-loading');
+
+            // Si falla, se conserva la última lista cargada (no se vacía la tabla) y se avisa
+            ticketsLoadFailed = !ok;
+            if (ok) ticketsLoadedOnce = true;
+            updateTicketsLoadStatus(ok, motivo);
+            renderTicketsTable();
+            if (ok && tkChatTicketId !== null) renderTicketChat(false);
+        }
+
+        function updateTicketsLoadStatus(ok, motivo) {
+            const alertBox = document.getElementById('tkLoadError');
+            const alertText = document.getElementById('tkLoadErrorText');
+            const lastUpdated = document.getElementById('tkLastUpdated');
+
+            if (alertBox) alertBox.hidden = ok;
+            if (!ok && alertText) {
+                alertText.textContent = ticketsLoadedOnce
+                    ? `No se han podido actualizar los tickets (${motivo}). Se muestran los últimos datos cargados.`
+                    : `No se han podido cargar los tickets desde /api/tickets (${motivo}).`;
+            }
+            if (ok && lastUpdated) {
+                lastUpdated.textContent = 'Actualizado a las ' + new Date().toLocaleTimeString('es-ES');
+            }
+        }
+
+        async function saveTicketsToServer() {
+            try {
+                const response = await fetch('/api/tickets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(ticketsList)
+                });
+                if (!response.ok) {
+                    throw new Error("No se pudieron guardar los tickets en el servidor.");
+                }
+            } catch (e) {
+                console.error("Error al sincronizar los tickets con /api/tickets:", e);
+            }
+        }
+
+        // Normaliza el estado del ticket a 'Activo' o 'Inactivo', aceptando
+        // variantes como 'Abierto'/'Cerrado' que pueda mandar tickets.html.
+        function normalizeTicketStatus(rawStatus) {
+            const s = String(rawStatus || 'Activo').toLowerCase().trim();
+            if (s === 'inactivo' || s === 'cerrado' || s === 'closed') return 'Inactivo';
+            return 'Activo';
+        }
+
+        // Quita la búsqueda y los filtros de estado y categoría (botón del estado "sin resultados")
+        function resetTicketFilters() {
+            const search = document.getElementById('tkSearchInput');
+            if (search) search.value = '';
+            tkStatusValue = 'Todos';
+            tkCategoryValue = 'Todas';
+            renderTicketsTable();
+        }
+
+        function renderTicketsTable() {
+            const query = (document.getElementById('tkSearchInput')?.value || '').toLowerCase().trim();
+            const statusFilter = tkStatusValue;
+            const tbody = document.getElementById('tkTableBody');
+            if (!tbody) return;
+
+            let activos = 0;
+            let inactivos = 0;
+            ticketsList.forEach(t => {
+                if (normalizeTicketStatus(tkEstadoRaw(t)) === 'Activo') activos++; else inactivos++;
+            });
+            const totalEl = document.getElementById('tkMetricTotal');
+            const activosEl = document.getElementById('tkMetricActivos');
+            const inactivosEl = document.getElementById('tkMetricInactivos');
+            if (totalEl) totalEl.textContent = ticketsList.length;
+            if (activosEl) activosEl.textContent = activos;
+            if (inactivosEl) inactivosEl.textContent = inactivos;
+
+            // El contador que coincide con el filtro actual queda resaltado
+            document.querySelectorAll('.tk-metric-card').forEach(card => {
+                const activa = card.dataset.status === statusFilter;
+                card.classList.toggle('is-active', activa);
+                card.setAttribute('aria-pressed', activa ? 'true' : 'false');
+            });
+
+            const filtered = ticketsList.filter(t => {
+                const estado = normalizeTicketStatus(tkEstadoRaw(t));
+                const matchesStatus = (statusFilter === 'Todos' || estado === statusFilter);
+                const matchesCategory = (tkCategoryValue === 'Todas' || tkCatDe(t) === tkCategoryValue);
+
+                const usuario = String(t.usuario || '').toLowerCase();
+                const discordId = String(t.discordId || '').toLowerCase();
+                const asunto = String(tkAsunto(t)).toLowerCase();
+                const id = String(t.id || '').toLowerCase();
+                const matchesSearch = !query || usuario.includes(query) || discordId.includes(query) || asunto.includes(query) || id.includes(query);
+
+                return matchesStatus && matchesCategory && matchesSearch;
+            });
+
+            // "12 de 40 tickets" cuando hay búsqueda o filtro aplicado
+            const hayFiltro = query !== '' || statusFilter !== 'Todos' || tkCategoryValue !== 'Todas';
+
+            // La cabecera "Categoría" muestra la categoría elegida
+            const catBtn = document.getElementById('tkCatBtn');
+            const catLabel = document.getElementById('tkCatLabel');
+            if (catBtn && catLabel) {
+                catBtn.classList.toggle('has-filter', tkCategoryValue !== 'Todas');
+                catLabel.textContent = tkCategoryValue === 'Todas' ? 'Categoría' : tkCategoryValue;
+            }
+            const resultInfo = document.getElementById('tkResultInfo');
+            if (resultInfo) {
+                const total = ticketsList.length;
+                resultInfo.textContent = (hayFiltro && total > 0) ? `${filtered.length} de ${total} ticket${total === 1 ? '' : 's'}` : '';
+            }
+
+            if (filtered.length === 0) {
+                // Tres casos distintos: el servidor no respondió, no hay tickets, o el filtro no encuentra nada
+                let emptyHtml;
+                if (ticketsList.length === 0 && ticketsLoadFailed) {
+                    emptyHtml = `<i class="fa-solid fa-plug-circle-xmark"></i><strong>No se han podido cargar los tickets</strong>Comprueba que el servidor está en marcha y vuelve a intentarlo.<br><button type="button" onclick="loadTicketsFromServer()">Reintentar</button>`;
+                } else if (ticketsList.length === 0 && !ticketsLoadedOnce) {
+                    emptyHtml = `<i class="fa-solid fa-spinner fa-spin"></i>Cargando tickets...`;
+                } else if (ticketsList.length === 0) {
+                    emptyHtml = `<i class="fa-solid fa-inbox"></i><strong>Todavía no hay tickets</strong>Cuando un usuario abra uno desde tickets.html aparecerá aquí.`;
+                } else {
+                    emptyHtml = `<i class="fa-solid fa-magnifying-glass"></i><strong>Ningún ticket coincide con la búsqueda</strong>Prueba con otro usuario o ID, o cambia los filtros de estado y categoría.<br><button type="button" onclick="resetTicketFilters()">Quitar filtros</button>`;
+                }
+                tbody.innerHTML = `<tr><td colspan="7" class="tk-empty-state">${emptyHtml}</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(t => {
+                const estado = normalizeTicketStatus(tkEstadoRaw(t));
+                const badgeClass = estado === 'Activo' ? 'activo' : 'inactivo';
+                const badgeIcon = estado === 'Activo' ? 'fa-circle-check' : 'fa-circle-xmark';
+                let fechaStr = 'N/D';
+                let fechaTitle = '';
+                if (t.fechaCreacion) {
+                    const d = new Date(t.fechaCreacion);
+                    if (!isNaN(d.getTime())) {
+                        fechaStr = d.toLocaleDateString('es-ES');
+                        fechaTitle = d.toLocaleString('es-ES');
+                    }
+                }
+                const asunto = tkAsunto(t) || 'Sin asunto';
+                return `
+                    <tr class="tk-row" data-id="${tkEsc(t.id)}" tabindex="0">
+                        <td><span class="tk-cell-id">${tkEsc(t.id || 'N/A')}</span></td>
+                        <td class="tk-cell-user">
+                            <div>${tkEsc(t.usuario || 'Desconocido')}</div>
+                            <small>ID: ${tkEsc(t.discordId || 'N/A')}</small>
+                        </td>
+                        <td><div class="tk-cell-subject" title="${tkEsc(asunto)}">${tkEsc(asunto)}</div></td>
+                        <td><span class="tk-chip">${tkEsc(tkCategoria(t) || 'General')}</span></td>
+                        <td class="tk-cell-date" title="${tkEsc(fechaTitle)}">${tkEsc(fechaStr)}</td>
+                        <td><span class="tk-badge ${badgeClass}"><i class="fa-solid ${badgeIcon}"></i> ${estado}</span></td>
+                        <td style="text-align: right;">
+                            <button class="tk-view-btn" title="Ver información del ticket" aria-label="Ver información del ticket">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function viewTicketDetails(id) {
+            const t = ticketsList.find(item => String(item.id) === String(id));
+            if (!t) return;
+
+            const estado = normalizeTicketStatus(tkEstadoRaw(t));
+            let fechaFormateada = 'No registrada';
+            if (t.fechaCreacion && !isNaN(new Date(t.fechaCreacion).getTime())) {
+                fechaFormateada = new Intl.DateTimeFormat('es-ES', {
+                    timeZone: 'Europe/Madrid',
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: false
+                }).format(new Date(t.fechaCreacion)) + ' (Horario Peninsular)';
+            }
+
+            let conversationHtml = '';
+            if (Array.isArray(t.mensajes) && t.mensajes.length > 0) {
+                conversationHtml = `
+                    <div class="tk-field-row">
+                        <span class="tk-field-label"><i class="fa-solid fa-comments"></i> Conversación (${t.mensajes.length})</span>
+                        <div class="tk-conversation-box">
+                            ${t.mensajes.map(m => `
+                                <div class="tk-message-item">
+                                    <div class="tk-message-author">
+                                        <span>${tkEsc(m.autor || m.usuario || 'Usuario')}${tkEsMensajeStaff(m, t) ? ' <span class="tk-msg-tag">Staff</span>' : ''}</span>
+                                        <span>${m.fecha ? tkEsc(new Date(m.fecha).toLocaleString('es-ES')) : ''}</span>
+                                    </div>
+                                    <div class="tk-field-value">${tkEsc(m.texto || '')}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            const content = document.getElementById('tkModalContent');
+            content.innerHTML = `
+                <div class="tk-detail-head">
+                    <div>
+                        <span class="tk-detail-id"><i class="fa-solid fa-hashtag"></i> ${tkEsc(t.id || 'N/A')}</span>
+                        <h4 class="tk-detail-subject">${tkEsc(tkAsunto(t) || 'Sin asunto')}</h4>
+                    </div>
+                    <span class="tk-badge ${estado === 'Activo' ? 'activo' : 'inactivo'}">
+                        <i class="fa-solid ${estado === 'Activo' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> ${estado}
+                    </span>
+                </div>
+                <div class="tk-detail-grid">
+                    <div class="tk-field-row">
+                        <span class="tk-field-label"><i class="fa-brands fa-discord"></i> Usuario de Discord</span>
+                        <span class="tk-field-value">${tkEsc(t.usuario || 'Desconocido')}</span>
+                    </div>
+                    <div class="tk-field-row">
+                        <span class="tk-field-label"><i class="fa-solid fa-id-card"></i> ID de Discord</span>
+                        <span class="tk-field-value">${tkEsc(t.discordId || 'N/A')}</span>
+                    </div>
+                    <div class="tk-field-row">
+                        <span class="tk-field-label"><i class="fa-solid fa-tag"></i> Categoría</span>
+                        <span class="tk-field-value">${tkEsc(tkCategoria(t) || 'General')}</span>
+                    </div>
+                    <div class="tk-field-row">
+                        <span class="tk-field-label"><i class="fa-solid fa-clock"></i> Fecha de Creación</span>
+                        <span class="tk-field-value">${tkEsc(fechaFormateada)}</span>
+                    </div>
+                </div>
+                <div class="tk-field-row">
+                    <span class="tk-field-label"><i class="fa-solid fa-align-left"></i> Mensaje / Descripción</span>
+                    <span class="tk-field-value">${tkEsc(tkMensaje(t) || 'Sin descripción')}</span>
+                </div>
+                ${conversationHtml}
+            `;
+
+            tkOpenTicketId = t.id;
+            const nMensajes = tkMensajesDe(t).length;
+            const chatLabel = document.getElementById('tkOpenChatLabel');
+            if (chatLabel) chatLabel.textContent = nMensajes > 0 ? `Abrir chat (${nMensajes})` : 'Abrir chat';
+
+            const modal = document.getElementById('tkDetailModal');
+            modal.querySelector('.tk-modal-box').scrollTop = 0;
+            modal.classList.add('active');
+        }
+
+        /**
+         * ------------------------------------------------------------------
+         * CHAT DEL TICKET
+         * Los mensajes viven en el propio ticket (campo "mensajes") y se guardan
+         * en el servidor con /api/tickets: nada se guarda en el navegador.
+         * Cada mensaje del staff queda así:
+         *   { autor: "<nombre de Discord>", autorId: "<ID de Discord>", rol: "staff",
+         *     fecha: "<ISO>", texto: "..." }
+         * ------------------------------------------------------------------
+         */
+        let tkOpenTicketId = null;   // ticket que se está viendo en el expediente
+        let tkChatTicketId = null;   // ticket cuyo chat está abierto (null = cerrado)
+        let tkChatTimer = null;      // refresco rápido mientras el chat está abierto
+        let tkChatSending = false;
+        let tkChatFirma = '';        // para no repintar si no hay mensajes nuevos
+
+        const tkMensajesDe = t => (t && Array.isArray(t.mensajes)) ? t.mensajes : [];
+        const tkBuscarTicket = (lista, id) => lista.find(item => String(item.id) === String(id));
+
+        // Quién escribe: el nombre de Discord con el que el admin ha iniciado sesión en la web
+        // (la misma sesión que se muestra en el menú lateral). Solo se lee; no se guarda nada.
+        function tkAdminIdentity() {
+            let u = {};
+            try { u = JSON.parse(localStorage.getItem('discord_user') || '{}') || {}; } catch (e) {}
+            return {
+                name: String(u.displayName || u.username || '').trim() || 'Staff',
+                id: String(u.id || u.discordId || '').trim()
+            };
+        }
+
+        // ¿El mensaje es del staff? Marcado como tal, o escrito por alguien que no es el dueño del ticket
+        function tkEsMensajeStaff(m, t) {
+            const rol = String(m.rol || m.role || m.tipo || '').toLowerCase();
+            if (m.esStaff === true || m.staff === true || m.isStaff === true) return true;
+            if (rol === 'staff' || rol === 'admin' || rol === 'soporte') return true;
+            const autorId = String(m.autorId || m.discordId || '').trim();
+            const duenoId = String(t.discordId || '').trim();
+            return !!(autorId && duenoId && autorId !== duenoId);
+        }
+
+        function tkFechaChat(valor) {
+            if (!valor) return '';
+            const d = new Date(valor);
+            return isNaN(d.getTime()) ? '' : d.toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function openTicketChat(id) {
+            const ticketId = (id !== undefined && id !== null) ? id : tkOpenTicketId;
+            const t = tkBuscarTicket(ticketsList, ticketId);
+            if (!t) return;
+
+            tkChatTicketId = t.id;
+            tkChatFirma = '';
+            document.getElementById('tkDetailModal').classList.remove('active');
+            document.getElementById('tkChatError').hidden = true;
+            const input = document.getElementById('tkChatInput');
+            input.value = '';
+            input.style.height = 'auto';
+
+            renderTicketChat(true);
+            document.getElementById('tkChatModal').classList.add('active');
+            if (!input.disabled) input.focus();
+
+            // Mientras el chat está abierto se consulta el servidor más a menudo para ver las respuestas del usuario
+            clearInterval(tkChatTimer);
+            tkChatTimer = setInterval(() => { if (!tkChatSending) loadTicketsFromServer(); }, 6000);
+        }
+
+        function closeTicketChat() {
+            tkChatTicketId = null;
+            clearInterval(tkChatTimer);
+            tkChatTimer = null;
+            document.getElementById('tkChatModal').classList.remove('active');
+        }
+
+        function backToTicketDetails() {
+            const id = tkChatTicketId;
+            closeTicketChat();
+            if (id !== null) viewTicketDetails(id);
+        }
+
+        // Pinta la conversación. forzarAbajo = bajar siempre al último mensaje (al abrir o al enviar)
+        function renderTicketChat(forzarAbajo) {
+            if (tkChatTicketId === null) return;
+            const t = tkBuscarTicket(ticketsList, tkChatTicketId);
+            const box = document.getElementById('tkChatMessages');
+            const input = document.getElementById('tkChatInput');
+            const sendBtn = document.getElementById('tkChatSendBtn');
+            if (!t) {
+                box.innerHTML = `<div class="tk-chat-empty"><i class="fa-solid fa-circle-question"></i>Este ticket ya no existe en el servidor.</div>`;
+                input.disabled = true; sendBtn.disabled = true;
+                return;
+            }
+
+            const estado = normalizeTicketStatus(tkEstadoRaw(t));
+            const cerrado = estado !== 'Activo';
+            const admin = tkAdminIdentity();
+
+            document.getElementById('tkChatTitle').textContent = tkAsunto(t) || 'Sin asunto';
+            document.getElementById('tkChatSubtitle').textContent = `${t.id || 'N/A'} · ${t.usuario || 'Desconocido'}`;
+            document.getElementById('tkChatStatus').innerHTML = `<span class="tk-badge ${cerrado ? 'inactivo' : 'activo'}"><i class="fa-solid ${cerrado ? 'fa-circle-xmark' : 'fa-circle-check'}"></i> ${estado}</span>`;
+            document.getElementById('tkChatAs').innerHTML = cerrado
+                ? `<i class="fa-solid fa-lock"></i> El ticket está cerrado: puedes leer la conversación, pero no enviar mensajes.`
+                : `Respondes como <strong>${tkEsc(admin.name)}</strong>`;
+            if (!tkChatSending) { input.disabled = cerrado; sendBtn.disabled = cerrado; }
+            input.placeholder = cerrado ? 'Ticket cerrado' : 'Escribe una respuesta...';
+
+            const mensajes = tkMensajesDe(t);
+            // Si no ha cambiado nada desde la última vez, no se repinta (no se pierde la posición de lectura)
+            const firma = JSON.stringify([t.id, estado, tkMensaje(t), mensajes]);
+            if (!forzarAbajo && firma === tkChatFirma) return;
+            tkChatFirma = firma;
+
+            const estabaAbajo = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+
+            const burbuja = (esStaff, autor, fecha, texto) => `
+                <div class="tk-msg ${esStaff ? 'is-staff' : ''}">
+                    <div class="tk-msg-meta">
+                        <strong>${tkEsc(autor)}</strong>
+                        ${esStaff ? '<span class="tk-msg-tag">Staff</span>' : ''}
+                        <span>${tkEsc(fecha)}</span>
+                    </div>
+                    <div class="tk-msg-bubble">${tkEsc(texto)}</div>
+                </div>`;
+
+            let html = '';
+            // El mensaje con el que el usuario abrió el ticket va primero
+            const descripcion = tkMensaje(t);
+            if (descripcion) html += burbuja(false, t.usuario || 'Usuario', tkFechaChat(t.fechaCreacion), descripcion);
+
+            mensajes.forEach(m => {
+                if (!m) return;
+                const esStaff = tkEsMensajeStaff(m, t);
+                const autor = m.autor || m.usuario || m.username || (esStaff ? 'Staff' : (t.usuario || 'Usuario'));
+                const texto = m.texto ?? m.mensaje ?? m.text ?? m.content ?? '';
+                html += burbuja(esStaff, autor, tkFechaChat(m.fecha || m.date || m.timestamp), texto);
+            });
+
+            box.innerHTML = html || `<div class="tk-chat-empty"><i class="fa-regular fa-comments"></i>Todavía no hay mensajes en este ticket.<br>Escribe abajo para iniciar la conversación.</div>`;
+            if (forzarAbajo || estabaAbajo) box.scrollTop = box.scrollHeight;
+        }
+
+        function tkChatMostrarError(texto) {
+            document.getElementById('tkChatErrorText').textContent = texto;
+            document.getElementById('tkChatError').hidden = false;
+        }
+
+        // Envía la respuesta del admin: lee la lista más reciente del servidor, añade el mensaje
+        // al ticket y la guarda. Así no se pisan los mensajes que el usuario haya enviado entretanto.
+        async function sendTicketChatMessage() {
+            if (tkChatSending || tkChatTicketId === null) return;
+            const input = document.getElementById('tkChatInput');
+            const sendBtn = document.getElementById('tkChatSendBtn');
+            const texto = input.value.trim();
+            if (!texto) { input.focus(); return; }
+
+            tkChatSending = true;
+            input.disabled = true;
+            sendBtn.disabled = true;
+            document.getElementById('tkChatError').hidden = true;
+
+            try {
+                const response = await fetch('/api/tickets', { cache: 'no-store' });
+                if (!response.ok) throw new Error('el servidor respondió con el error ' + response.status + ' al leer los tickets');
+                const fresh = await response.json();
+                if (!Array.isArray(fresh)) throw new Error('el servidor devolvió una lista de tickets no válida');
+
+                const ticket = tkBuscarTicket(fresh, tkChatTicketId);
+                if (!ticket) throw new Error('el ticket ya no existe en el servidor');
+                if (normalizeTicketStatus(tkEstadoRaw(ticket)) !== 'Activo') throw new Error('el ticket se ha cerrado');
+
+                const admin = tkAdminIdentity();
+                if (!Array.isArray(ticket.mensajes)) ticket.mensajes = [];
+                ticket.mensajes.push({
+                    autor: admin.name,
+                    autorId: admin.id,
+                    rol: 'staff',
+                    fecha: new Date().toISOString(),
+                    texto: texto
+                });
+
+                const save = await fetch('/api/tickets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(fresh)
+                });
+                if (!save.ok) throw new Error('el servidor respondió con el error ' + save.status + ' al guardar');
+
+                ticketsList = fresh;
+                input.value = '';
+                input.style.height = 'auto';
+                tkChatSending = false;
+                renderTicketsTable();
+                renderTicketChat(true);
+            } catch (e) {
+                console.error("Error al enviar el mensaje del ticket:", e);
+                // El texto se queda en la caja para poder reintentar
+                tkChatMostrarError('No se ha podido enviar el mensaje: ' + (e.message || 'no hay conexión con el servidor') + '.');
+                if (String(e.message || '').includes('cerrado') || String(e.message || '').includes('ya no existe')) loadTicketsFromServer();
+            } finally {
+                tkChatSending = false;
+                const t = tkBuscarTicket(ticketsList, tkChatTicketId);
+                const cerrado = !t || normalizeTicketStatus(tkEstadoRaw(t)) !== 'Activo';
+                input.disabled = cerrado;
+                sendBtn.disabled = cerrado;
+                if (!cerrado) input.focus();
+            }
+        }
+
+        function closeTicketModal() {
+            document.getElementById('tkDetailModal').classList.remove('active');
+        }
+
+        // ---------- Desplegable de categorías ----------
+        // Lista de categorías con cuántos tickets tiene cada una: las fijas + las que aparecen en los tickets
+        function tkListaCategorias() {
+            const conteo = new Map();
+            TK_CATEGORIAS_BASE.forEach(c => conteo.set(String(c), 0));
+            ticketsList.forEach(t => {
+                const c = tkCatDe(t);
+                conteo.set(c, (conteo.get(c) || 0) + 1);
+            });
+            return [...conteo.entries()].sort((a, b) => a[0].localeCompare(b[0], 'es'));
+        }
+
+        function tkPintarMenuCategorias() {
+            const menu = document.getElementById('tkCatMenu');
+            if (!menu) return;
+            const item = (valor, texto, n) => `
+                <button type="button" class="tk-cat-item ${tkCategoryValue === valor ? 'is-active' : ''}" role="menuitem" data-cat="${tkEsc(valor)}">
+                    <span>${tkEsc(texto)}</span><span class="tk-cat-count">${n}</span>
+                </button>`;
+            menu.innerHTML = item('Todas', 'Todas las categorías', ticketsList.length)
+                + tkListaCategorias().map(([nombre, n]) => item(nombre, nombre, n)).join('');
+        }
+
+        function tkCerrarCatMenu() {
+            document.getElementById('tkCatMenu')?.classList.remove('show');
+            const btn = document.getElementById('tkCatBtn');
+            if (btn) { btn.classList.remove('is-open'); btn.setAttribute('aria-expanded', 'false'); }
+        }
+
+        function tkToggleCatMenu(e) {
+            e.stopPropagation();
+            const menu = document.getElementById('tkCatMenu');
+            const btn = document.getElementById('tkCatBtn');
+            if (!menu || !btn) return;
+            if (menu.classList.contains('show')) { tkCerrarCatMenu(); return; }
+
+            tkPintarMenuCategorias();
+            // Se coloca justo debajo de la cabecera, sin salirse de la pantalla
+            const rect = btn.getBoundingClientRect();
+            const ancho = Math.max(menu.offsetWidth, 240);
+            menu.style.top = (rect.bottom + 8) + 'px';
+            menu.style.left = Math.max(12, Math.min(rect.left, window.innerWidth - ancho - 12)) + 'px';
+            menu.classList.add('show');
+            btn.classList.add('is-open');
+            btn.setAttribute('aria-expanded', 'true');
+        }
+
+        function initTicketGlobalHandlers() {
+            // Filtro por categoría: abrir/cerrar el menú y elegir una opción
+            const catBtn = document.getElementById('tkCatBtn');
+            const catMenu = document.getElementById('tkCatMenu');
+            if (catBtn && catMenu) {
+                catBtn.addEventListener('click', tkToggleCatMenu);
+                catMenu.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const opcion = e.target.closest('.tk-cat-item');
+                    if (!opcion) return;
+                    tkCategoryValue = opcion.dataset.cat;
+                    tkCerrarCatMenu();
+                    renderTicketsTable();
+                });
+                window.addEventListener('click', tkCerrarCatMenu);
+                window.addEventListener('resize', tkCerrarCatMenu);
+                window.addEventListener('scroll', (e) => { if (e.target !== catMenu) tkCerrarCatMenu(); }, true);
+            }
+
+            // Cerrar el expediente pulsando fuera o con la tecla Esc
+            document.getElementById('tkDetailModal').addEventListener('click', (e) => {
+                if (e.target.id === 'tkDetailModal') closeTicketModal();
+            });
+            document.getElementById('tkChatModal').addEventListener('click', (e) => {
+                if (e.target.id === 'tkChatModal') closeTicketChat();
+            });
+            // Chat: Enter envía, Mayús+Enter hace salto de línea; la caja crece con el texto
+            const chatInput = document.getElementById('tkChatInput');
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendTicketChatMessage(); }
+            });
+            chatInput.addEventListener('input', () => {
+                chatInput.style.height = 'auto';
+                chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Escape') return;
+                // Con el chat abierto, Esc cierra primero el chat
+                if (tkChatTicketId !== null) { closeTicketChat(); return; }
+                closeTicketModal();
+                tkCerrarCatMenu();
+            });
+
+            // Abrir el expediente pulsando cualquier parte de la fila (o Enter con el teclado).
+            // Delegación: sigue funcionando aunque la tabla se vuelva a pintar cada 20 s.
+            const tbody = document.getElementById('tkTableBody');
+            tbody.addEventListener('click', (e) => {
+                const row = e.target.closest('tr.tk-row');
+                if (row) viewTicketDetails(row.dataset.id);
+            });
+            tbody.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.target.classList.contains('tk-row')) {
+                    viewTicketDetails(e.target.dataset.id);
+                }
+            });
+
+            // Los contadores filtran por estado
+            document.querySelectorAll('.tk-metric-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    tkStatusValue = card.dataset.status;
+                    renderTicketsTable();
+                });
+            });
+        }
+    </script>
+
+    <!-- Permisos (mismo control de acceso que el panel) -->
+    <script src="/src/views/permissions.js"></script>
+</body>
+</html>

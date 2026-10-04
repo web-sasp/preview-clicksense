@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nivel DEFCON | ClickSense RP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/src/assets/admin.css">
+<link rel="stylesheet" href="/src/assets/perfil.css">
+<style>
+/* Scrollbar moderna y bonita */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(14, 10, 20, 0.9);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.3);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(168, 85, 247, 0.6);
+}
+
+/* Animación de entrada general para toda la página */
+@keyframes pageEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.99);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+.main-content {
+    animation: pageEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Estilos específicos con tonos rosados/morados para cara al público */
+:root {
+    --purple-primary: #a855f7;
+    --purple-glow: rgba(168, 85, 247, 0.3);
+    --pink-accent: #ec4899;
+}
+.defcon-active-banner {
+    background: linear-gradient(135deg, rgba(25, 15, 35, 0.95) 0%, rgba(35, 15, 45, 0.95) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 25px rgba(168, 85, 247, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+.defcon-active-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(to bottom, #a855f7, #ec4899);
+}
+.defcon-badge-massive {
+    padding: 8px 20px;
+    border-radius: 12px;
+    font-size: 24px;
+    font-weight: 800;
+    display: inline-block;
+    letter-spacing: 1px;
+}
+.level-5 { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
+.level-4 { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.4); } /* Azul original */
+.level-3 { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
+.level-2 { background: rgba(249, 115, 22, 0.2); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.4); }
+.level-1 { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: 0 0 30px rgba(239,68,68,0.3); }
+
+.defcon-scale-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+}
+.defcon-scale-card {
+    background: rgba(18, 12, 28, 0.85);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s;
+}
+.defcon-scale-card.active-scale {
+    border-color: #a855f7;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(18, 12, 28, 0.95) 100%);
+    box-shadow: 0 4px 20px rgba(168, 85, 247, 0.2);
+}
+.scale-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.scale-pill {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.extended-reason-box {
+    background: rgba(18, 12, 28, 0.9);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* Estilo FAQ Acordeón Animado */
+.faq-item {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(168, 85, 247, 0.15);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+.faq-item:hover {
+    border-color: rgba(168, 85, 247, 0.4);
+}
+.faq-question-btn {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 16px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: inherit;
+    gap: 12px;
+}
+.faq-question-btn i {
+    color: #c084fc;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 12px;
+}
+.faq-item.open .faq-question-btn i {
+    transform: rotate(180deg);
+}
+.faq-answer-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 20px;
+}
+.faq-item.open .faq-answer-container {
+    max-height: 250px;
+    padding: 0 20px 18px 20px;
+}
+.faq-answer-content {
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 12px;
+    margin: 0;
+}
+
+/* Estilo exacto del botón activo con pill morado/rosado igual al de Whitelist */
+.sidebar-nav .nav-item.active {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(147, 51, 234, 0.18) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);
+}
+</style>
+</head>
+<body>
+<div class="grid-background"></div>
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+                <span class="server-main-title">ClickSense</span>
+            </div>
+            <button class="sidebar-toggle-icon" id="sidebarToggleBtn"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-category">General</div>
+            <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> Equipo</a>
+            <a href="/calendario.html" class="nav-item"><i class="fa-solid fa-calendar-days"></i> Calendario</a>
+            <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> Comercios</a>
+            <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> Postulaciones ilegales</a>
+            <div class="nav-category">Espacio de trabajo</div>
+            <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> Grupos</a>
+            <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> Documentos</a>
+            <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Whitelist</a>
+            <div class="nav-category">Mi Cuenta</div>
+            <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> Mi Perfil</a>
+            <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> Historias personaje</a>
+            <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+            <div class="nav-category">SASP</div>
+            <a href="/lspd-academia.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Academia LSPD</a>
+            <a href="/lssd-academia.html" class="nav-item" style="padding-left: 2.2rem; font-size: 13px;">Academia LSSD</a>
+            <a href="/public/defcon.html" class="nav-item active"><i class="fa-solid fa-triangle-exclamation"></i> Defcon</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-scale-balanced"></i> Código penal</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-sitemap"></i> Organigrama</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile-mini" id="userProfileMini">
+                <div class="avatar-placeholder" id="userAvatarContainer">
+                    <span id="userAvatarFallback">?</span>
+                </div>
+                <div class="user-info">
+                    <span class="username" id="userNameDisplay">Usuario</span>
+                    <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted); display: block;">@tag</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+    <main class="main-content">
+        <header class="top-action-bar">
+            <div class="breadcrumb">Estado de Seguridad / DEFCON</div>
+        </header>
+
+        <!-- Tarjeta de Estado DEFCON Actual -->
+        <div class="defcon-active-banner">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+                <div>
+                    <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #c084fc; font-weight: 700; display: block; margin-bottom: 8px;">
+                        <i class="fa-solid fa-shield-halved" style="color: #ec4899; margin-right: 6px;"></i> Nivel de Alerta Actual en San Andreas
+                    </span>
+                    <div id="activeDefconContainer" style="margin-bottom: 4px;">
+                        <span class="defcon-badge-massive level-5" id="activeDefconBadge">DEFCON 5</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Escala Completa de Niveles DEFCON -->
+        <div class="admin-card" style="margin-bottom: 24px; border-color: rgba(168, 85, 247, 0.2);">
+            <h3><i class="fa-solid fa-list-check" style="color: #a855f7;"></i> Escala de Alerta DEFCON</h3>
+            <p style="margin-bottom: 16px; font-size: 13px; color: var(--text-muted);">Conoce el significado de cada nivel de seguridad establecido en la ciudad.</p>
+            
+            <div class="defcon-scale-grid">
+                <div class="defcon-scale-card" id="scale-card-5">
+                    <div class="scale-header">
+                        <span class="scale-pill level-5">DEFCON 5</span>
+                        <i class="fa-solid fa-shield" style="color: #22c55e;"></i>
+                    </div>
+                    <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin: 0;">Condición normal</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4;">Seguridad estándar en todo el estado de San Andreas. Operaciones policiales rutinarias y sin incidencias extraordinarias.</p>
+                </div>
+                <div class="defcon-scale-card" id="scale-card-4">
+                    <div class="scale-header">
+                        <span class="scale-pill level-4">DEFCON 4</span>
+                        <i class="fa-solid fa-shield-halved" style="color: #3b82f6;"></i>
+                    </div>
+                    <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin: 0;">Vigilancia elevada</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4;">Mayor control de patrullaje preventivo y supervisión ante posibles altercados menores en puntos críticos.</p>
+                </div>
+                <div class="defcon-scale-card" id="scale-card-3">
+                    <div class="scale-header">
+                        <span class="scale-pill level-3">DEFCON 3</span>
+                        <i class="fa-solid fa-triangle-exclamation" style="color: #eab308;"></i>
+                    </div>
+                    <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin: 0;">Alerta media</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4;">Fuerzas policiales y tácticas en aviso previo. Restricciones operativas puntuales y protocolos de respuesta intermedia.</p>
+                </div>
+                <div class="defcon-scale-card" id="scale-card-2">
+                    <div class="scale-header">
+                        <span class="scale-pill level-2">DEFCON 2</span>
+                        <i class="fa-solid fa-fire" style="color: #f97316;"></i>
+                    </div>
+                    <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin: 0;">Alerta alta</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4;">Operaciones críticas autorizadas. Movilización general de unidades de emergencia ante amenazas graves a la estabilidad.</p>
+                </div>
+                <div class="defcon-scale-card" id="scale-card-1">
+                    <div class="scale-header">
+                        <span class="scale-pill level-1">DEFCON 1</span>
+                        <i class="fa-solid fa-radiation" style="color: #ef4444;"></i>
+                    </div>
+                    <h4 style="font-size: 15px; font-weight: 700; color: #fff; margin: 0;">Emergencia máxima</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4;">Estado de sitio o máxima emergencia estatal. Autorización total de protocolos excepcionales de seguridad y defensa.</p>
+                </div>
+            </div>
+
+            <!-- Apartado con extensión larga detallando el motivo adaptado dinámicamente -->
+            <div class="extended-reason-box">
+                <h4 style="color: #c084fc; font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-circle-info"></i> Informe ampliado y justificado del nivel de alerta actual
+                </h4>
+                <div id="extendedReasonContent" style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                    <!-- Se rellena dinámicamente según el DEFCON -->
+                </div>
+            </div>
+
+            <!-- Apartado FAQ con animación de acordeón -->
+            <div class="extended-reason-box" style="margin-top: 20px;">
+                <h4 style="color: #c084fc; font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-circle-question"></i> Preguntas frecuentes (FAQ)
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Pregunta 1 -->
+                    <div class="faq-item" id="faq-1">
+                        <button class="faq-question-btn" onclick="toggleFaq('faq-1')">
+                            <span>¿Cuándo finaliza este nivel de DEFCON?</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer-container">
+                            <p class="faq-answer-content">El nivel de DEFCON permanece activo hasta que el departamento de administración y los altos mandos unificados determinen una mejora en las condiciones de seguridad y emitan una orden oficial de desescalada.</p>
+                        </div>
+                    </div>
+                    <!-- Pregunta 2 -->
+                    <div class="faq-item" id="faq-2">
+                        <button class="faq-question-btn" onclick="toggleFaq('faq-2')">
+                            <span>¿El DEFCON se aplica en toda la isla o solamente en Los Santos?</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer-container">
+                            <p class="faq-answer-content">Las alertas DEFCON tienen jurisdicción estatal completa; por lo tanto, aplican de manera uniforme en toda la isla, abarcando tanto el núcleo urbano de Los Santos como los condados y carreteras federales gestionados por LSSD.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+async function loadDiscordSessionData() {
+    const storedUser = localStorage.getItem('discord_user');
+    const avatarContainer = document.getElementById('userAvatarContainer');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const userHandleDisplay = document.getElementById('userHandleDisplay');
+    if (!storedUser) return;
+    try {
+        const discordUser = JSON.parse(storedUser);
+        if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+        if (userHandleDisplay) userHandleDisplay.textContent = "@" + (discordUser.username || "discord");
+        if (avatarContainer && discordUser.avatarUrl) {
+            avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    } catch (e) {
+        console.error("Error al cargar sesión de Discord", e);
+    }
+}
+loadDiscordSessionData();
+
+const toggleBtn = document.getElementById('sidebarToggleBtn');
+const revealBtn = document.getElementById('sidebarRevealBtn');
+const sidebar = document.getElementById('sidebar');
+if (toggleBtn && revealBtn && sidebar) {
+    toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+    revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+}
+
+// Textos del informe ampliado según el nivel de DEFCON
+const defconReports = {
+    "5": `
+        <p style="margin-bottom: 12px;">
+            El estado actual del condado se encuentra en condiciones totalmente normales y rutinarias. Las agencias de seguridad (LSPD y LSSD) mantienen un patrullaje estándar sin alertas extraordinarias, garantizando la libre circulación y la tranquilidad de todos los ciudadanos en Los Santos y sus alrededores.
+        </p>
+        <p style="margin: 0;">
+            No existen restricciones operativas especiales en este momento. Se anima a la ciudadanía a reportar cualquier incidencia menor a través de los canales habituales de emergencia.
+        </p>
+    `,
+    "4": `
+        <p style="margin-bottom: 12px;">
+            El establecimiento del estado actual en el condado responde a un análisis exhaustivo de inteligencia y reportes de seguridad ciudadana coordinados por las agencias del orden (LSPD y LSSD). Específicamente, bajo el marco operativo de <strong>DEFCON 4</strong>, se ha detectado un incremento sostenido en la actividad de grupos delictivos no catalogados y el flujo de armamento no registrado en los distritos periféricos de Los Santos.
+        </p>
+        <p style="margin-bottom: 12px;">
+            Esta medida preventiva otorga facultades especiales a los mandos medios para intensificar los controles de identidad selectivos, el establecimiento de puestos de control móviles en las principales arterias viales de acceso estatal y la obligatoriedad de patrullajes en binomio en zonas de alto riesgo comercial y residencial. Las fuerzas del orden velarán estrictamente por el cumplimiento de los protocolos sin vulnerar las normativas vigentes.
+        </p>
+        <p style="margin: 0;">
+            Se recuerda a todos los directores de departamentos legales mantener la máxima alerta operativa y reportar cualquier anomalía de carácter crítico al centro de mando unificado.
+        </p>
+    `,
+    "3": `
+        <p style="margin-bottom: 12px;">
+            ¡Alerta de nivel medio activo! Nos encontramos en <strong>DEFCON 3</strong> debido a un peligro latente y amenazas de confrontación directa en zonas clave del estado. Las fuerzas policiales y unidades tácticas especiales de (LSPD y LSSD) se encuentran en aviso previo reforzado, implementando restricciones operativas estrictas y controles rigurosos en accesos urbanos.
+        </p>
+        <p style="margin-bottom: 12px;">
+            Se insta a la población a extremar las precauciones al transitar por zonas conflictivas o de alta afluencia comercial. Las autoridades quedan facultadas para realizar inspecciones preventivas exhaustivas en vehículos y transeúntes ante cualquier indicio de riesgo para la estabilidad del estado.
+        </p>
+        <p style="margin: 0;">
+            Manténgase sintonizado a los canales oficiales de comunicación de las agencias legales para recibir actualizaciones de seguridad en tiempo real.
+        </p>
+    `,
+    "2": `
+        <p style="margin-bottom: 12px;">
+            ¡Atención ciudadana crítica! Nos encontramos en <strong>DEFCON 2</strong>, un nivel de alerta alta donde el peligro de confrontación violenta en las calles es inminente. 
+        </p>
+        <p style="margin-bottom: 12px;">
+            Se recomienda encarecidamente <strong>no salir a la calle</strong> a menos que sea estrictamente necesario por motivos de fuerza mayor. Las autoridades advierten de forma oficial que cualquier transeúnte o vehículo en circulación sin una justificación de peso podrá ser interceptado, fiscalizado y <strong>detenido de inmediato por los agentes del orden</strong> para salvaguardar la seguridad pública y prevenir altercados graves.
+        </p>
+        <p style="margin: 0;">
+            Colabore de forma absoluta con las directrices de los cuerpos de seguridad (LSPD y LSSD) desplegados en todo el territorio estatal.
+        </p>
+    `,
+    "1": `
+        <p style="margin-bottom: 12px;">
+            ¡EMERGENCIA MÁXIMA (DEFCON 1)! Se ha decretado el estado de sitio y máxima alerta estatal en todo el territorio de San Andreas ante un peligro catastrófico para la seguridad pública.
+        </p>
+        <p style="margin-bottom: 12px;">
+            Se prohíbe terminantemente la circulación en la vía pública sin excepción. Las fuerzas de seguridad, agencias tácticas y defensa (LSPD y LSSD) tienen autorización total y absoluta para aplicar protocolos excepcionales, toque de queda absoluto y la <strong>detención inmediata de cualquier individuo</strong> que desafíe las órdenes de confinamiento y defensa nacional.
+        </p>
+        <p style="margin: 0;">
+            Cualquier desobediencia a las directrices de DEFCON 1 será tratada con el máximo rigor legal y táctico disponible.
+        </p>
+    `
+};
+
+function toggleFaq(id) {
+    const item = document.getElementById(id);
+    const isOpen = item.classList.contains('open');
+    item.classList.toggle('open', !isOpen);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Cargar DEFCON actual desde localStorage configurado en el panel admin
+    const savedCurrent = localStorage.getItem('clicksense_defcon_current');
+    let currentLevel = "5";
+    if (savedCurrent) {
+        try {
+            const defcon = JSON.parse(savedCurrent);
+            currentLevel = defcon.level || "5";
+            const badge = document.getElementById('activeDefconBadge');
+            
+            if (badge) {
+                let badgeLabel = defcon.label || 'DEFCON 5';
+                badgeLabel = badgeLabel
+                    .replace('DEFCON 5 (Normal)', 'DEFCON 5')
+                    .replace('DEFCON 4 (Vigilancia)', 'DEFCON 4')
+                    .replace('DEFCON 3 (Alerta Media)', 'DEFCON 3')
+                    .replace('DEFCON 2 (Alerta Alta)', 'DEFCON 2')
+                    .replace('DEFCON 1 (Emergencia máxima)', 'DEFCON 1');
+                
+                badge.className = `defcon-badge-massive ${defcon.badgeClass || 'level-5'}`;
+                badge.textContent = badgeLabel;
+            }
+
+            // Marcar tarjeta de escala activa
+            document.querySelectorAll('.defcon-scale-card').forEach(c => c.classList.remove('active-scale'));
+            const activeCard = document.getElementById(`scale-card-${currentLevel}`);
+            if (activeCard) activeCard.classList.add('active-scale');
+        } catch(e) {}
+    }
+
+    // Inyectar el texto correspondiente en el informe ampliado según el DEFCON actual
+    const reasonContainer = document.getElementById('extendedReasonContent');
+    if (reasonContainer) {
+        reasonContainer.innerHTML = defconReports[currentLevel] || defconReports["5"];
+    }
+});
+</script>
+
+<script src="/guards.js"></script>
+</body>
+</html>

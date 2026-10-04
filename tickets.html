@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soporte y Tickets | ClickSense RP</title>
+    <!-- Google Fonts: Plus Jakarta Sans e Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/src/assets/home.css">
+    <link rel="stylesheet" href="/src/assets/tickets.css">
+    <link rel="stylesheet" href="/src/assets/perfil.css">
+
+    <style>
+        /* ===== Vista grande del ticket: la tarjeta se expande a pantalla completa ===== */
+        #viewTicketModal.ticket-modal-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 5000 !important;
+            display: flex !important;
+            align-items: stretch !important;
+            justify-content: stretch !important;
+            padding: 0 !important;
+            background: rgba(8, 6, 16, 0) !important;
+            backdrop-filter: blur(0) !important;
+            opacity: 1 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            transition: background .45s ease, backdrop-filter .45s ease, visibility 0s linear .6s !important;
+        }
+        #viewTicketModal.ticket-modal-overlay.active {
+            background: rgba(8, 6, 16, .94) !important;
+            backdrop-filter: blur(10px) !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            transition: background .45s ease, backdrop-filter .45s ease, visibility 0s !important;
+        }
+        #viewTicketModal .ticket-modal-card {
+            width: 100% !important;
+            max-width: none !important;
+            height: 100% !important;
+            max-height: none !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+            background: linear-gradient(160deg, #13141f 0%, #0b0a14 100%) !important;
+            animation: none !important;
+            transform: none !important;
+            clip-path: var(--clip-from, inset(40% 35% 40% 35% round 18px));
+            transition: clip-path .6s cubic-bezier(.16, 1, .3, 1);
+        }
+        #viewTicketModal.active .ticket-modal-card { clip-path: inset(0 0 0 0 round 0); }
+
+        #viewTicketModal .ticket-modal-header {
+            width: 100%; max-width: 1000px; margin: 0 auto !important; box-sizing: border-box;
+            padding: 22px 24px !important; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+        }
+        #viewTicketModal .ticket-chat-body {
+            flex: 1 1 auto !important; min-height: 0; height: auto !important; max-height: none !important;
+            width: 100%; max-width: 1000px; margin: 0 auto !important; box-sizing: border-box;
+            padding: 24px !important; overflow-y: auto;
+        }
+        #viewTicketModal .ticket-reply-footer {
+            width: 100%; max-width: 1000px; margin: 0 auto !important; box-sizing: border-box;
+            padding: 16px 24px 24px !important; flex-shrink: 0; gap: 10px;
+        }
+
+        /* Entrada escalonada del contenido */
+        #viewTicketModal.active .ticket-modal-header { animation: tkDown .5s cubic-bezier(.16,1,.3,1) .25s both; }
+        #viewTicketModal.active .ticket-chat-body { animation: tkFade .5s ease .35s both; }
+        #viewTicketModal.active .ticket-reply-footer { animation: tkUp .5s cubic-bezier(.16,1,.3,1) .4s both; }
+        @keyframes tkDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+        @keyframes tkUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+        @keyframes tkFade { from { opacity: 0; } to { opacity: 1; } }
+
+        .tk-head-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .tk-head-btn {
+            display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 10px;
+            background: transparent; border: 1px solid rgba(168, 85, 247, .5); color: #c084fc;
+            font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none;
+            transition: background .2s, color .2s, box-shadow .2s;
+        }
+        .tk-head-btn:hover { background: rgba(168, 85, 247, .15); color: #fff; box-shadow: 0 0 14px rgba(168, 85, 247, .3); }
+        .tk-head-btn.danger { border-color: rgba(239, 68, 68, .5); color: #f87171; }
+        .tk-head-btn.danger:hover { background: rgba(239, 68, 68, .15); color: #fff; box-shadow: 0 0 14px rgba(239, 68, 68, .3); }
+        @media (max-width: 700px) {
+            #viewTicketModal .ticket-modal-header { flex-wrap: wrap; padding: 16px !important; }
+            #viewTicketModal .ticket-chat-body { padding: 16px !important; }
+            #viewTicketModal .ticket-reply-footer { padding: 12px 16px 16px !important; }
+        }
+
+        /* ===== Mensajes del equipo administrativo ===== */
+        /* Etiqueta "Staff" junto al nombre del administrador que responde */
+        .chat-staff-tag {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 1px 8px;
+            border-radius: 999px;
+            background: rgba(236, 72, 153, .15);
+            border: 1px solid rgba(236, 72, 153, .4);
+            color: #f9a8d4;
+            font-size: 10.5px;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+        /* Aviso en la lista: el último mensaje del ticket es una respuesta del staff */
+        .ticket-staff-reply-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(236, 72, 153, .12);
+            border: 1px solid rgba(236, 72, 153, .4);
+            color: #f9a8d4;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fondo de cuadrícula 3D unificado -->
+    <div class="grid-background"></div>
+
+    <!-- Notificación Flotante Superior Central -->
+    <div class="ticket-notification" id="ticketNotification">
+        <i class="fa-solid fa-circle-check" id="ticketNotificationIcon"></i>
+        <span id="ticketNotificationText">Has creado un ticket con éxito.</span>
+    </div>
+
+    <div class="app-container">
+        <!-- Menú Lateral (Sidebar) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+                    <span class="server-main-title">ClickSense</span>
+                </div>
+                <button class="sidebar-toggle-icon" id="sidebarToggleBtn"><i class="fa-solid fa-bars"></i></button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Sección General -->
+                <div class="nav-category">General</div>
+                <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> Equipo</a>
+                <a href="/calendario.html" class="nav-item"><i class="fa-solid fa-calendar-days"></i> Calendario</a>
+                <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> Comercios</a>
+                <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> Postulaciones ilegales</a>
+
+                <!-- Espacio de trabajo -->
+                <div class="nav-category">Espacio de trabajo</div>
+                <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> Grupos</a>
+                <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> Documentos</a>
+                <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Whitelist</a>
+
+                <!-- Mi Cuenta -->
+                <div class="nav-category">Mi Cuenta</div>
+                <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> Mi Perfil</a>
+                <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> Historias personaje</a>
+                <a href="/tickets.html" class="nav-item active"><i class="fa-solid fa-ticket"></i> Tickets</a>
+
+                <!-- SASP -->
+                <div class="nav-category">SASP</div>
+                <a href="/lspd-academia.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Academia LSPD</a>
+                <a href="/lssd-academia.html" class="nav-item"><i class="fa-solid fa-star-badge"></i> Academia LSSD</a>
+                <a href="/defcon.html" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i> Defcon</a>
+                <a href="/codigo-penal.html" class="nav-item"><i class="fa-solid fa-scale-balanced"></i> Código penal</a>
+                <a href="/organigrama.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Organigrama</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-mini" id="userProfileMini">
+                    <div class="avatar-placeholder" id="userAvatarContainer">
+                        <span id="userAvatarFallback">G</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">! 𝓖𝓪𝓵𝓵𝓮𝓰𝓸 ™</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@galleginho_</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Botón flotante para abrir menú colapsado -->
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <!-- Barra superior con breadcrumb -->
+            <header class="top-action-bar animate-fade-down">
+                <div class="breadcrumb">Tickets de Soporte</div>
+                <div class="top-buttons" id="topActionButtonsContainer">
+                    <button class="top-btn highlight-btn" id="openNewTicketModalBtn"><i class="fa-solid fa-plus"></i> Crea un nuevo ticket</button>
+                </div>
+            </header>
+
+            <!-- Cabecera de la sección de Tickets -->
+            <div class="tickets-header-card animate-fade-up">
+                <div class="tickets-title-area">
+                    <h1><i class="fa-solid fa-headset"></i> Panel de Gestión de Tickets</h1>
+                    <p>Consulta tus consultas activas o revisa el archivo de incidencias cerradas vinculadas a tu cuenta.</p>
+                </div>
+                <div class="tickets-stats">
+                    <div class="stat-badge open">
+                        <span class="stat-num" id="openTicketsCount">0</span>
+                        <span class="stat-lbl">Activos</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-num" id="closedTicketsCount">0</span>
+                        <span class="stat-lbl">Cerrados</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros y Listado de Tickets -->
+            <section class="section-block animate-fade-up delay-1">
+                <div class="tickets-toolbar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchTicketInput" placeholder="Buscar en mis tickets...">
+                    </div>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="open"><i class="fa-solid fa-lock-open"></i> Activos</button>
+                        <button class="filter-tab" data-filter="closed"><i class="fa-solid fa-lock"></i> Cerrados</button>
+                    </div>
+                </div>
+
+                <!-- Contenedor dinámico -->
+                <div class="tickets-container" id="ticketsContainer">
+                    <div class="empty-state-container animate-fade-up">
+                        <div class="empty-state-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                        <h3>Cargando tus tickets...</h3>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal para Crear Nuevo Ticket -->
+    <div class="ticket-modal-overlay" id="newTicketModal">
+        <div class="ticket-modal-card">
+            <div class="ticket-modal-header">
+                <h3><i class="fa-solid fa-ticket"></i> Crea un nuevo ticket</h3>
+                <button class="ticket-modal-close" id="closeNewTicketModalBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="newTicketForm" class="ticket-modal-body">
+                <div class="form-group custom-select-wrapper">
+                    <label for="ticketCategoryBtn"><i class="fa-solid fa-list"></i> Categoría del ticket</label>
+                    
+                    <!-- Dropdown personalizado con iconos y búsqueda por tecleo -->
+                    <div class="custom-select" id="customCategorySelect">
+                        <div class="select-selected" id="categorySelectedDisplay">
+                            <span class="placeholder-text">Selecciona una categoría...</span>
+                        </div>
+                        <div class="select-items select-hide" id="categoryDropdownItems">
+                            <div data-value="Ayuda"><i class="fa-solid fa-circle-question" style="color: #60a5fa;"></i> Ayuda</div>
+                            <div data-value="Reporte"><i class="fa-solid fa-triangle-exclamation" style="color: #f87171;"></i> Reporte</div>
+                            <div data-value="Apelaciones"><i class="fa-solid fa-scale-balanced" style="color: #fbbf24;"></i> Apelaciones</div>
+                            <div data-value="Soporte facción legal"><i class="fa-solid fa-shield-halved" style="color: #38bdf8;"></i> Soporte facción legal</div>
+                            <div data-value="Soporte facción ilegal"><i class="fa-solid fa-skull" style="color: #c084fc;"></i> Soporte facción ilegal</div>
+                            <div data-value="Donaciones"><i class="fa-solid fa-hand-holding-dollar" style="color: #4ade80;"></i> Donaciones</div>
+                            <div data-value="Solicitud de CK"><i class="fa-solid fa-user-slash" style="color: #f43f5e;"></i> De CK</div>
+                            <div data-value="Bugs y fallos"><i class="fa-solid fa-bug" style="color: #fb923c;"></i> De bug y fallos</div>
+                            <div data-value="Playmaker"><i class="fa-solid fa-video" style="color: #a78bfa;"></i> De playmaker</div>
+                            <div data-value="Reclamaciones"><i class="fa-solid fa-file-invoice-dollar" style="color: #34d399;"></i> De reclamaciones</div>
+                            <div data-value="Solicitar invitación al servidor"><i class="fa-solid fa-user-plus" style="color: #818cf8;"></i> De solicitar invitación al servidor</div>
+                            <div data-value="Reporte a STAFF"><i class="fa-solid fa-user-shield" style="color: #f87171;"></i> Reporte a staff</div>
+                        </div>
+                        <input type="hidden" id="ticketCategory" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="ticketTitle"><i class="fa-solid fa-tag"></i> Título</label>
+                    <input type="text" id="ticketTitle" placeholder="Breve resumen de tu consulta o problema..." required>
+                </div>
+
+                <div class="form-group checkbox-group centered">
+                    <label class="checkbox-container-label">
+                        <input type="checkbox" id="ticketWarningCheck">
+                        <span>Soy consciente que el mal uso o abuso de los tickets puede acarrear sanciones administrativas.</span>
+                    </label>
+                </div>
+
+                <div class="ticket-modal-actions">
+                    <button type="submit" class="top-btn highlight-btn" id="submitNewTicketBtn" style="width: 100%; justify-content: center;">Crear ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Vista grande del ticket (la tarjeta se expande a pantalla completa) -->
+    <div class="ticket-modal-overlay" id="viewTicketModal">
+        <div class="ticket-modal-card large">
+            <div class="ticket-modal-header">
+                <div class="modal-title-wrapper">
+                    <span id="viewTicketIdTag" class="ticket-id-pill">#TK-0000</span>
+                    <h3 id="viewTicketTitle">Título del Ticket</h3>
+                </div>
+                <div class="tk-head-actions">
+                    <a id="viewTranscriptLink" class="tk-head-btn" href="#" target="_blank" rel="noopener" style="display: none;"><i class="fa-solid fa-file-lines"></i> Ver en HTML</a>
+                    <button type="button" id="closeTicketInViewBtn" class="tk-head-btn danger"><i class="fa-solid fa-lock"></i> Cerrar ticket</button>
+                    <button class="ticket-modal-close" id="closeViewTicketModalBtn" title="Cerrar vista (Esc)"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="ticket-chat-body" id="ticketChatContainer">
+                <!-- Historial de mensajes -->
+            </div>
+            <div class="ticket-reply-footer" id="ticketReplyFooterArea">
+                <textarea id="replyMessageInput" placeholder="Escribe tu mensaje o respuesta..." rows="1" style="resize: none; overflow-y: auto;"></textarea>
+                <input type="file" id="attachImageInput" accept="image/*" style="display: none;">
+                <button type="button" class="top-btn attach-btn" id="attachImageBtn" title="Adjuntar imagen"><i class="fa-solid fa-image"></i></button>
+                <button type="button" class="top-btn highlight-btn" id="sendReplyBtn" title="Enviar mensaje"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de Interactividad -->
+    <script>
+        function getDiscordUser() {
+            try {
+                const stored = JSON.parse(localStorage.getItem('discord_user'));
+                if (stored) return stored;
+            } catch (e) {}
+            return {
+                displayName: "! 𝓖𝓪𝓵𝓵𝓮𝓰𝓸 ™",
+                username: "galleginho_",
+                id: "demo-local-user",
+                avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop"
+            };
+        }
+
+        function loadDiscordSessionData() {
+            const discordUser = getDiscordUser();
+            const avatarContainer = document.getElementById('userAvatarContainer');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userHandleDisplay = document.getElementById('userHandleDisplay');
+
+            if (discordUser) {
+                if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || 'Usuario';
+                if (userHandleDisplay) userHandleDisplay.textContent = `@${discordUser.username || 'discord'}`;
+                if (avatarContainer && discordUser.avatarUrl) {
+                    avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                }
+            }
+        }
+
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+        const revealBtn = document.getElementById('sidebarRevealBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        if (toggleBtn) toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+        if (revealBtn) revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+
+        // Escapa texto antes de meterlo en HTML (mensajes, títulos, nombres...)
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        // Solo se muestran imágenes adjuntas (data:image/...) o enlaces http(s)
+        const safeImage = u => /^(data:image\/|https?:\/\/)/i.test(String(u || '')) ? String(u) : '';
+
+        /**
+         * ------------------------------------------------------------------
+         * TICKETS
+         *  - Fuente principal: el servidor (/api/tickets), lista compartida.
+         *  - Cada ticket se asocia al ID de Discord de quien lo crea (discordId)
+         *    y cada usuario solo ve los suyos.
+         *  - Copia de seguridad por usuario en este navegador
+         *    (click_tickets_backup_<discordId>). Si el servidor pierde un ticket
+         *    (por ejemplo otra página guarda una lista antigua encima), se
+         *    recupera de la copia y se vuelve a subir al servidor.
+         *  - Nunca se envía nada al servidor si no se ha leído bien antes.
+         *  - Al cerrar un ticket, el servidor genera su copia en HTML y avisa
+         *    por MD de Discord a su dueño (se detecta al guardar la lista).
+         *  - CONVERSACIÓN: todos los mensajes viven en ticket.messages. Los del
+         *    usuario llevan sender "user"; los del staff (escritos desde
+         *    admin/tickets.html) llevan sender "staff" y rol "staff", con el
+         *    nombre de Discord del administrador. Se leen del servidor.
+         * ------------------------------------------------------------------
+         */
+        let allTicketsCache = [];
+        let serverLoadedOk = false;
+        let needsSync = false;          // hay tickets que el servidor no tiene y hay que subir
+        let lastServerIds = new Set();  // ids confirmados en la última carga correcta
+        let busy = false;               // pausa el refresco mientras se guarda algo
+
+        // ID de Discord del usuario actual (vacío si no hay sesión real)
+        function getCurrentUserId() {
+            const u = getDiscordUser();
+            const id = String(u.id || u.discordId || '').trim();
+            return id === 'demo-local-user' ? '' : id;
+        }
+
+        function backupKey() { return 'click_tickets_backup_' + getCurrentUserId(); }
+
+        function readBackup() {
+            if (!getCurrentUserId()) return [];
+            try {
+                const b = JSON.parse(localStorage.getItem(backupKey()) || '[]');
+                return Array.isArray(b) ? b : [];
+            } catch (e) { return []; }
+        }
+
+        function isMine(t) {
+            const me = getCurrentUserId();
+            return !!me && String(t.discordId || '') === me;
+        }
+
+        // Guarda en la copia local SOLO los tickets de este usuario (por ID de Discord)
+        function writeBackup() {
+            if (!getCurrentUserId()) return;
+            try {
+                localStorage.setItem(backupKey(), JSON.stringify(allTicketsCache.filter(isMine)));
+            } catch (e) { console.error('No se pudo escribir la copia de seguridad:', e); }
+        }
+
+        // Normaliza tickets que pueden venir del admin con otros nombres de campo
+        function normalizeTicket(t) {
+            if (!t || typeof t !== 'object') return t;
+            if (!t.status) t.status = t.estado || 'open';
+            if (!t.title) t.title = t.asunto || '(Sin título)';
+            if (!t.category) t.category = t.categoria || 'General';
+            if (!t.date) t.date = t.fechaCreacion ? new Date(t.fechaCreacion).toLocaleString('es-ES') : '';
+            if (!Array.isArray(t.messages)) t.messages = [];
+            return t;
+        }
+
+        async function fetchServerTickets() {
+            try {
+                const res = await fetch('/api/tickets', { cache: 'no-store' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                return Array.isArray(data) ? data : [];
+            } catch (e) {
+                console.error('Error al cargar tickets desde /api/tickets:', e);
+                return null; // null = fallo (no es lo mismo que lista vacía)
+            }
+        }
+
+        // Carga del servidor + recuperación de los tickets propios que el servidor haya perdido
+        async function loadAllTicketsFromServer() {
+            const server = await fetchServerTickets();
+
+            if (server === null) {
+                // Servidor caído: se conserva la caché; si está vacía, se usa la copia local
+                if (!allTicketsCache.length) {
+                    allTicketsCache = readBackup().map(normalizeTicket);
+                    needsSync = allTicketsCache.length > 0;
+                }
+                return false;
+            }
+
+            const serverIds = new Set(server.map(t => t.id));
+            const missing = readBackup().filter(b => b && b.id && !serverIds.has(b.id));
+
+            allTicketsCache = server.slice();
+            missing.forEach(m => allTicketsCache.unshift(m));
+            allTicketsCache.forEach(normalizeTicket);
+
+            lastServerIds = serverIds;
+            serverLoadedOk = true;
+            needsSync = missing.length > 0;
+
+            writeBackup(); // la copia pasa a reflejar la versión más reciente
+            return true;
+        }
+
+        // Envía la lista completa. Devuelve true solo si el servidor confirma.
+        async function saveAllTicketsToServer() {
+            if (!serverLoadedOk) return false; // nunca pisar el servidor sin haberlo leído antes
+            try {
+                const res = await fetch('/api/tickets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(allTicketsCache)
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                lastServerIds = new Set(allTicketsCache.map(t => t.id));
+                return true;
+            } catch (e) {
+                console.error('Error al sincronizar tickets con /api/tickets:', e);
+                return false;
+            }
+        }
+
+        // Aplica un cambio sobre la versión MÁS RECIENTE del servidor y lo guarda
+        // (así no se pisan los mensajes que el staff haya enviado entretanto)
+        async function mutateTicket(ticketId, mutator) {
+            busy = true;
+            try {
+                await loadAllTicketsFromServer();
+                const ticket = allTicketsCache.find(t => t.id === ticketId);
+                if (!ticket) return false;
+                mutator(ticket);
+                writeBackup();
+                const ok = await saveAllTicketsToServer();
+                needsSync = !ok;
+                return ok;
+            } finally {
+                busy = false;
+            }
+        }
+
+        async function refreshTickets() {
+            if (busy) return;
+            busy = true;
+            try {
+                await loadAllTicketsFromServer();
+                if (needsSync) {
+                    const ok = await saveAllTicketsToServer(); // re-sube los tickets que faltaban
+                    if (ok) needsSync = false;
+                }
+            } finally {
+                busy = false;
+            }
+            const searchInput = document.getElementById('searchTicketInput');
+            renderTickets(currentFilter, searchInput ? searchInput.value : '');
+
+            // Si hay una conversación abierta, se actualiza con los mensajes nuevos del staff
+            refreshOpenConversation();
+        }
+
+        function getCurrentUsername() {
+            return (getDiscordUser().username || '').toLowerCase();
+        }
+
+        // Solo los tickets cuyo discordId coincide con el del usuario logueado
+        function getUserTickets() {
+            return allTicketsCache.filter(isMine);
+        }
+
+        // Genera un ID de ticket único dentro del array compartido
+        function generateUniqueTicketId() {
+            let id;
+            do {
+                id = 'TK-' + Math.floor(1000 + Math.random() * 9000);
+            } while (allTicketsCache.some(t => t.id === id));
+            return id;
+        }
+
+        let currentActiveTicketId = null;
+        let currentFilter = 'open';
+
+        // ===== Conversación =====
+        // "HH:MM" a partir de una fecha ISO
+        function hourOf(fecha) {
+            const d = new Date(fecha);
+            if (!fecha || isNaN(d.getTime())) return '';
+            return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+
+        // Lista completa de mensajes de un ticket. Además de ticket.messages, se recogen los
+        // que una versión anterior del panel de administración guardó en ticket.mensajes.
+        function getConversation(ticket) {
+            const base = Array.isArray(ticket.messages) ? ticket.messages.slice() : [];
+            const legacy = Array.isArray(ticket.mensajes) ? ticket.mensajes.filter(Boolean) : [];
+            if (!legacy.length) return base;
+
+            legacy.forEach(m => base.push({
+                sender: 'staff',
+                rol: 'staff',
+                name: m.autor || 'Staff',
+                text: m.texto || '',
+                time: hourOf(m.fecha),
+                fecha: m.fecha,
+                autorId: m.autorId || ''
+            }));
+            // Orden cronológico, solo si todos los mensajes tienen fecha
+            if (base.every(m => m.fecha && !isNaN(new Date(m.fecha).getTime()))) {
+                base.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+            }
+            return base;
+        }
+
+        // ¿Es una respuesta escrita por un administrador (no el mensaje automático de bienvenida)?
+        function isAdminReply(msg) {
+            return !!msg && msg.sender === 'staff' && (String(msg.rol || '').toLowerCase() === 'staff' || !!msg.autorId);
+        }
+
+        // ¿El último mensaje del ticket es una respuesta del staff? (aviso en la lista)
+        function staffRepliedLast(ticket) {
+            const conv = getConversation(ticket).filter(m => m && m.sender !== 'system');
+            return conv.length > 0 && isAdminReply(conv[conv.length - 1]);
+        }
+
+        // Nombre del remitente. El texto se escapa siempre; solo el mensaje automático
+        // del sistema conserva su icono de información.
+        function senderNameHtml(msg) {
+            const raw = String(msg.name ?? msg.autor ?? '');
+            const plain = raw.replace(/<[^>]*>/g, '').trim() || (msg.sender === 'staff' ? 'Staff' : 'Usuario');
+            let html = esc(plain);
+            if (raw.includes('info-tooltip-wrapper')) {
+                html += ' <span class="info-tooltip-wrapper"><i class="fa-solid fa-circle-info" title="Este mensaje ha sido enviado automáticamente por el sistema al crear un nuevo ticket."></i></span>';
+            }
+            if (isAdminReply(msg)) html += '<span class="chat-staff-tag">Staff</span>';
+            return html;
+        }
+
+        let conversationSignature = '';
+
+        // Pinta los mensajes del ticket: los del usuario, los del sistema y los del staff
+        function renderConversation(ticket, forceBottom) {
+            const chatContainer = document.getElementById('ticketChatContainer');
+            if (!chatContainer) return;
+
+            const conversation = getConversation(ticket);
+            // Si no hay nada nuevo no se repinta (no se pierde la posición de lectura)
+            const signature = JSON.stringify([ticket.id, conversation.length, conversation.map(m => [m.sender, m.text ?? m.texto, m.time, !!m.image])]);
+            if (!forceBottom && signature === conversationSignature) return;
+            conversationSignature = signature;
+
+            const wasAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 80;
+            chatContainer.innerHTML = '';
+
+            conversation.forEach(msg => {
+                if (!msg) return;
+                const bubble = document.createElement('div');
+                const text = esc(msg.text ?? msg.texto ?? '');
+                if (msg.sender === 'system') {
+                    bubble.className = 'chat-bubble system';
+                    bubble.innerHTML = `
+                        <div class="chat-bubble-header system-header">
+                            <span class="chat-sender-name">${senderNameHtml(msg)}</span>
+                        </div>
+                        <p class="chat-text">${text}</p>
+                    `;
+                } else {
+                    bubble.className = `chat-bubble ${msg.sender === 'user' ? 'user' : 'staff'}`;
+                    let contentHtml = `<p class="chat-text" style="white-space: pre-line;">${text}</p>`;
+                    const image = safeImage(msg.image);
+                    if (image) {
+                        contentHtml += `<div class="chat-image-preview"><a href="${esc(image)}" target="_blank" rel="noopener"><img src="${esc(image)}" alt="Imagen adjunta"></a></div>`;
+                    }
+                    bubble.innerHTML = `
+                        <div class="chat-bubble-header">
+                            <span class="chat-sender-name">${senderNameHtml(msg)}</span>
+                            <span class="chat-time">${esc(msg.time || hourOf(msg.fecha))}</span>
+                        </div>
+                        ${contentHtml}
+                    `;
+                }
+                chatContainer.appendChild(bubble);
+            });
+
+            if (forceBottom || wasAtBottom) chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Cabecera y pie de la vista según el estado del ticket (puede cerrarlo el staff)
+        function renderViewChrome(ticket) {
+            const idTag = document.getElementById('viewTicketIdTag');
+            const titleEl = document.getElementById('viewTicketTitle');
+            if (idTag) idTag.textContent = `#${ticket.id}`;
+            if (titleEl) titleEl.textContent = ticket.title;
+
+            const transcriptLink = document.getElementById('viewTranscriptLink');
+            const closeInViewBtn = document.getElementById('closeTicketInViewBtn');
+            if (ticket.status === 'closed') {
+                if (transcriptLink) { transcriptLink.href = `/ticket/${encodeURIComponent(ticket.id)}.html`; transcriptLink.style.display = 'inline-flex'; }
+                if (closeInViewBtn) closeInViewBtn.style.display = 'none';
+            } else {
+                if (transcriptLink) transcriptLink.style.display = 'none';
+                if (closeInViewBtn) closeInViewBtn.style.display = 'inline-flex';
+            }
+
+            const replyFooter = document.getElementById('ticketReplyFooterArea');
+            if (replyFooter) replyFooter.style.display = ticket.status === 'closed' ? 'none' : 'flex';
+        }
+
+        // Con la conversación abierta: muestra lo nuevo que haya llegado del servidor
+        function refreshOpenConversation() {
+            if (!currentActiveTicketId || !viewTicketModal || !viewTicketModal.classList.contains('active')) return;
+            const ticket = allTicketsCache.find(t => t.id === currentActiveTicketId);
+            if (!ticket) return;
+            renderViewChrome(ticket);
+            renderConversation(ticket, false);
+        }
+
+        const ticketsContainer = document.getElementById('ticketsContainer');
+
+        function renderTickets(filter = 'open', searchQuery = '') {
+            if (!ticketsContainer) return;
+            ticketsContainer.innerHTML = '';
+            const ticketsData = getUserTickets();
+
+            const openCount = ticketsData.filter(t => t.status === 'open').length;
+            const closedCount = ticketsData.filter(t => t.status === 'closed').length;
+
+            const openTicketsCountEl = document.getElementById('openTicketsCount');
+            const closedTicketsCountEl = document.getElementById('closedTicketsCount');
+            if (openTicketsCountEl) openTicketsCountEl.textContent = openCount;
+            if (closedTicketsCountEl) closedTicketsCountEl.textContent = closedCount;
+
+            const topActionContainer = document.getElementById('topActionButtonsContainer');
+            if (topActionContainer) {
+                topActionContainer.style.display = 'flex';
+            }
+
+            const q = searchQuery.toLowerCase();
+            let filtered = ticketsData.filter(ticket => {
+                const matchesFilter = ticket.status === filter;
+                const matchesSearch = String(ticket.title).toLowerCase().includes(q) || 
+                                    String(ticket.id).toLowerCase().includes(q) ||
+                                    String(ticket.category).toLowerCase().includes(q);
+                return matchesFilter && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                if (ticketsData.length === 0) {
+                    ticketsContainer.innerHTML = `
+                        <div class="empty-state-container animate-fade-up">
+                            <div class="empty-state-icon">
+                                <i class="fa-solid fa-headset"></i>
+                            </div>
+                            <h3>No tienes ningún ticket creado</h3>
+                            <p>¿Necesitas asistencia del equipo administrativo, reportar un bug o consultar alguna duda? Abre tu primer ticket ahora mismo.</p>
+                            <button class="top-btn highlight-btn" onclick="document.getElementById('newTicketModal').classList.add('active')">
+                                <i class="fa-solid fa-plus"></i> Crea un nuevo ticket
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    ticketsContainer.innerHTML = `
+                        <div class="empty-tickets animate-fade-up">
+                            <i class="fa-solid fa-folder-open"></i>
+                            <p>No hay tickets ${filter === 'open' ? 'activos' : 'cerrados'} que coincidan con tu búsqueda.</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            filtered.forEach(ticket => {
+                const card = document.createElement('div');
+                card.className = `ticket-row-card ${ticket.status} animate-fade-up`;
+                
+                let lockButtonHtml = '';
+                if (ticket.status === 'open') {
+                    lockButtonHtml = `
+                        <button type="button" class="top-btn lock-ticket-quick-btn" data-close-id="${esc(ticket.id)}" title="Cerrar ticket" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 10px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; pointer-events: auto !important; position: relative; z-index: 9999;">
+                            <i class="fa-solid fa-lock" style="pointer-events: none;"></i>
+                        </button>
+                    `;
+                }
+
+                const pendingBadge = !lastServerIds.has(ticket.id)
+                    ? `<span title="Se está sincronizando con el servidor" style="color:#fbbf24;font-size:12px;"><i class="fa-solid fa-cloud-arrow-up"></i> Sincronizando</span>`
+                    : '';
+
+                // Aviso: el staff ha respondido y es el último mensaje del ticket
+                const staffReplyBadge = (ticket.status === 'open' && staffRepliedLast(ticket))
+                    ? `<span class="ticket-staff-reply-pill" title="El equipo administrativo ha respondido a este ticket"><i class="fa-solid fa-reply"></i> Respuesta del staff</span>`
+                    : '';
+
+                card.innerHTML = `
+                    <div class="ticket-row-left">
+                        <span class="ticket-id">${esc(ticket.id)}</span>
+                        <div class="ticket-main-info">
+                            <h4>${esc(ticket.title)}</h4>
+                            <span class="ticket-category-tag"><i class="fa-solid fa-tag"></i> ${esc(ticket.category)}</span>
+                        </div>
+                    </div>
+                    <div class="ticket-row-right" style="display: flex; align-items: center; gap: 10px; position: relative; z-index: 5;">
+                        ${pendingBadge}
+                        ${staffReplyBadge}
+                        <span class="ticket-date"><i class="fa-regular fa-clock"></i> ${esc(ticket.date)}</span>
+                        <span class="ticket-status-badge ${ticket.status}">
+                            ${ticket.status === 'open' ? '<i class="fa-solid fa-lock-open"></i> Activo' : '<i class="fa-solid fa-lock"></i> Cerrado'}
+                        </span>
+                        ${lockButtonHtml}
+                        <button class="top-btn view-ticket-btn" data-id="${esc(ticket.id)}">Ver conversación</button>
+                    </div>
+                `;
+                ticketsContainer.appendChild(card);
+            });
+
+            // La tarjeta se expande desde su posición en la lista
+            ticketsContainer.querySelectorAll('.view-ticket-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    openViewModal(btn.getAttribute('data-id'), btn.closest('.ticket-row-card'));
+                });
+            });
+            ticketsContainer.querySelectorAll('.lock-ticket-quick-btn').forEach(btn => {
+                btn.addEventListener('click', () => quickCloseTicket(btn.getAttribute('data-close-id')));
+            });
+        }
+
+        // Cierre de un ticket (desde la lista o desde la vista grande).
+        // El servidor detecta el cierre al guardar: crea la copia HTML y avisa por MD al dueño.
+        async function quickCloseTicket(ticketId) {
+            const current = allTicketsCache.find(t => t.id === ticketId);
+            if (!current || current.status === 'closed') return;
+
+            if (!confirm('¿Cerrar este ticket? Es una acción definitiva y se enviará un resumen por mensaje privado de Discord.')) return;
+
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            const ok = await mutateTicket(ticketId, (ticket) => {
+                ticket.status = 'closed';
+                ticket.estado = 'closed';
+                ticket.fechaCierre = now.toISOString();
+                pushMessage(ticket, {
+                    sender: "system",
+                    name: "SISTEMA DE SOPORTE - CLICKSENSE",
+                    text: "El ticket ha sido cerrado por el usuario.",
+                    time: timeStr
+                });
+            });
+
+            if (currentActiveTicketId === ticketId) closeViewPanel();
+
+            const searchInput = document.getElementById('searchTicketInput');
+            renderTickets(currentFilter, searchInput ? searchInput.value : '');
+
+            if (ok) {
+                showNotification(`El ticket <span class="notification-ticket-pill">${esc(ticketId)}</span> ha sido cerrado. Si tienes los mensajes privados abiertos, recibirás un resumen por Discord.`, false);
+            } else {
+                showNotification('No se pudo guardar el cierre en el servidor. Se reintentará automáticamente.', true);
+            }
+        }
+
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('ticketNotification');
+            const notificationText = document.getElementById('ticketNotificationText');
+            const notificationIcon = document.getElementById('ticketNotificationIcon');
+            
+            if (!notification || !notificationText || !notificationIcon) return;
+            notificationText.innerHTML = message;
+            
+            if (isError) {
+                notification.style.borderColor = 'rgba(239, 68, 68, 0.6)';
+                notification.style.boxShadow = '0 10px 30px rgba(239, 68, 68, 0.35)';
+                notificationIcon.className = 'fa-solid fa-circle-exclamation';
+                notificationIcon.style.color = '#ef4444';
+            } else {
+                notification.style.borderColor = 'rgba(147, 51, 234, 0.6)';
+                notification.style.boxShadow = '0 10px 30px rgba(147, 51, 234, 0.35)';
+                notificationIcon.className = 'fa-solid fa-circle-check';
+                notificationIcon.style.color = '#4ade80';
+            }
+
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                const targetTab = e.target.closest('.filter-tab');
+                targetTab.classList.add('active');
+                currentFilter = targetTab.getAttribute('data-filter');
+                const searchInput = document.getElementById('searchTicketInput');
+                renderTickets(currentFilter, searchInput ? searchInput.value : '');
+            });
+        });
+
+        const searchTicketInput = document.getElementById('searchTicketInput');
+        if (searchTicketInput) {
+            searchTicketInput.addEventListener('input', (e) => {
+                renderTickets(currentFilter, e.target.value);
+            });
+        }
+
+        const newTicketModal = document.getElementById('newTicketModal');
+        const viewTicketModal = document.getElementById('viewTicketModal');
+
+        const openBtn = document.getElementById('openNewTicketModalBtn');
+        if (openBtn) {
+            openBtn.addEventListener('click', () => {
+                if (newTicketModal) newTicketModal.classList.add('active');
+            });
+        }
+
+        const closeNewBtn = document.getElementById('closeNewTicketModalBtn');
+        if (closeNewBtn) {
+            closeNewBtn.addEventListener('click', () => {
+                if (newTicketModal) newTicketModal.classList.remove('active');
+            });
+        }
+
+        // ===== Vista grande: la tarjeta se expande desde su posición y se encoge al cerrar =====
+        let lastOrigin = null;
+
+        function applyClipFrom(originEl) {
+            const card = viewTicketModal ? viewTicketModal.querySelector('.ticket-modal-card') : null;
+            if (!card) return;
+            const W = window.innerWidth, H = window.innerHeight;
+            if (originEl && originEl.getBoundingClientRect) {
+                const r = originEl.getBoundingClientRect();
+                lastOrigin = {
+                    top: Math.max(0, r.top), right: Math.max(0, W - r.right),
+                    bottom: Math.max(0, H - r.bottom), left: Math.max(0, r.left)
+                };
+            } else if (!lastOrigin) {
+                lastOrigin = { top: H * 0.4, right: W * 0.35, bottom: H * 0.4, left: W * 0.35 };
+            }
+            card.style.setProperty('--clip-from',
+                `inset(${lastOrigin.top}px ${lastOrigin.right}px ${lastOrigin.bottom}px ${lastOrigin.left}px round 18px)`);
+        }
+
+        function closeViewPanel() {
+            if (!viewTicketModal) return;
+            viewTicketModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        const closeViewBtn = document.getElementById('closeViewTicketModalBtn');
+        if (closeViewBtn) closeViewBtn.addEventListener('click', closeViewPanel);
+
+        const closeTicketInViewBtn = document.getElementById('closeTicketInViewBtn');
+        if (closeTicketInViewBtn) {
+            closeTicketInViewBtn.addEventListener('click', () => {
+                if (currentActiveTicketId) quickCloseTicket(currentActiveTicketId);
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && viewTicketModal && viewTicketModal.classList.contains('active')) closeViewPanel();
+        });
+
+        // Lógica del Select Personalizado con Búsqueda Interactiva
+        const customSelect = document.getElementById('customCategorySelect');
+        const selectedDisplay = document.getElementById('categorySelectedDisplay');
+        const dropdownItems = document.getElementById('categoryDropdownItems');
+        const hiddenCategoryInput = document.getElementById('ticketCategory');
+        
+        if (customSelect && selectedDisplay && dropdownItems && hiddenCategoryInput) {
+            const itemsList = dropdownItems.querySelectorAll('div');
+            let searchTypeBuffer = "";
+            let searchTimeout = null;
+
+            selectedDisplay.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownItems.classList.toggle('select-hide');
+                customSelect.classList.toggle('open');
+            });
+
+            itemsList.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = item.getAttribute('data-value');
+                    hiddenCategoryInput.value = val;
+                    selectedDisplay.innerHTML = item.innerHTML;
+                    dropdownItems.classList.add('select-hide');
+                    customSelect.classList.remove('open');
+                    searchTypeBuffer = "";
+                });
+            });
+
+            document.addEventListener('click', () => {
+                dropdownItems.classList.add('select-hide');
+                customSelect.classList.remove('open');
+                searchTypeBuffer = "";
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (dropdownItems.classList.contains('select-hide')) return;
+                if (e.key === 'Backspace') {
+                    searchTypeBuffer = searchTypeBuffer.slice(0, -1);
+                } else if (e.key.length === 1) {
+                    searchTypeBuffer += e.key.toLowerCase();
+                } else {
+                    return;
+                }
+
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchTypeBuffer = "";
+                }, 1200);
+
+                let firstMatch = null;
+                itemsList.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if (text.includes(searchTypeBuffer)) {
+                        item.style.display = 'flex';
+                        if (!firstMatch) firstMatch = item;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                if (firstMatch && searchTypeBuffer.length > 0) {
+                    itemsList.forEach(i => i.classList.remove('highlighted-match'));
+                    firstMatch.classList.add('highlighted-match');
+                    dropdownItems.scrollTop = firstMatch.offsetTop - dropdownItems.offsetTop;
+                }
+            });
+        }
+
+        // Añade un mensaje al ticket, guardando tanto los nombres de campo
+        // que usa esta página (sender/name/text/time) como los alias que
+        // lee el panel de administración (autor/texto/fecha/rol).
+        function pushMessage(ticket, msg) {
+            const fullMsg = {
+                ...msg,
+                autor: msg.name,
+                texto: msg.text,
+                fecha: new Date().toISOString()
+            };
+            // Los mensajes del usuario llevan su ID de Discord (el panel los distingue así de los del staff)
+            if (msg.sender === 'user') {
+                fullMsg.rol = 'usuario';
+                fullMsg.autorId = getCurrentUserId();
+            }
+            if (!Array.isArray(ticket.messages)) ticket.messages = [];
+            ticket.messages.push(fullMsg);
+        }
+
+        // Creación del Ticket
+        const newTicketForm = document.getElementById('newTicketForm');
+        if (newTicketForm) {
+            newTicketForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const category = hiddenCategoryInput ? hiddenCategoryInput.value : '';
+                const titleInput = document.getElementById('ticketTitle');
+                const warningCheck = document.getElementById('ticketWarningCheck');
+                const submitBtn = document.getElementById('submitNewTicketBtn');
+
+                const title = titleInput ? titleInput.value.trim() : '';
+                const warningChecked = warningCheck ? warningCheck.checked : false;
+
+                if (!category || !title || !warningChecked) {
+                    showNotification("Es necesario rellenar todos los campos y aceptar la advertencia para poder crear un ticket.", true);
+                    return;
+                }
+
+                // El ticket se asocia al ID de Discord: sin sesión real no se puede crear
+                const ownerId = getCurrentUserId();
+                if (!ownerId) {
+                    showNotification("No se ha detectado tu sesión de Discord. Vuelve a iniciar sesión para crear un ticket.", true);
+                    return;
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creando ticket...';
+                }
+
+                busy = true; // pausa el refresco automático mientras se crea
+                let savedOk = false;
+                let newId = '';
+
+                try {
+                    // 1. Última versión del servidor (para no pisar tickets de otros)
+                    await loadAllTicketsFromServer();
+
+                    newId = generateUniqueTicketId();
+
+                    const now = new Date();
+                    const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                    const dateStr = `${now.getDate()} ${months[now.getMonth()]} , ${now.getFullYear()} - ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+                    const systemNoticeMsg = {
+                        sender: "system",
+                        name: "SISTEMA DE SOPORTE - CLICKSENSE",
+                        text: "Todos los tickets quedan registrados en el sistema para la administración y el usuario que lo abre. Puedes acceder a este historial en cualquier momento. Recuerda que el mal uso o abuso de los tickets puede acarrear sanciones administrativas.",
+                        time: ""
+                    };
+
+                    const categoriaMensajes = {
+                        'Ayuda': "¡Buenas! Un miembro del equipo administrativo atenderá el ticket con la mayor brevedad posible.\n\nMientras, explique detalladamente su consulta y adjunte pruebas gráficas si es necesario.",
+                        'Reporte': "- Indica el ID de la persona reportada:\n- Motivos específicos que se reportan:\n- Fecha y hora exactas de lo ocurrido:\n- Contexto de la situación de rol:\n- Pruebas gráficas (video):",
+                        'Apelaciones': "- Enlace de steam de la persona baneada:\n- ID de discord de la persona baneada:\n- Motivo del baneo:\n- Captura de la sanción al intentar acceder al servidor:\n- STAFF que ha impuesto la sanción:\n\nSi se detecta información falsa, la apelación será rechazada y el usuario que abre el ticket podrá ser sancionado.",
+                        'Soporte facción legal': "¡Buenas! Un miembro del equipo de la facción legal atenderá el ticket con la mayor brevedad posible.\n\nMientras, explique detalladamente su consulta y adjunte pruebas gráficas si es necesario.",
+                        'Soporte facción ilegal': "¡Buenas! Un miembro del equipo de la facción ilegal atenderá el ticket con la mayor brevedad posible.\n\nMientras, explique detalladamente su consulta y adjunte pruebas gráficas si es necesario."
+                    };
+
+                    const user = getDiscordUser();
+
+                    const newTicket = {
+                        id: newId,
+                        title: title,
+                        category: category,
+                        status: 'open',
+                        date: dateStr,
+                        messages: [],
+
+                        // Asociación al usuario creador (ID de Discord)
+                        discordId: ownerId,
+                        usuario: user.displayName || user.username || 'Ciudadano',
+                        usuarioTag: user.username || '',
+
+                        // Campos alias que lee admin.html:
+                        asunto: title,
+                        categoria: category,
+                        estado: 'open',
+                        mensaje: title,
+                        fechaCreacion: now.toISOString()
+                    };
+
+                    pushMessage(newTicket, systemNoticeMsg);
+                    if (categoriaMensajes[category]) {
+                        pushMessage(newTicket, {
+                            sender: "staff",
+                            name: 'Soporte Administrativo <span class="info-tooltip-wrapper"><i class="fa-solid fa-circle-info" title="Este mensaje ha sido enviado automáticamente por el sistema al crear un nuevo ticket."></i></span>',
+                            text: categoriaMensajes[category],
+                            time: timeStr
+                        });
+                    }
+
+                    // 2. Se añade a la lista y a la copia de seguridad del usuario ANTES de guardar:
+                    //    aunque el servidor falle, el ticket NO desaparece.
+                    allTicketsCache.unshift(newTicket);
+                    writeBackup();
+
+                    // 3. Guardar en el servidor
+                    savedOk = await saveAllTicketsToServer();
+
+                    // 4. Verificar que de verdad está en el servidor
+                    if (savedOk) {
+                        const check = await fetchServerTickets();
+                        savedOk = !!(check && check.some(t => t.id === newId));
+                    }
+                    needsSync = !savedOk;
+                } catch (err) {
+                    console.error('Error al crear el ticket:', err);
+                    savedOk = false;
+                    needsSync = true;
+                } finally {
+                    busy = false;
+                }
+
+                newTicketForm.reset();
+                if (selectedDisplay) {
+                    selectedDisplay.innerHTML = '<span class="placeholder-text">Selecciona una categoría...</span>';
+                }
+                if (hiddenCategoryInput) {
+                    hiddenCategoryInput.value = '';
+                }
+                if (newTicketModal) {
+                    newTicketModal.classList.remove('active');
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Crear ticket';
+                }
+                
+                currentFilter = 'open';
+                document.querySelectorAll('.filter-tab').forEach(t => {
+                    if (t.getAttribute('data-filter') === 'open') t.classList.add('active');
+                    else t.classList.remove('active');
+                });
+
+                renderTickets(currentFilter);
+
+                if (savedOk) {
+                    showNotification(`Has creado un ticket con éxito: <span class="notification-ticket-pill">${esc(newId)}</span> <strong class="notification-ticket-title">${esc(title)}</strong>`, false);
+                } else {
+                    showNotification(`El ticket <span class="notification-ticket-pill">${esc(newId)}</span> se ha creado pero aún no se ha confirmado en el servidor. Se reintentará automáticamente.`, true);
+                }
+            });
+        }
+
+        // Abre la vista grande. originEl = tarjeta de la lista desde la que se expande (opcional).
+        function openViewModal(ticketId, originEl) {
+            currentActiveTicketId = ticketId;
+            const ticket = allTicketsCache.find(t => t.id === ticketId);
+            if (!ticket) return;
+
+            // Cabecera, pie y conversación (mensajes del usuario, del sistema y del staff)
+            renderViewChrome(ticket);
+            renderConversation(ticket, true);
+
+            // La animación de expansión solo se lanza si la vista no estaba ya abierta
+            if (viewTicketModal && !viewTicketModal.classList.contains('active')) {
+                applyClipFrom(originEl);
+                void viewTicketModal.offsetWidth;   // fuerza el estado inicial antes de animar
+                document.body.style.overflow = 'hidden';
+                viewTicketModal.classList.add('active');
+            }
+            const chatContainer = document.getElementById('ticketChatContainer');
+            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Se pide al servidor la versión más reciente por si el staff acaba de responder
+            refreshTickets();
+        }
+
+        const sendReplyBtn = document.getElementById('sendReplyBtn');
+        const replyMessageInput = document.getElementById('replyMessageInput');
+
+        if (sendReplyBtn) {
+            sendReplyBtn.addEventListener('click', sendReplyMessage);
+        }
+
+        if (replyMessageInput) {
+            replyMessageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    if (e.shiftKey) {
+                        e.preventDefault();
+                        const start = replyMessageInput.selectionStart;
+                        const end = replyMessageInput.selectionEnd;
+                        const value = replyMessageInput.value;
+
+                        replyMessageInput.value = value.substring(0, start) + "\n" + value.substring(end);
+                        replyMessageInput.selectionStart = replyMessageInput.selectionEnd = start + 1;
+                        
+                        replyMessageInput.style.height = 'auto';
+                        replyMessageInput.style.height = (replyMessageInput.scrollHeight) + 'px';
+                    } else {
+                        e.preventDefault();
+                        sendReplyMessage();
+                    }
+                }
+            });
+
+            replyMessageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
+
+        // Tras enviar algo: se repinta la conversación (bajando al final) y la lista
+        function afterOwnMessage(ticketId) {
+            const ticket = allTicketsCache.find(t => t.id === ticketId);
+            if (ticket && currentActiveTicketId === ticketId) {
+                renderViewChrome(ticket);
+                renderConversation(ticket, true);
+            }
+            const searchInput = document.getElementById('searchTicketInput');
+            renderTickets(currentFilter, searchInput ? searchInput.value : '');
+        }
+
+        // Lógica para adjuntar imagen
+        const attachImageBtn = document.getElementById('attachImageBtn');
+        const attachImageInput = document.getElementById('attachImageInput');
+
+        if (attachImageBtn && attachImageInput) {
+            attachImageBtn.addEventListener('click', () => {
+                attachImageInput.click();
+            });
+
+            attachImageInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file || !currentActiveTicketId) return;
+
+                const reader = new FileReader();
+                reader.onload = async function(event) {
+                    const imageUrl = event.target.result;
+                    const ticketId = currentActiveTicketId;
+                    const current = allTicketsCache.find(t => t.id === ticketId);
+                    if (!current || current.status === 'closed') return;
+
+                    const user = getDiscordUser();
+                    const now = new Date();
+                    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+                    const ok = await mutateTicket(ticketId, (ticket) => {
+                        pushMessage(ticket, {
+                            sender: "user",
+                            name: user.displayName || user.username,
+                            text: "Ha adjuntado una imagen:",
+                            image: imageUrl,
+                            time: timeStr
+                        });
+                    });
+
+                    attachImageInput.value = '';
+                    if (!ok) showNotification('No se pudo enviar la imagen al servidor. Se reintentará automáticamente.', true);
+                    afterOwnMessage(ticketId);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function sendReplyMessage() {
+            const input = document.getElementById('replyMessageInput');
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text || !currentActiveTicketId) return;
+
+            const ticketId = currentActiveTicketId;
+            const current = allTicketsCache.find(t => t.id === ticketId);
+            if (!current || current.status === 'closed') return;
+
+            const user = getDiscordUser();
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            input.value = '';
+            input.style.height = 'auto';
+
+            const ok = await mutateTicket(ticketId, (ticket) => {
+                pushMessage(ticket, {
+                    sender: "user",
+                    name: user.displayName || user.username,
+                    text: text,
+                    time: timeStr
+                });
+            });
+
+            if (!ok) showNotification('No se pudo enviar el mensaje al servidor. Se reintentará automáticamente.', true);
+            afterOwnMessage(ticketId);
+        }
+
+        // Inicialización de la página
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadDiscordSessionData();
+            await refreshTickets();
+
+            // Abrir directamente un ticket si se llega desde Home: /tickets.html?ticket=TK-1234
+            const ticketParam = new URLSearchParams(window.location.search).get('ticket');
+            if (ticketParam) {
+                const target = getUserTickets().find(t => t.id === ticketParam);
+                if (target) {
+                    if (target.status === 'closed') {
+                        currentFilter = 'closed';
+                        document.querySelectorAll('.filter-tab').forEach(t => {
+                            t.classList.toggle('active', t.getAttribute('data-filter') === 'closed');
+                        });
+                        renderTickets(currentFilter);
+                    }
+                    openViewModal(target.id);
+                }
+            }
+
+            // Refresco periódico por si el staff cierra o responde el ticket desde el panel de administración
+            setInterval(refreshTickets, 20000);
+            window.addEventListener('focus', refreshTickets);
+
+            // Con una conversación abierta se consulta más a menudo, para ver enseguida las respuestas del staff
+            setInterval(() => {
+                if (viewTicketModal && viewTicketModal.classList.contains('active')) refreshTickets();
+            }, 6000);
+        });
+    </script>
+
+    <script src="/guards.js"></script>
+</body>
+</html>

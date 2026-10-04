@@ -1,0 +1,2924 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio | ClickSense RP</title>
+    <!-- Google Fonts: Plus Jakarta Sans, Inter y Lexend (esta última para la página de perfil) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Lexend:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/src/assets/home.css">
+    <link rel="stylesheet" href="/src/assets/perfil.css">
+
+    <!-- Estilos personalizados con morado corporativo y transiciones fluidas -->
+    <style>
+        /* Fondo oscuro inmediato para evitar pantallas grises al cargar.
+           IMPORTANTE: NO usar overflow hidden en html/body (rompe el menú lateral fijo/sticky).
+           "clip" evita el scroll horizontal sin crear un contenedor de scroll. */
+        html, body {
+            background-color: #0f1016;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        body { overflow-x: clip; }
+
+        /* Menú lateral: siempre a la izquierda, con la altura de la pantalla.
+           Solo la lista de enlaces se desplaza, así se ven todos los botones. */
+        aside.sidebar {
+            height: 100vh;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        aside.sidebar .sidebar-brand,
+        aside.sidebar .sidebar-footer {
+            flex-shrink: 0;
+        }
+        aside.sidebar .sidebar-nav {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        aside.sidebar .sidebar-nav::-webkit-scrollbar { width: 6px; }
+        aside.sidebar .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.35);
+            border-radius: 6px;
+        }
+
+        .nv-home-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        
+        /* Tarjetas de novedades y destacadas con morado corporativo (#a855f7) */
+        .nv-featured { border-color: rgba(168, 85, 247, 0.65) !important; box-shadow: 0 0 25px rgba(168, 85, 247, 0.22); cursor: pointer; }
+        .ann-card-modern { cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+        .ann-card-modern:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(168, 85, 247, 0.25); border-color: rgba(168, 85, 247, 0.5); }
+        .nv-card-in { animation: nvIn .4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes nvIn { from { opacity:0; transform:translateY(12px) scale(.98); } to { opacity:1; transform:none; } }
+
+        /* Categorías en mayúsculas estrictas solo en las tarjetas */
+        .ann-badge { text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+
+        /* Buscador con borde morado corporativo y luz al enfocar */
+        .custom-search-box {
+            display: flex;
+            align-items: center;
+            background: #0f1016;
+            border: 1px solid rgba(168, 85, 247, 0.45);
+            border-radius: 14px;
+            padding: 8px 14px;
+            gap: 10px;
+            width: 260px;
+            transition: all 0.3s ease;
+        }
+        .custom-search-box:focus-within {
+            border-color: #a855f7;
+            box-shadow: 0 0 18px rgba(168, 85, 247, 0.45);
+        }
+        .custom-search-box i {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .custom-search-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 13.5px;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-search-box input::placeholder {
+            color: #64748b;
+        }
+
+        /* Selector de Filtro desplegable con morado corporativo */
+        .custom-dropdown-container {
+            position: relative;
+            user-select: none;
+        }
+        .custom-dropdown-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0f1016;
+            border: 1px solid rgba(168, 85, 247, 0.45);
+            border-radius: 14px;
+            padding: 9px 14px;
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 500;
+            gap: 10px;
+            cursor: pointer;
+            min-width: 170px;
+            transition: all 0.3s ease;
+        }
+        .custom-dropdown-btn:hover, .custom-dropdown-btn.active {
+            border-color: #a855f7;
+            box-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
+        }
+        .custom-dropdown-btn i.fa-filter {
+            color: #a855f7;
+        }
+        
+        /* Menú de Filtro animado en capa superior absoluta */
+        .custom-dropdown-menu {
+            position: fixed;
+            width: 220px;
+            background: #13141f;
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            border-radius: 14px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(168, 85, 247, 0.4);
+            display: flex;
+            flex-direction: column;
+            z-index: 2147483647;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 6px 0;
+        }
+        .custom-dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .custom-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .custom-dropdown-item i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            text-align: center;
+        }
+        .custom-dropdown-item:hover {
+            background: rgba(168, 85, 247, 0.2);
+            color: #fff;
+        }
+
+        /* Menú Desplegable de Soporte Estilizado (Tipo Discord) en Capa Máxima */
+        .support-dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+        .support-dropdown-menu {
+            position: fixed;
+            width: 250px;
+            background: #13141f;
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            border-radius: 14px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(168, 85, 247, 0.4);
+            display: flex;
+            flex-direction: column;
+            z-index: 2147483647;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 6px 0;
+        }
+        .support-dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        
+        /* Secciones del menú */
+        .support-menu-section {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .support-menu-section:last-child {
+            border-bottom: none;
+        }
+        .support-menu-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            padding: 6px 16px 4px 16px;
+            letter-spacing: 0.5px;
+        }
+        .support-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            font-size: 13px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+            font-weight: 500;
+        }
+        .support-dropdown-item:hover {
+            background: rgba(168, 85, 247, 0.2);
+            color: #fff;
+        }
+        .support-dropdown-item i {
+            color: #a855f7;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Modal Emergente con Animación Fluida */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(0px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            pointer-events: none;
+            transition: background 0.3s ease, backdrop-filter 0.3s ease;
+        }
+        .modal-overlay.active {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            pointer-events: auto;
+        }
+        .modal-content-box {
+            background: #13141f;
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            box-shadow: 0 0 35px rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 550px;
+            padding: 25px;
+            position: relative;
+            color: #fff;
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        }
+        .modal-overlay.active .modal-content-box {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+        
+        .modal-close-btn {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: #cbd5e1;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .modal-close-btn:hover {
+            background: rgba(168, 85, 247, 0.35);
+            border-color: rgba(168, 85, 247, 0.7);
+            color: #fff;
+        }
+
+        .modal-header-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .modal-body p {
+            color: #94a3b8;
+            font-size: 14.5px;
+            line-height: 1.6;
+            margin-top: 15px;
+            white-space: pre-wrap;
+        }
+        .modal-footer-info {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12.5px;
+            color: #94a3b8;
+        }
+        .author-badge-click {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #fff;
+            text-decoration: none;
+        }
+        .author-badge-click:hover,
+        .author-badge-click:focus-visible {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: rgba(168, 85, 247, 0.5);
+            outline: none;
+        }
+        .author-badge-click img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Campanita de notificaciones optimizada, más pequeña y agradable */
+        .nv-title-wrap { display: flex; align-items: center; gap: 14px; }
+                .nv-bell-btn {
+            position: relative;
+            width: 40px; height: 40px;
+            border-radius: 13px;
+            background: linear-gradient(145deg, rgba(168, 85, 247, 0.18), rgba(236, 72, 153, 0.08));
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            color: #c084fc;
+            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 15px;
+            box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.12), 0 4px 14px rgba(0, 0, 0, 0.35);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+        }
+        .nv-bell-btn i { transform-origin: 50% 8%; }
+        .nv-bell-btn:hover {
+            transform: translateY(-3px) scale(1.08);
+            border-color: #a855f7;
+            color: #fff;
+            box-shadow: inset 0 0 14px rgba(168, 85, 247, 0.3), 0 10px 26px rgba(168, 85, 247, 0.45);
+        }
+        .nv-bell-btn:hover i { animation: nvRing 0.7s ease; }
+        .nv-bell-btn:active { transform: scale(0.88); }
+
+        /* Activada: degradado, brillo que late y halo */
+        .nv-bell-btn.on {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            border-color: transparent;
+            color: #fff;
+            animation: nvGlow 2.6s ease-in-out infinite;
+        }
+        .nv-bell-btn.on i { animation: nvRing 0.7s ease; }
+        .nv-bell-btn.on:hover i { animation: nvRing 0.7s ease; }
+        @keyframes nvGlow {
+            0%, 100% { box-shadow: 0 4px 16px rgba(168, 85, 247, 0.45); }
+            50%      { box-shadow: 0 4px 26px rgba(236, 72, 153, 0.7); }
+        }
+
+        /* Onda al pulsar */
+        .nv-bell-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 13px;
+            border: 2px solid rgba(192, 132, 252, 0.9);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .nv-bell-btn.burst::after { animation: nvBurst 0.6s ease-out; }
+        .nv-bell-btn.burst { animation: nvPop 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes nvBurst {
+            from { opacity: 0.9; transform: scale(1); }
+            to   { opacity: 0;   transform: scale(1.9); }
+        }
+        @keyframes nvPop {
+            0% { transform: scale(0.8); }
+            60% { transform: scale(1.18); }
+            100% { transform: scale(1); }
+        }
+        .nv-bell-btn:disabled { opacity: .6; cursor: wait; }
+        @keyframes nvRing {
+            0% { transform: rotate(0); } 20% { transform: rotate(18deg); }
+            40% { transform: rotate(-16deg); } 60% { transform: rotate(10deg); }
+            80% { transform: rotate(-6deg); } 100% { transform: rotate(0); }
+        }
+        .nv-bell-toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: #130d1c; border: 1px solid rgba(168, 85, 247, 0.4);
+            color: #fff; padding: 14px 20px; border-radius: 12px;
+            font-size: 14px; max-width: 360px;
+            opacity: 0; transform: translateY(10px);
+            transition: .3s; z-index: 3000; pointer-events: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .nv-bell-toast.show { opacity: 1; transform: translateY(0); }
+
+        /* ===== Panel de actividad: Tickets + Sugerencias y bugs ===== */
+        .act-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+        @media (max-width: 900px) { .act-grid { grid-template-columns: 1fr; } }
+
+        .act-card {
+            background: rgba(20, 22, 32, 0.85);
+            border: 1px solid rgba(168, 85, 247, 0.22);
+            border-radius: 18px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-height: 300px;
+            box-sizing: border-box;
+        }
+        .act-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .act-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .act-card-title i { color: #a855f7; }
+        .act-see-all {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            transition: color .2s;
+        }
+        .act-see-all:hover { color: #c084fc; }
+
+        .act-list { display: flex; flex-direction: column; gap: 10px; }
+
+        /* Resumen: total de sugerencias y votos registrados */
+        .act-summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 12.5px;
+            color: #94a3b8;
+            padding: 8px 12px;
+            background: rgba(168, 85, 247, 0.08);
+            border: 1px solid rgba(168, 85, 247, 0.22);
+            border-radius: 10px;
+        }
+        .act-summary strong { color: #fff; }
+        .act-summary .up { color: #34d399; }
+        .act-summary .down { color: #f87171; }
+
+        /* Cuántas sugerencias hay en cada estado (mismos estados y colores que en sugerencias.html) */
+        .act-states {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .act-state {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 11.5px;
+            font-weight: 600;
+            min-width: 0;
+            transition: border-color .2s, background .2s, transform .2s;
+        }
+        .act-state:hover { border-color: var(--c); background: rgba(255, 255, 255, 0.05); transform: translateY(-2px); }
+        .act-state b { display: flex; align-items: center; gap: 7px; font-size: 16px; font-weight: 800; color: #fff; }
+        .act-state b::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--c); flex-shrink: 0; }
+        .act-state span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .act-state.changed b { animation: actPillPop .7s cubic-bezier(.16, 1, .3, 1); }
+        @media (max-width: 480px) { .act-states { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+        .act-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 12px;
+            text-decoration: none;
+            color: #fff;
+            transition: border-color .2s, background .2s, transform .2s;
+        }
+        a.act-row { cursor: pointer; }
+        a.act-row:hover {
+            border-color: rgba(168, 85, 247, 0.55);
+            background: rgba(168, 85, 247, 0.08);
+            transform: translateY(-2px);
+        }
+        /* La sugerencia acaba de cambiar de estado: se resalta un momento */
+        .act-row.changed { animation: actRowFlash 1.6s ease; }
+        @keyframes actRowFlash {
+            0%   { border-color: var(--c, #a855f7); box-shadow: 0 0 0 0 var(--c, #a855f7); }
+            30%  { border-color: var(--c, #a855f7); box-shadow: 0 0 22px -4px var(--c, #a855f7); }
+            100% { border-color: rgba(255, 255, 255, 0.07); box-shadow: none; }
+        }
+        .act-row-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .act-row-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        a.act-row-title:hover { color: #c084fc; }
+        .act-row-time { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+        .act-row-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .act-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.25);
+            font-size: 12px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        .act-pill.ok { color: #34d399; }
+        .act-pill.warn { color: #fbbf24; }
+        .act-pill.bad { color: #f87171; }
+        .act-pill.info { color: #60a5fa; }
+        .act-pill.id { color: #c084fc; }
+        .act-pill.changed { animation: actPillPop .7s cubic-bezier(.16, 1, .3, 1); }
+        @keyframes actPillPop {
+            0%   { transform: scale(.7); opacity: .3; }
+            55%  { transform: scale(1.14); opacity: 1; }
+            100% { transform: none; }
+        }
+
+        .act-vote-box {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+            position: relative;
+            z-index: 2;
+        }
+        .act-vote-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            border-radius: 8px;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all .2s;
+            font-family: inherit;
+        }
+        .act-vote-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+        .act-vote-btn.voted-up { background: rgba(16, 185, 129, 0.18); color: #34d399; border-color: rgba(16, 185, 129, 0.4); }
+        .act-vote-btn.voted-down { background: rgba(239, 68, 68, 0.18); color: #f87171; border-color: rgba(239, 68, 68, 0.4); }
+        .act-vote-btn:disabled { opacity: .6; cursor: wait; }
+        .act-vote-btn i, .act-vote-btn span { pointer-events: none; }
+
+        .act-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 10px;
+            padding: 26px 18px;
+            border: 1px dashed rgba(255, 255, 255, 0.14);
+            border-radius: 14px;
+        }
+        .act-empty-icon {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            display: flex; align-items: center; justify-content: center;
+            color: #cbd5e1;
+            font-size: 16px;
+        }
+        .act-empty h4 { margin: 4px 0 0; font-size: 14.5px; font-weight: 700; color: #fff; }
+        .act-empty p { margin: 0; font-size: 13.5px; line-height: 1.55; color: #94a3b8; max-width: 320px; }
+        .act-empty-btn {
+            margin-top: 6px;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 7px 16px;
+            border-radius: 10px;
+            transition: filter .2s, transform .2s;
+        }
+        .act-empty-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
+        /* ===== ClickSense en imágenes: 3 columnas x 3 filas, tarjetas de 341 x 227 px (3:2) ===== */
+        .gallery-grid-9 {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 341px));
+            gap: 14px;
+            justify-content: center;
+        }
+        .gallery-card-item {
+            position: relative;
+            background: #13141f;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            overflow: hidden;
+            aspect-ratio: 3 / 2;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        .gallery-card-item:hover {
+            transform: translateY(-3px);
+            border-color: #a855f7;
+            box-shadow: 0 8px 22px rgba(168, 85, 247, 0.3);
+        }
+        .gallery-card-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+        .gallery-card-item:hover img { transform: scale(1.06); }
+
+        /* "Ver" en el centro al pasar el ratón */
+        .gallery-card-view {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(10, 8, 20, 0.55);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .gallery-card-view span {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 999px;
+            background: rgba(168, 85, 247, 0.85);
+            box-shadow: 0 6px 18px rgba(168, 85, 247, 0.45);
+            transform: translateY(8px) scale(0.92);
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .gallery-card-item:hover .gallery-card-view { opacity: 1; }
+        .gallery-card-item:hover .gallery-card-view span { transform: none; }
+
+        @media (max-width: 600px) {
+            .gallery-grid-9 { gap: 8px; }
+            .gallery-card-item { border-radius: 12px; }
+            .gallery-card-view span { padding: 5px 12px; font-size: 12px; }
+        }
+
+        /* ===== Visor de imágenes (lightbox) ===== */
+        .lb-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            padding: 24px 70px 20px;
+            box-sizing: border-box;
+            background: rgba(6, 5, 12, 0);
+            backdrop-filter: blur(0px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, background 0.3s ease, backdrop-filter 0.3s ease, visibility 0s linear 0.3s;
+        }
+        .lb-overlay.open {
+            background: rgba(6, 5, 12, 0.92);
+            backdrop-filter: blur(8px);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 0.3s ease, background 0.3s ease, backdrop-filter 0.3s ease, visibility 0s;
+        }
+        .lb-stage {
+            position: relative;
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lb-img-wrap {
+            max-width: 100%;
+            max-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0.92);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .lb-overlay.open .lb-img-wrap { transform: scale(1); }
+        .lb-img {
+            max-width: 100%;
+            max-height: calc(100vh - 190px);
+            border-radius: 16px;
+            border: 1px solid rgba(168, 85, 247, 0.45);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(168, 85, 247, 0.25);
+            object-fit: contain;
+            opacity: 1;
+            transition: opacity 0.22s ease, transform 0.22s ease;
+        }
+        .lb-img.out-left  { opacity: 0; transform: translateX(-40px); }
+        .lb-img.out-right { opacity: 0; transform: translateX(40px); }
+        .lb-img.in-left   { opacity: 0; transform: translateX(-40px); transition: none; }
+        .lb-img.in-right  { opacity: 0; transform: translateX(40px); transition: none; }
+
+        .lb-nav, .lb-close {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            background: rgba(19, 20, 31, 0.85);
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+        .lb-nav:hover, .lb-close:hover {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            border-color: transparent;
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
+        }
+        .lb-nav { width: 46px; height: 46px; top: 50%; margin-top: -23px; font-size: 16px; }
+        .lb-nav:hover { transform: scale(1.08); }
+        .lb-prev { left: -58px; }
+        .lb-next { right: -58px; }
+        .lb-close { top: 18px; right: 20px; width: 40px; height: 40px; font-size: 15px; z-index: 3; }
+                /* Animación del botón de cerrar */
+        .lb-close i { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        .lb-close:hover { transform: scale(1.1); }
+        .lb-close:hover i { transform: rotate(90deg) scale(1.15); }
+        .lb-close:active { transform: scale(0.86); }
+        .lb-overlay.open .lb-close { animation: lbCloseIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.15s backwards; }
+        @keyframes lbCloseIn {
+            from { opacity: 0; transform: scale(0.3) rotate(-180deg); }
+            to   { opacity: 1; transform: none; }
+        }
+        .lb-counter {
+            position: absolute;
+            top: 26px;
+            left: 24px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #cbd5e1;
+            letter-spacing: 0.5px;
+        }
+
+        .lb-thumbs {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            max-width: 100%;
+            overflow-x: auto;
+            border-radius: 14px;
+            background: rgba(19, 20, 31, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.08s, opacity 0.4s ease 0.08s;
+        }
+        .lb-overlay.open .lb-thumbs { transform: none; opacity: 1; }
+        .lb-thumbs::-webkit-scrollbar { height: 5px; }
+        .lb-thumbs::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.4); border-radius: 5px; }
+        .lb-thumb {
+            flex: 0 0 auto;
+            width: 84px;
+            aspect-ratio: 3 / 2;
+            padding: 0;
+            border-radius: 9px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            background: #13141f;
+            opacity: 0.55;
+            transition: opacity 0.2s, border-color 0.2s, transform 0.2s;
+        }
+        .lb-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+        .lb-thumb:hover { opacity: 0.9; transform: translateY(-2px); }
+        .lb-thumb.active { opacity: 1; border-color: #a855f7; box-shadow: 0 0 14px rgba(168, 85, 247, 0.55); }
+
+        @media (max-width: 700px) {
+            .lb-overlay { padding: 60px 12px 14px; }
+            .lb-prev { left: 4px; }
+            .lb-next { right: 4px; }
+            .lb-nav { width: 38px; height: 38px; margin-top: -19px; background: rgba(19, 20, 31, 0.9); z-index: 2; }
+            .lb-thumb { width: 60px; }
+        }
+
+        /* ===== Footer ===== */
+        .site-footer {
+            margin-top: 40px;
+            padding: 40px 0 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .site-footer-grid {
+            display: grid;
+            grid-template-columns: minmax(280px, 1.4fr) minmax(200px, 1fr) minmax(160px, 0.8fr);
+            gap: 40px;
+            align-items: start;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-top: 40px;
+        }
+        .footer-brand img {
+            width: 150px;
+            max-width: 40%;
+            height: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .footer-brand p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.55;
+            color: #94a3b8;
+        }
+        .footer-col h4 {
+            margin: 0 0 18px;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .footer-col:nth-child(3) { padding-top: 45px; }
+        .footer-col a {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color .2s;
+        }
+        .footer-col a:hover { color: #c084fc; }
+        .footer-bottom {
+            max-width: 1100px;
+            margin: 30px auto 0;
+            padding: 22px 0 26px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 12.5px;
+            color: #64748b;
+        }
+        @media (max-width: 900px) {
+            .site-footer-grid { grid-template-columns: 1fr 1fr; }
+            .footer-brand { grid-column: 1 / -1; padding-top: 0; }
+            .footer-col:nth-child(3) { padding-top: 0; }
+        }
+        @media (max-width: 560px) {
+            .site-footer-grid { grid-template-columns: 1fr; }
+            .footer-brand { flex-direction: column; align-items: flex-start; }
+        }
+
+                /* Más separación vertical entre apartados */
+        main.main-content > section.section-block { margin-bottom: 56px; }
+
+        /* Aparición al hacer scroll */
+        .reveal {
+            opacity: 0;
+            transform: translateY(36px);
+            transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+            transition-delay: var(--rd, 0s);
+        }
+        .reveal.in { opacity: 1; transform: none; }
+        .animate-fade-up.reveal, .animate-fade-down.reveal { animation: none !important; }
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1; transform: none; transition: none; }
+            .act-row.changed, .act-pill.changed, .act-state.changed b { animation: none; }
+        }
+
+                .live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+        .live-card {
+            display: flex; flex-direction: column; gap: 12px; padding: 16px;
+            background: rgba(20,22,32,.85); border: 1px solid rgba(168,85,247,.22);
+            border-radius: 16px; text-decoration: none; color: #fff;
+            transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+        }
+        .live-card:hover { transform: translateY(-4px); border-color: #a855f7; box-shadow: 0 10px 26px rgba(168,85,247,.3); }
+        .live-top { display: flex; align-items: center; gap: 12px; }
+        .live-avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(168,85,247,.5); background: #13141f; }
+        .live-name { font-weight: 700; font-size: 14.5px; }
+        .live-title { font-size: 12.5px; color: #94a3b8; line-height: 1.4; min-height: 34px; }
+        .live-foot { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #94a3b8; }
+        .live-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .5px; background: rgba(100,116,139,.2); color: #94a3b8; }
+        .live-badge.on { background: rgba(239,68,68,.18); color: #f87171; }
+        .live-badge.on::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #ef4444; animation: livePulse 1.3s ease-in-out infinite; }
+        @keyframes livePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.6); } 50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); } }
+        .live-card.off { opacity: .6; }
+
+        /* ===== Página de perfil (mismo diseño que en equipo.html) ===== */
+        /* Con el perfil abierto, se oculta todo el contenido de Home salvo la barra superior y el perfil */
+        main.main-content.pv-open > *:not(.top-action-bar):not(#profileView) { display: none !important; }
+
+        .breadcrumb a { color: #94a3b8; text-decoration: none; cursor: pointer; }
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb .bc-sep { margin: 0 8px; opacity: .5; }
+
+        .pv { max-width: 1100px; margin: 0 auto; animation: pvIn .5s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes pvIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+        .pv-banner {
+            position: relative; height: 210px; border-radius: 18px; overflow: hidden;
+            background: linear-gradient(135deg, #5865f2, #a855f7 55%, #ec4899);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,.45);
+        }
+        .pv-banner::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(255,255,255,.18), transparent 55%); }
+        .pv-banner-title {
+            position: relative; z-index: 2; font-family: 'Lexend', sans-serif; font-size: 44px; font-weight: 700;
+            color: #fff; text-transform: uppercase; letter-spacing: 3px; text-align: center; padding: 0 20px;
+            text-shadow: 0 4px 18px rgba(0,0,0,.6);
+        }
+        .pv-back {
+            position: absolute; top: 14px; left: 14px; z-index: 3;
+            background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.18); color: #fff;
+            padding: 8px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 8px; transition: background .2s, transform .2s;
+        }
+        .pv-back:hover { background: rgba(0,0,0,.7); transform: translateX(-2px); }
+
+        .pv-grid { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; margin-top: 28px; align-items: start; }
+        @media (max-width: 900px) { .pv-grid { grid-template-columns: 1fr; } .pv-banner-title { font-size: 28px; } }
+
+        .pv-avatar { width: 160px; height: 160px; border-radius: 18px; object-fit: cover; border: 1px solid rgba(255,255,255,.12); box-shadow: 0 8px 26px rgba(0,0,0,.45); background: #13141f; display: block; }
+        .pv-name { margin: 18px 0 4px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .pv-id { margin: 0; color: #94a3b8; font-size: 14px; word-break: break-all; }
+        .pv-copy {
+            background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: #cbd5e1;
+            width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all .2s;
+        }
+        .pv-copy:hover { background: rgba(168,85,247,.25); border-color: #a855f7; color: #fff; }
+        .pv-copy i { pointer-events: none; }
+        .pv-label { margin: 24px 0 10px; font-size: 11.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #94a3b8; }
+        .pv-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+        .pv-pill {
+            display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px;
+            background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); font-size: 12.5px; font-weight: 600;
+        }
+        .pv-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .pv-info { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+        .pv-info li { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #e2e8f0; }
+        .pv-info li i { width: 16px; text-align: center; color: #94a3b8; }
+
+        .pv-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 560px) { .pv-stats { grid-template-columns: 1fr; } }
+        .pv-stat {
+            display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: 18px;
+            background: rgba(20,24,33,.7); border: 1px solid rgba(255,255,255,.08);
+        }
+        .pv-stat-ico { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .pv-stat small { display: block; color: #94a3b8; font-size: 13px; }
+        .pv-stat strong { display: block; font-size: 24px; font-weight: 800; margin-top: 2px; }
+
+        .pv-sections { margin-top: 18px; display: flex; flex-direction: column; }
+        .pv-sec { border-bottom: 1px solid rgba(255,255,255,.05); }
+        .pv-sec-head {
+            width: 100%; display: flex; align-items: center; gap: 12px; background: transparent; border: none;
+            color: #fff; padding: 18px 4px; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 16px; font-weight: 700; text-align: left;
+        }
+        .pv-sec-head > i:first-child { color: #94a3b8; width: 18px; text-align: center; }
+        .pv-sec-head span { flex: 1; }
+        .pv-sec-head i, .pv-sec-head span { pointer-events: none; }
+        .pv-chev { color: #94a3b8; transition: transform .35s cubic-bezier(.16,1,.3,1); }
+        .pv-sec.open .pv-chev { transform: rotate(180deg); }
+        .pv-sec-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s cubic-bezier(.16,1,.3,1); }
+        .pv-sec.open .pv-sec-body { grid-template-rows: 1fr; }
+        .pv-sec-inner { overflow: hidden; min-height: 0; }
+        .pv-sec-pad { padding: 0 4px 18px; }
+
+        .pv-empty { text-align: center; padding: 26px 16px; border: 1px dashed rgba(255,255,255,.14); border-radius: 14px; color: #94a3b8; font-size: 13.5px; }
+        .pv-empty b { display: block; color: #fff; margin-bottom: 6px; font-size: 14px; }
+        .pv-socials { display: flex; flex-wrap: wrap; gap: 10px; }
+        .pv-social {
+            display: inline-flex; align-items: center; gap: 9px; padding: 9px 16px; border-radius: 12px; text-decoration: none;
+            background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); color: #e2e8f0; font-size: 13.5px; font-weight: 600;
+            transition: transform .2s, border-color .2s, background .2s;
+        }
+        .pv-social:hover { transform: translateY(-2px); border-color: #a855f7; background: rgba(168,85,247,.1); }
+        .pv-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .pv-photo { display: block; aspect-ratio: 3 / 2; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); background: #13141f; }
+        .pv-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+        .pv-photo:hover img { transform: scale(1.07); }
+        .pv-sug { padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); margin-bottom: 10px; }
+        .pv-sug-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; word-break: break-word; }
+        .pv-sug-meta { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: #94a3b8; }
+        .pv-sug-meta .up { color: #34d399; margin-right: 10px; }
+        .pv-sug-meta .down { color: #f87171; }
+        .pv-more { text-align: center; font-size: 12.5px; color: #94a3b8; margin-top: 4px; }
+
+        /* Carga / privado / error: mensaje centrado */
+        .pv-center {
+            min-height: 62vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; gap: 14px; padding: 30px 20px; animation: pvIn .5s cubic-bezier(.16,1,.3,1) both;
+        }
+        .pv-center i.spin { font-size: 28px; color: #a855f7; }
+        .pv-lock {
+            width: 92px; height: 92px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 34px; color: #f87171; background: radial-gradient(circle, rgba(239,68,68,.22), rgba(239,68,68,.05));
+            border: 1px solid rgba(239,68,68,.35); box-shadow: 0 0 44px rgba(239,68,68,.2); animation: pvPulse 2.6s ease-in-out infinite;
+        }
+        .pv-lock.warn { color: #fbbf24; background: radial-gradient(circle, rgba(251,191,36,.2), rgba(251,191,36,.04)); border-color: rgba(251,191,36,.35); box-shadow: 0 0 44px rgba(251,191,36,.18); }
+        @keyframes pvPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+        .pv-center h3 { margin: 0; font-family: 'Lexend', sans-serif; font-size: 22px; }
+        .pv-center p { margin: 0; max-width: 360px; font-size: 14px; line-height: 1.6; color: #94a3b8; }
+        .pv-btn {
+            margin-top: 6px; background: transparent; border: 1px solid rgba(168,85,247,.55); color: #c084fc;
+            padding: 10px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s;
+        }
+        .pv-btn:hover { background: rgba(168,85,247,.15); color: #fff; box-shadow: 0 0 16px rgba(168,85,247,.35); }
+        .pv-btn.alt { border-color: #3f4147; color: #cbd5e1; }
+        @media (prefers-reduced-motion: reduce) {
+            .pv, .pv-center, .pv-lock { animation: none; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Fondo de cuadrícula 3D unificado -->
+    <div class="grid-background"></div>
+
+    <div class="app-container">
+        <!-- Menú Lateral (Sidebar) Actualizado -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+                    <span class="server-main-title">ClickSense</span>
+                </div>
+                <button class="sidebar-toggle-icon" id="sidebarToggleBtn" title="Colapsar menú"><i class="fa-solid fa-bars"></i></button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-category">General</div>
+                <a href="/home.html" class="nav-item active"><i class="fa-solid fa-house"></i> <span>Home</span></a>
+                <a href="/home.html#novedades" class="nav-item"><i class="fa-solid fa-newspaper"></i> <span>Novedades</span></a>
+                <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> <span>Equipo</span></a>
+                <a href="/calendario.html" class="nav-item"><i class="fa-solid fa-calendar-days"></i> <span>Calendario</span></a>
+                <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> <span>Comercios</span></a>
+                <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> <span>Postulaciones ilegales</span></a>
+
+                <div class="nav-category">Espacio de trabajo</div>
+                <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> <span>Grupos</span></a>
+                <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> <span>Documentos</span></a>
+                <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> <span>Whitelist</span></a>
+
+                <div class="nav-category">Mi Cuenta</div>
+                <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> <span>Mi Perfil</span></a>
+                <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> <span>Historias personaje</span></a>
+                <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> <span>Tickets</span></a>
+
+                <div class="nav-category">SASP</div>
+                <a href="/lspd-academia.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> <span>Academia LSPD</span></a>
+                <a href="/lssd-academia.html" class="nav-item"><i class="fa-solid fa-star-badge"></i> <span>Academia LSSD</span></a>
+                <a href="/defcon.html" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i> <span>Defcon</span></a>
+                <a href="/codigo-penal.html" class="nav-item"><i class="fa-solid fa-scale-balanced"></i> <span>Código penal</span></a>
+                <a href="/organigrama.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> <span>Organigrama</span></a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-mini" id="userProfileMini">
+                    <!-- Contenedor del avatar -->
+                    <div class="avatar-placeholder" id="userAvatarContainer">
+                        <span id="userAvatarFallback">?</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">Usuario</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@tag</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Botón flotante que aparece en el borde izquierdo cuando el menú está oculto -->
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <!-- Barra superior con botones compactos y alineados -->
+            <header class="top-action-bar animate-fade-down">
+                <div class="breadcrumb" id="breadcrumbBar">Home</div>
+                <div class="top-buttons">
+                    <!-- Botón de Soporte -->
+                    <div class="support-dropdown-container" id="supportDropdownContainer">
+                        <button class="top-btn highlight-btn" id="supportDropdownBtn">
+                            <i class="fa-solid fa-circle-question"></i> Soporte
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Página de perfil de un usuario (se muestra al pulsar el autor de una novedad) -->
+            <div id="profileView" style="display: none;"></div>
+
+            <!-- Menú Desplegable Estilizado (Ubicado en el body para máxima capa superior) -->
+            <div class="support-dropdown-menu" id="supportDropdownMenu">
+                <!-- Sección Soporte -->
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Soporte</div>
+                    <a href="/tickets.html" class="support-dropdown-item"><i class="fa-solid fa-ticket"></i> Crear un ticket</a>
+                </div>
+                <!-- Sección Apoyo -->
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Apoyo</div>
+                    <a href="/sugerencias.html" class="support-dropdown-item"><i class="fa-solid fa-lightbulb"></i> Enviar una sugerencia</a>
+                    <a href="/feedback.html" class="support-dropdown-item"><i class="fa-solid fa-comment-dots"></i> Dar tu feedback</a>
+                    <a href="/perfil.html" class="support-dropdown-item"><i class="fa-solid fa-user"></i> Acceder al perfil</a>
+                    <a href="/index.html" class="support-dropdown-item"><i class="fa-solid fa-house-chimney"></i> Acceder al panel principal</a>
+                </div>
+                <!-- Sección Información -->
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Información</div>
+                    <a href="/normativa.html" class="support-dropdown-item"><i class="fa-solid fa-book"></i> Normativa general</a>
+                    <a href="/pol-privacidad.html" class="support-dropdown-item"><i class="fa-solid fa-shield-halved"></i> Política de privacidad</a>
+                    <a href="/terminos.html" class="support-dropdown-item"><i class="fa-solid fa-file-contract"></i> Términos y condiciones</a>
+                </div>
+            </div>
+
+            <!-- Menú Desplegable de Filtro de Novedades Animado -->
+            <div class="custom-dropdown-menu" id="nvDropdownMenu">
+                <div class="custom-dropdown-item" data-cat="Todas"><i class="fa-solid fa-border-all" style="color:#a855f7;"></i> Todas</div>
+                <div class="custom-dropdown-item" data-cat="Comunicados"><i class="fa-solid fa-bullhorn" style="color:#ec4899;"></i> Comunicados</div>
+                <div class="custom-dropdown-item" data-cat="ChangeLog"><i class="fa-solid fa-code-merge" style="color:#3b82f6;"></i> ChangeLog</div>
+                <div class="custom-dropdown-item" data-cat="Eventos"><i class="fa-solid fa-calendar-days" style="color:#10b981;"></i> Eventos</div>
+                <div class="custom-dropdown-item" data-cat="Avisos"><i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i> Avisos</div>
+                <div class="custom-dropdown-item" data-cat="Otros"><i class="fa-solid fa-circle-info" style="color:#6366f1;"></i> Otros</div>
+            </div>
+
+            <!-- Tarjeta de Bienvenida (Zona azul modificada dinámicamente) -->
+            <div class="welcome-banner-card animate-fade-up">
+                <div class="welcome-avatar" id="welcomeAvatarContainer">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop" alt="Avatar">
+                </div>
+                <div class="welcome-text-content">
+                    <h1 id="welcomeNameDisplay">Bienvenido, Usuario</h1>
+                    <p>Explora, gestiona y vive la mejor experiencia de rol.</p>
+                </div>
+            </div>
+
+            <!-- Anuncios y Novedades con Filtro de Categorías y Buscador -->
+            <section class="section-block animate-fade-up delay-1" id="novedades">
+                <div class="section-header-flex">
+                    <div class="nv-title-wrap">
+                        <h2 class="section-title"><i class="fa-solid fa-bullhorn"></i> Anuncios y Novedades</h2>
+                        <button class="nv-bell-btn" id="nvBellBtn" title="Activar avisos por Discord de nuevas novedades">
+                            <i class="fa-solid fa-bell-slash"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="nv-home-actions">
+                        <!-- Desplegable Filtro con las 6 Categorías Requeridas en formato normal -->
+                        <div class="custom-dropdown-container" id="nvDropdownContainer">
+                            <div class="custom-dropdown-btn" id="nvDropdownBtn">
+                                <span style="display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid fa-filter"></i> <span id="nvDropdownLabel">Todas</span>
+                                </span>
+                                <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: #94a3b8;"></i>
+                            </div>
+                        </div>
+
+                        <!-- Buscador con luz morada corporativa al enfocar -->
+                        <div class="custom-search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="filterAnnouncements" placeholder="Buscar anuncios...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="announcements-grid-modern" id="novedadesGrid">
+                    <p style="color:var(--text-muted,#94a3b8);padding:15px;font-size:13.5px;">Cargando novedades...</p>
+                </div>
+            </section>
+
+            <!-- Actividad: Tickets y Sugerencias y bugs -->
+            <section class="section-block animate-fade-up delay-2">
+                <div class="act-grid">
+
+                    <!-- Tickets -->
+                    <div class="act-card">
+                        <div class="act-card-header">
+                            <h3 class="act-card-title"><i class="fa-regular fa-comment-dots"></i> Tickets</h3>
+                            <a href="/tickets.html" class="act-see-all">Ver todos</a>
+                        </div>
+                        <div id="actTicketsBody" class="act-list">
+                            <div class="act-empty">
+                                <div class="act-empty-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                                <p>Cargando tus tickets...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sugerencias y bugs -->
+                    <div class="act-card">
+                        <div class="act-card-header">
+                            <h3 class="act-card-title"><i class="fa-regular fa-lightbulb"></i> Sugerencias y bugs</h3>
+                            <a href="/sugerencias.html" class="act-see-all">Ver todas</a>
+                        </div>
+                        <div id="actSugBody" class="act-list">
+                            <div class="act-empty">
+                                <div class="act-empty-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                                <p>Cargando sugerencias...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Nuevas Incorporaciones -->
+            <section class="section-block animate-fade-up delay-2">
+                <div class="section-header-flex">
+                    <h2 class="section-title"><i class="fa-solid fa-user-plus"></i> Nuevas incorporaciones</h2>
+                    
+                </div>
+                
+                <div class="members-grid-clean" id="nuevasIncorporacionesGrid">
+                    <!-- Contenido renderizado dinámicamente -->
+                </div>
+            </section>
+
+            <section class="section-block" id="liveSection">
+    <div class="section-header-flex">
+        <h2 class="section-title"><i class="fa-solid fa-tower-broadcast"></i> Canales en directo</h2>
+    </div>
+    <div class="live-grid" id="liveGrid"></div>
+</section>
+
+            <!-- ClickSense en imágenes (9 imágenes: 3 columnas x 3 filas) -->
+            <section class="section-block animate-fade-up delay-3">
+                <div class="section-header-flex">
+                    <h2 class="section-title"><i class="fa-solid fa-images"></i> ClickSense en imágenes</h2>
+                    
+                </div>
+
+                <!--
+                    CAMBIA las URLs de cada imagen:
+                    - src       -> miniatura que se ve en la cuadrícula
+                    - data-full -> imagen grande que se ve en el visor (puede ser la misma URL)
+                -->
+                <div class="gallery-grid-9" id="galleryGrid">
+                    <div class="gallery-card-item" role="button" tabindex="0" aria-label="Ver imagen 1">
+                        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=700&auto=format&fit=crop" data-full="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1800&auto=format&fit=crop" alt="Imagen 1" loading="lazy">
+                        <div class="gallery-card-view"><span><i class="fa-solid fa-eye"></i> Ver</span></div>
+                    </div>
+                    <div class="gallery-card-item" role="button" tabindex="0" aria-label="Ver imagen 2">
+                        <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=700&auto=format&fit=crop" data-full="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1800&auto=format&fit=crop" alt="Imagen 2" loading="lazy">
+                        <div class="gallery-card-view"><span><i class="fa-solid fa-eye"></i> Ver</span></div>
+                    </div>
+                    <div class="gallery-card-item" role="button" tabindex="0" aria-label="Ver imagen 3">
+                        <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=700&auto=format&fit=crop" data-full="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=1800&auto=format&fit=crop" alt="Imagen 3" loading="lazy">
+                        <div class="gallery-card-view"><span><i class="fa-solid fa-eye"></i> Ver</span></div>
+                    </div>
+                    <div class="gallery-card-item" role="button" tabindex="0" aria-label="Ver imagen 4">
+                        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=700&auto=format&fit=crop" data-full="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1800&auto=format&fit=crop" alt="Imagen 4" loading="lazy">
+                        <div class="gallery-card-view"><span><i class="fa-solid fa-eye"></i> Ver</span></div>
+                    </div>
+                    <div class="gallery-card-item" role="button" tabindex="0" aria-label="Ver imagen 5">
+                        <img src="https://images.unsplash.com/photo-1612287233202-b51b36671c6d?q=80&w=700&auto=format&fit=crop" data-full="https://images.unsplash.com/photo-1612287233202-b51b36671c6d?q=80&w=1800&auto=format&fit=crop" alt="Imagen 5" loading="lazy">
+                        <div class="gallery-card-view"><span><i class="fa-solid fa-eye"></i> Ver</span></div>
+                    </div>
+                    <div class="gallery-card-item" role="button" tabindex="0" aria-label="Ver imagen 6">
+                        <img src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=700&auto=format&fit=crop" data-full="https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=1800&auto=format&fit=crop" alt="Imagen 6" loading="lazy">
+                        <div class="gallery-card-view"><span><i class="fa-solid fa-eye"></i> Ver</span></div>
+                    </div>
+                    <div class="gallery-card-item" role="button" tabindex="0" aria-label="Ver imagen 7">
+                        <img src="https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=700&auto=format&fit=crop" data-full="https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=1800&auto=format&fit=crop" alt="Imagen 7" loading="lazy">
+                        <div class="gallery-card-view"><span><i class="fa-solid fa-eye"></i> Ver</span></div>
+                    </div>
+                    <div class="gallery-card-item" role="button" tabindex="0" aria-label="Ver imagen 8">
+                        <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=700&auto=format&fit=crop" data-full="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1800&auto=format&fit=crop" alt="Imagen 8" loading="lazy">
+                        <div class="gallery-card-view"><span><i class="fa-solid fa-eye"></i> Ver</span></div>
+                    </div>
+                    <div class="gallery-card-item" role="button" tabindex="0" aria-label="Ver imagen 9">
+                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=700&auto=format&fit=crop" data-full="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1800&auto=format&fit=crop" alt="Imagen 9" loading="lazy">
+                        <div class="gallery-card-view"><span><i class="fa-solid fa-eye"></i> Ver</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Normativas y Equipo Administrativo -->
+            <section class="section-block animate-fade-up delay-3">
+                <div class="normativa-grid">
+                    
+                    <a href="/normativa.html" class="normativa-card">
+                        <div class="norm-img-box">
+                            <img src="https://i.imgur.com/c6TISFN.png" alt="Normativa">
+                        </div>
+                        <div class="norm-info">
+                            <h3>Normativa</h3>
+                            <p>Reglas generales del servidor</p>
+                        </div>
+                    </a>
+
+                    <a href="/normativa-ilegal.html" class="normativa-card">
+                        <div class="norm-img-box">
+                            <img src="https://i.imgur.com/YmrZGiw.png" alt="Normativa ilegal">
+                        </div>
+                        <div class="norm-info">
+                            <h3>Normativa ilegal</h3>
+                            <p>Normas para bandas y mafias</p>
+                        </div>
+                    </a>
+
+                    <a href="/normativa-locales.html" class="normativa-card">
+                        <div class="norm-img-box">
+                            <img src="https://i.imgur.com/quxYcMX.png" alt="Normativa locales">
+                        </div>
+                        <div class="norm-info">
+                            <h3>Normativa locales</h3>
+                            <p>Regulación de negocios y tiendas</p>
+                        </div>
+                    </a>
+
+                    <a href="/equipo.html" class="normativa-card">
+                        <div class="norm-img-box">
+                            <i class="fa-solid fa-gavel"></i>
+                        </div>
+                        <div class="norm-info">
+                            <h3>Equipo administrativo</h3>
+                            <p>Staff y moderación de ClickSense</p>
+                        </div>
+                    </a>
+
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="site-footer">
+                <div class="site-footer-grid">
+                    <div class="footer-brand">
+                        <img src="/src/assets/logowipe.png" alt="ClickSense RP">
+                        <p>Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                    </div>
+
+                    <div class="footer-col">
+                        <h4>Información</h4>
+                        <a href="/normativa.html">Normativa del servidor</a>
+                        <a href="/pol-privacidad.html">Política de privacidad</a>
+                        <a href="/cookies.html">Política de cookies</a>
+                        <a href="/terminos.html">Términos y condiciones</a>
+                        <a href="/terminos-compra.html">Términos y condiciones de compra</a>
+                        <a href="/vip.html">Información VIP</a>
+                        <a href="/vip-comercios.html">Información VIP Comercios</a>
+                    </div>
+
+                    <div class="footer-col">
+                        <h4>Comunidad</h4>
+                        <a href="#" target="_blank" rel="noopener">Discord</a>
+                        <a href="#" target="_blank" rel="noopener">Twitter / X</a>
+                        <a href="/equipo.html">Staff</a>
+                        <a href="/whitelist.html">Whitelist</a>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                    <span>Developed by Gallegoo</span>
+                </div>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- Visor de imágenes (lightbox) -->
+    <div class="lb-overlay" id="lbOverlay" aria-hidden="true">
+        <span class="lb-counter" id="lbCounter">1 / 9</span>
+        <button type="button" class="lb-close" id="lbClose" title="Cerrar (Esc)"><i class="fa-solid fa-xmark"></i></button>
+
+        <div class="lb-stage" id="lbStage">
+            <button type="button" class="lb-nav lb-prev" id="lbPrev" title="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="lb-img-wrap">
+                <img class="lb-img" id="lbImg" src="" alt="">
+            </div>
+            <button type="button" class="lb-nav lb-next" id="lbNext" title="Siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+        <div class="lb-thumbs" id="lbThumbs"></div>
+    </div>
+
+    <!-- Modal Emergente de Novedades -->
+    <div class="modal-overlay" id="novedadModal">
+        <div class="modal-content-box">
+            <button class="modal-close-btn" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header-meta">
+                <span class="ann-badge" id="modalBadge"></span>
+            </div>
+            <h2 id="modalTitle" style="font-size: 20px; font-weight: 700; margin-bottom: 5px;"></h2>
+            <div class="modal-body">
+                <p id="modalDescription"></p>
+            </div>
+            <div class="modal-footer-info">
+                <div id="modalAuthorContainer"></div>
+                <div id="modalTime" style="font-size: 12.5px; color: #94a3b8; font-weight: 500;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aviso emergente de la campanita -->
+    <div class="nv-bell-toast" id="nvBellToast"></div>
+
+    <!-- Scripts de interactividad -->
+    <script>
+    function registrarLoginUnico(userData) {
+        try {
+            let recentLogins = JSON.parse(localStorage.getItem('recent_logins') || '[]');
+            const existingIndex = recentLogins.findIndex(u => u.id === userData.id);
+
+            if (existingIndex === -1) {
+                recentLogins.unshift({
+                    id: userData.id,
+                    username: userData.displayName || userData.username || "Usuario",
+                    avatarUrl: userData.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop",
+                    timestamp: new Date().toISOString()
+                });
+            }
+            if (recentLogins.length > 8) {
+                recentLogins = recentLogins.slice(0, 8);
+            }
+            localStorage.setItem('recent_logins', JSON.stringify(recentLogins));
+        } catch (e) {
+            console.error("Error al registrar el login único:", e);
+        }
+    }
+
+    function renderNuevasIncorporaciones() {
+        const grid = document.getElementById('nuevasIncorporacionesGrid');
+        if (!grid) return;
+
+        let recentLogins = [];
+        try {
+            const data = localStorage.getItem('recent_logins');
+            if (data) recentLogins = JSON.parse(data);
+        } catch (e) {}
+
+        if (recentLogins.length === 0) {
+            grid.innerHTML = `<p style="color: var(--text-muted, #94a3b8); padding: 15px; font-size: 13.5px;">No hay registros recientes de incorporaciones todavía.</p>`;
+            return;
+        }
+
+        let html = '';
+        recentLogins.forEach(user => {
+            const timeAgo = formatTimeAgo(user.timestamp);
+            html += `
+                <div class="member-card-clean">
+                    <div class="member-avatar-box">
+                        <img src="${user.avatarUrl}" alt="${user.username}" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop'">
+                    </div>
+                    <div class="member-meta">
+                        <span class="m-name">${user.username}</span>
+                        <span class="m-status-text">${timeAgo}</span>
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+    }
+
+    function formatTimeAgo(timestamp) {
+        if (!timestamp) return "Hace un momento";
+        const diff = Date.now() - new Date(timestamp).getTime();
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+
+        if (minutes < 1) return "Hace un momento";
+        if (minutes < 60) return `Hace ${minutes} min`;
+        if (hours < 24) return `Hace ${hours} hora${hours > 1 ? 's' : ''}`;
+        return `Hace ${days} día${days > 1 ? 's' : ''}`;
+    }
+
+    /* ------------------------------------------------------------------
+       Estado de una sugerencia: el MISMO criterio y los mismos colores que
+       el tablero de sugerencias.html (Nueva / En revisión / Implementada /
+       Rechazada). Se usa en el panel "Sugerencias y bugs" y en los perfiles.
+       ------------------------------------------------------------------ */
+    const SUG_ESTADOS = {
+        nueva:        { texto: 'Nueva',        plural: 'Nuevas',        cls: 'info', color: '#60a5fa' },
+        revision:     { texto: 'En revisión',  plural: 'En revisión',   cls: 'warn', color: '#fbbf24' },
+        implementada: { texto: 'Implementada', plural: 'Implementadas', cls: 'ok',   color: '#34d399' },
+        rechazada:    { texto: 'Rechazada',    plural: 'Rechazadas',    cls: 'bad',  color: '#f87171' }
+    };
+
+    function sugEstado(s) {
+        const raw = String((s && s.status) || '').trim();
+        const e = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        let col = 'nueva';
+        if (e.includes('rechaz') || e.includes('deneg')) col = 'rechazada';
+        else if (e.includes('implement') || e.includes('complet')) col = 'implementada';
+        else if (e.includes('revis') || e.includes('aprob') || e.includes('acept') || e.includes('proceso')) col = 'revision';
+        const base = SUG_ESTADOS[col];
+        // "Pendiente" se muestra como "Nueva". Si el panel de admin usa otro texto (p. ej. "Aprobada"), se respeta.
+        return { col, texto: col === 'nueva' ? base.texto : (raw || base.texto), cls: base.cls, color: base.color };
+    }
+
+    // Nombre del staff que cambió el estado (si quedó guardado)
+    function sugStaffNombre(s) {
+        const o = s && (s.staff || s.revisadoPor || s.gestionadoPor);
+        if (o && typeof o === 'object') return String(o.usuario || o.nombre || o.username || '').trim();
+        if (typeof o === 'string') return o.trim();
+        return String((s && (s.staffNombre || s.staffUsuario)) || '').trim();
+    }
+
+    async function loadDiscordSessionData() {
+        renderNuevasIncorporaciones();
+        const storedUser = localStorage.getItem('discord_user');
+        const avatarContainer = document.getElementById('userAvatarContainer');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userHandleDisplay = document.getElementById('userHandleDisplay');
+        const welcomeAvatarContainer = document.getElementById('welcomeAvatarContainer');
+        const welcomeNameDisplay = document.getElementById('welcomeNameDisplay');
+
+        if (!storedUser) return;
+        try {
+            const discordUser = JSON.parse(storedUser);
+            registrarLoginUnico(discordUser);
+            renderNuevasIncorporaciones();
+
+            const name = discordUser.displayName || discordUser.username || "Usuario";
+            const handle = "@" + (discordUser.username || "discord");
+            const avatarUrl = discordUser.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop";
+
+            if (userNameDisplay) userNameDisplay.textContent = name;
+            if (userHandleDisplay) userHandleDisplay.textContent = handle;
+            if (avatarContainer) avatarContainer.innerHTML = `<img src="${avatarUrl}" alt="Avatar de ${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            if (welcomeNameDisplay) welcomeNameDisplay.textContent = `Bienvenido, ${name}`;
+            if (welcomeAvatarContainer) welcomeAvatarContainer.innerHTML = `<img src="${avatarUrl}" alt="Avatar de ${name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        } catch (e) {}
+    }
+
+    loadDiscordSessionData();
+
+    // Colapso de Sidebar
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const revealBtn = document.getElementById('sidebarRevealBtn');
+    const sidebar = document.getElementById('sidebar');
+
+    if (toggleBtn && revealBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+        revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+    }
+
+    // Lógica dinámica del menú desplegable de Soporte con posicionamiento global absoluto
+    const supportBtn = document.getElementById('supportDropdownBtn');
+    const supportMenu = document.getElementById('supportDropdownMenu');
+    
+    if (supportBtn && supportMenu) {
+        supportBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = supportMenu.classList.contains('show');
+            
+            document.getElementById('nvDropdownMenu')?.classList.remove('show');
+
+            if (!isOpen) {
+                if (supportMenu.parentElement !== document.body) {
+                    document.body.appendChild(supportMenu);
+                }
+                const rect = supportBtn.getBoundingClientRect();
+                supportMenu.style.top = (rect.bottom + 8) + 'px';
+                supportMenu.style.right = (window.innerWidth - rect.right) + 'px';
+                supportMenu.classList.add('show');
+            } else {
+                supportMenu.classList.remove('show');
+            }
+        });
+
+        window.addEventListener('click', () => {
+            supportMenu.classList.remove('show');
+        });
+
+        window.addEventListener('resize', () => {
+            supportMenu.classList.remove('show');
+        });
+    }
+    </script>
+
+    <!-- Lógica robusta de Novedades y Animaciones -->
+    <script>
+        const NV_BADGES = {
+            'Comunicados': { cls: 'notice', icon: 'fa-bullhorn' },
+            'ChangeLog': { cls: 'rocket', icon: 'fa-code-merge' },
+            'Eventos': { cls: 'calendar', icon: 'fa-calendar-days' },
+            'Avisos': { cls: 'charity', icon: 'fa-triangle-exclamation' },
+            'Otros': { cls: 'notice', icon: 'fa-circle-info' }
+        };
+        let nvLista = [];
+        let nvCategoriaSeleccionada = 'Todas';
+        let nvBusquedaTexto = '';
+
+        const nvEsc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        const NV_MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+        function nvFormatearFechaEvento(fechaStr) {
+            const d = new Date(fechaStr);
+            if (isNaN(d.getTime())) return String(fechaStr || '');
+            const hora = String(fechaStr).includes('T')
+                ? ' a las ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0')
+                : '';
+            return `${d.getDate()} de ${NV_MESES[d.getMonth()]} de ${d.getFullYear()}${hora}`;
+        }
+
+        function eventosCalendarioComoNovedades() {
+            let obj = {};
+            try {
+                const parsed = JSON.parse(localStorage.getItem('calendar_events') || '{}');
+                if (parsed && typeof parsed === 'object') obj = parsed;
+            } catch (e) { return []; }
+
+            const out = [];
+            Object.keys(obj).forEach(dateKey => {
+                if (!Array.isArray(obj[dateKey])) return;
+                obj[dateKey].forEach((ev, idx) => {
+                    if (!ev || !ev.title) return;
+
+                    let publicado = ev.createdAt;
+                    if (!publicado && Number(ev.id) > 1e12) publicado = new Date(Number(ev.id)).toISOString();
+                    if (!publicado) publicado = ev.date || dateKey;
+
+                    const fechaEvento = nvFormatearFechaEvento(ev.date || dateKey);
+                    const lugar = ev.location || (Array.isArray(ev.businesses) ? ev.businesses.join(', ') : (ev.businesses || ''));
+                    let descripcion = ev.description ? ev.description : 'Nuevo evento programado en el calendario.';
+                    descripcion += `\n\n📅 Fecha y hora: ${fechaEvento}`;
+                    if (lugar) descripcion += `\n📍 Ubicación: ${lugar}`;
+
+                    out.push({
+                        id: 'cal-' + (ev.id ?? (dateKey + '-' + idx)),
+                        titulo: ev.title,
+                        descripcion,
+                        categoria: 'Eventos',
+                        destacada: false,
+                        fecha: publicado,
+                        autor: ev.autor || 'Staff ClickSense',
+                        avatarAutor: ev.avatarAutor || '',
+                        origen: 'calendario'
+                    });
+                });
+            });
+            return out;
+        }
+
+        function obtenerAvatarAutor(n) {
+            if (n.avatarAutor && !n.avatarAutor.includes('default')) return n.avatarAutor;
+            if (n.avatarUrl && !n.avatarUrl.includes('default')) return n.avatarUrl;
+
+            try {
+                const storedUser = JSON.parse(localStorage.getItem('discord_user') || '{}');
+                if (storedUser.username && storedUser.username.toLowerCase() === (n.autor || '').toLowerCase() && storedUser.avatarUrl) {
+                    return storedUser.avatarUrl;
+                }
+            } catch (e) {}
+
+            try {
+                const recentLogins = JSON.parse(localStorage.getItem('recent_logins') || '[]');
+                const found = recentLogins.find(u => u.username && u.username.toLowerCase() === (n.autor || '').toLowerCase());
+                if (found && found.avatarUrl) return found.avatarUrl;
+            } catch (e) {}
+
+            return "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop";
+        }
+
+        async function cargarNovedadesHome(silencioso = false) {
+            try {
+                const r = await fetch('/api/novedades');
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                const data = await r.json();
+                nvLista = Array.isArray(data) ? data : [];
+                localStorage.setItem('novedades_cache', JSON.stringify(nvLista));
+            } catch (e) {
+                if (!silencioso) {
+                    try { nvLista = JSON.parse(localStorage.getItem('novedades_cache') || '[]'); } catch { nvLista = []; }
+                }
+            }
+            renderNovedadesHome();
+        }
+
+        function renderNovedadesHome() {
+            const grid = document.getElementById('novedadesGrid');
+            if (!grid) return;
+
+            let items = [...nvLista, ...eventosCalendarioComoNovedades()].filter(n => {
+                const cumpleCat = (nvCategoriaSeleccionada === 'Todas' || (n.categoria || '').toLowerCase() === nvCategoriaSeleccionada.toLowerCase());
+                const query = nvBusquedaTexto.toLowerCase();
+                const cumpleBusq = !query || 
+                    (n.titulo && n.titulo.toLowerCase().includes(query)) || 
+                    (n.descripcion && n.descripcion.toLowerCase().includes(query)) ||
+                    (n.categoria && n.categoria.toLowerCase().includes(query));
+                return cumpleCat && cumpleBusq;
+            });
+
+            items.sort((a, b) => ((b.destacada ? 1 : 0) - (a.destacada ? 1 : 0)) || (new Date(b.fecha) - new Date(a.fecha)));
+
+            const filtrandoActivo = (nvCategoriaSeleccionada !== 'Todas' || nvBusquedaTexto.trim() !== '');
+            if (!filtrandoActivo) {
+                items = items.slice(0, 5);
+            }
+
+            if (!items.length) {
+                grid.innerHTML = `<p style="color:var(--text-muted,#94a3b8);padding:15px;font-size:13.5px;">No se encontraron novedades.</p>`;
+                return;
+            }
+
+            grid.innerHTML = items.map((n, i) => {
+                const catKey = Object.keys(NV_BADGES).find(k => k.toLowerCase() === (n.categoria || '').toLowerCase()) || 'Otros';
+                const b = NV_BADGES[catKey] || NV_BADGES['Otros'];
+                const nJson = encodeURIComponent(JSON.stringify(n)).replace(/'/g, '%27');
+                const catMayus = nvEsc(n.categoria || catKey).toUpperCase();
+                return `
+                <div class="ann-card-modern nv-card-in ${n.destacada ? 'nv-featured' : ''}" style="animation-delay:${i * 0.05}s" onclick="abrirModalNovedad(JSON.parse(decodeURIComponent('${nJson}')))">
+                    <div class="ann-card-header">
+                        <span class="ann-badge ${b.cls}"><i class="fa-solid ${b.icon}"></i> ${catMayus}${n.destacada ? '<i class="fa-solid fa-star" style="color:#a855f7;font-size:12px;margin-left:6px;"></i>' : ''}</span>
+                        <span class="ann-time">${nvEsc(formatTimeAgo(n.fecha))}</span>
+                    </div>
+                    <h3>${nvEsc(n.titulo)}</h3>
+                    <p>${nvEsc(n.descripcion)}</p>
+                </div>`;
+            }).join('');
+        }
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'calendar_events') renderNovedadesHome();
+        });
+
+        const dropdownBtn = document.getElementById('nvDropdownBtn');
+        const dropdownMenu = document.getElementById('nvDropdownMenu');
+        const dropdownLabel = document.getElementById('nvDropdownLabel');
+
+        dropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdownMenu.classList.contains('show');
+            
+            document.getElementById('supportDropdownMenu')?.classList.remove('show');
+
+            if (!isOpen) {
+                if (dropdownMenu.parentElement !== document.body) {
+                    document.body.appendChild(dropdownMenu);
+                }
+                const rect = dropdownBtn.getBoundingClientRect();
+                dropdownMenu.style.top = (rect.bottom + 8) + 'px';
+                dropdownMenu.style.left = rect.left + 'px';
+                dropdownMenu.style.width = Math.max(rect.width, 170) + 'px';
+                dropdownMenu.classList.add('show');
+                dropdownBtn.classList.add('active');
+            } else {
+                dropdownMenu.classList.remove('show');
+                dropdownBtn.classList.remove('active');
+            }
+        });
+
+        document.querySelectorAll('.custom-dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                nvCategoriaSeleccionada = item.dataset.cat;
+                dropdownLabel.textContent = item.textContent.trim();
+                dropdownMenu.classList.remove('show');
+                dropdownBtn.classList.remove('active');
+                
+                const grid = document.getElementById('novedadesGrid');
+                if (grid) {
+                    grid.style.opacity = '0';
+                    grid.style.transform = 'translateY(8px)';
+                    setTimeout(() => {
+                        renderNovedadesHome();
+                        grid.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        grid.style.opacity = '1';
+                        grid.style.transform = 'none';
+                    }, 150);
+                } else {
+                    renderNovedadesHome();
+                }
+            });
+        });
+
+        window.addEventListener('click', () => {
+            dropdownMenu.classList.remove('show');
+            dropdownBtn.classList.remove('active');
+        });
+
+        window.addEventListener('resize', () => {
+            dropdownMenu.classList.remove('show');
+            dropdownBtn.classList.remove('active');
+        });
+
+        const filterInput = document.getElementById('filterAnnouncements');
+        if (filterInput) {
+            filterInput.addEventListener('input', (e) => {
+                nvBusquedaTexto = e.target.value.trim();
+                renderNovedadesHome();
+            });
+        }
+
+        function abrirModalNovedad(n) {
+            const modal = document.getElementById('novedadModal');
+            const catKey = Object.keys(NV_BADGES).find(k => k.toLowerCase() === (n.categoria || '').toLowerCase()) || 'Otros';
+            const b = NV_BADGES[catKey] || NV_BADGES['Otros'];
+            const catMayus = nvEsc(n.categoria || catKey).toUpperCase();
+            
+            document.getElementById('modalBadge').className = `ann-badge ${b.cls}`;
+            document.getElementById('modalBadge').innerHTML = `<i class="fa-solid ${b.icon}"></i> ${catMayus} ${n.destacada ? '<i class="fa-solid fa-star" style="color:#a855f7;font-size:12px;margin-left:6px;"></i>' : ''}`;
+            document.getElementById('modalTitle').textContent = n.titulo;
+            document.getElementById('modalDescription').textContent = n.descripcion;
+            document.getElementById('modalTime').textContent = formatTimeAgo(n.fecha);
+
+            const authorName = n.autor || n.username || "Gallego ™";
+            const authorAvatar = obtenerAvatarAutor(n);
+            
+            // Al pulsar el autor se abre su página de perfil (la misma que en Equipo)
+            const authorContainer = document.getElementById('modalAuthorContainer');
+            authorContainer.innerHTML = `
+                <div class="author-badge-click" role="button" tabindex="0" title="Ver perfil">
+                    <img src="${nvEsc(authorAvatar)}" alt="${nvEsc(authorName)}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop'">
+                    <span style="font-weight: 600; font-size: 13.5px; color: #fff;">${nvEsc(authorName)}</span>
+                </div>
+            `;
+            const authorBadge = authorContainer.querySelector('.author-badge-click');
+            const verPerfil = () => abrirPerfilAutor(n, authorName, authorAvatar);
+            authorBadge.addEventListener('click', verPerfil);
+            authorBadge.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); verPerfil(); }
+            });
+
+            modal.classList.add('active');
+        }
+
+        document.getElementById('modalCloseBtn')?.addEventListener('click', () => {
+            document.getElementById('novedadModal').classList.remove('active');
+        });
+
+        document.getElementById('novedadModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('novedadModal')) {
+                document.getElementById('novedadModal').classList.remove('active');
+            }
+        });
+
+        const bellBtn = document.getElementById('nvBellBtn');
+        let notifActivas = false;
+
+        function nvBellToast(msg) {
+            const t = document.getElementById('nvBellToast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 4200);
+        }
+
+        function pintarCampana() {
+            bellBtn.classList.toggle('on', notifActivas);
+            bellBtn.innerHTML = `<i class="fa-solid ${notifActivas ? 'fa-bell' : 'fa-bell-slash'}"></i>`;
+            bellBtn.title = notifActivas
+                ? 'Notificaciones activadas. Clic para desactivar'
+                : 'Activar avisos por Discord de nuevas novedades';
+        }
+
+        async function cargarPreferenciaNotif() {
+            try {
+                const r = await fetch('/api/notificaciones/preferencias', { credentials: 'same-origin' });
+                if (r.ok) notifActivas = (await r.json()).activas === true;
+            } catch (e) {}
+            pintarCampana();
+        }
+
+        function sesionServidorCaducada() {
+            nvBellToast('Tu sesión con el servidor ha caducado. Vuelve a iniciar sesión con Discord.');
+            setTimeout(() => {
+                if (confirm('Tu sesión con el servidor ha caducado. ¿Quieres volver a iniciar sesión con Discord ahora?')) {
+                    try { localStorage.removeItem('discord_user'); } catch (e) {}
+                    window.location.href = '/login.html';
+                }
+            }, 400);
+        }
+
+        bellBtn.addEventListener('click', async () => {
+                        bellBtn.classList.remove('burst');
+            void bellBtn.offsetWidth;
+            bellBtn.classList.add('burst');
+            setTimeout(() => bellBtn.classList.remove('burst'), 650);
+            const nuevo = !notifActivas;
+            bellBtn.disabled = true;
+            try {
+                const r = await fetch('/api/notificaciones/preferencias', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ activas: nuevo })
+                });
+                if (r.status === 401) {
+                    sesionServidorCaducada();
+                    return;
+                }
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                notifActivas = nuevo;
+                pintarCampana();
+                nvBellToast(nuevo
+                    ? 'Notificaciones activadas: el bot te avisará por mensaje privado de cada nueva novedad.'
+                    : 'Notificaciones desactivadas.');
+            } catch (e) {
+                nvBellToast('No se pudo cambiar la preferencia (' + (e.message || 'error de red') + ').');
+            } finally {
+                bellBtn.disabled = false;
+            }
+        });
+
+        cargarPreferenciaNotif();
+        cargarNovedadesHome(false);
+        setInterval(() => cargarNovedadesHome(true), 45000);
+    </script>
+
+    <!-- Perfil del autor de una novedad: misma página de perfil que en equipo.html, respetando la privacidad -->
+    <script>
+        const PF_BASE = {
+            instagram: { label: 'Instagram', base: 'https://instagram.com/', icon: 'fa-brands fa-instagram', color: '#e1306c' },
+            youtube:   { label: 'YouTube',   base: 'https://youtube.com/@',  icon: 'fa-brands fa-youtube',   color: '#ff0000' },
+            twitch:    { label: 'Twitch',    base: 'https://twitch.tv/',     icon: 'fa-brands fa-twitch',    color: '#9146ff' },
+            kick:      { label: 'Kick',      base: 'https://kick.com/',      icon: 'fa-solid fa-k',          color: '#53fc18' }
+        };
+        const PF_AVATAR_DEF = 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+        const pfMain = document.querySelector('main.main-content');
+        const pfView = document.getElementById('profileView');
+        const pfBread = document.getElementById('breadcrumbBar');
+
+        let pfToken = 0;          // evita que una carga antigua pinte encima de una nueva
+        let pfAbierto = false;
+        let pfScrollPrevio = 0;   // posición de Home para volver al mismo sitio al cerrar
+        let pfActual = null;      // { n, nombre, avatar, member, id }
+
+        // Un ID de Discord válido es solo dígitos (snowflake)
+        const pfEsId = v => /^\d{15,22}$/.test(String(v ?? '').trim());
+
+        function pfSafeSocialUrl(key, val) {
+            val = String(val || '').trim();
+            if (!val || !PF_BASE[key]) return '';
+            if (/^https?:\/\//i.test(val)) return val;
+            if (/^[a-z][a-z0-9+.-]*:/i.test(val)) return '';
+            const user = val.replace(/^@/, '').replace(/[^\w.\-]/g, '');
+            return user ? PF_BASE[key].base + user : '';
+        }
+
+        async function pfFetchJson(url) {
+            try {
+                const r = await fetch(url, { cache: 'no-store', credentials: 'same-origin' });
+                if (!r.ok) return { ok: false, status: r.status };
+                return { ok: true, data: await r.json() };
+            } catch (e) {
+                return { ok: false, status: 0 };
+            }
+        }
+
+        function pfDiscordDate(discordId) {
+            if (!pfEsId(discordId)) return 'Desconocida';
+            try {
+                const DISCORD_EPOCH = 1420070400000n;
+                const timestamp = Number((BigInt(discordId) >> 22n) + DISCORD_EPOCH);
+                return new Date(timestamp).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            } catch (e) {
+                return 'Desconocida';
+            }
+        }
+
+        function pfLeerStaff() {
+            try {
+                const arr = JSON.parse(localStorage.getItem('staff_data') || '[]');
+                return Array.isArray(arr) ? arr : [];
+            } catch (e) { return []; }
+        }
+
+        // Averigua el ID de Discord del autor de la novedad y su ficha de staff (si la tiene).
+        // Orden: ID guardado en la novedad -> ID dentro de la URL de su avatar de Discord
+        //        -> ficha de staff con el mismo nombre -> sesión actual / últimos accesos.
+        function pfResolverAutor(n, nombre, avatar) {
+            const low = String(nombre || '').toLowerCase().trim();
+            const mismoNombre = v => !!low && String(v || '').toLowerCase().trim() === low;
+            const staff = pfLeerStaff();
+
+            let id = [n.autorId, n.autorDiscordId, n.discordId, n.discord_id, n.authorId, n.userId]
+                .map(v => String(v ?? '').trim()).find(pfEsId) || '';
+
+            if (!id) {
+                const m = /cdn\.discordapp\.com\/avatars\/(\d{15,22})\//.exec(String(avatar || ''));
+                if (m) id = m[1];
+            }
+
+            let member = id ? staff.find(s => String(s.discordId || '').trim() === id) : null;
+            if (!member) {
+                const porNombre = staff.find(s => mismoNombre(s.usuario));
+                if (porNombre && (!id || !pfEsId(porNombre.discordId) || String(porNombre.discordId).trim() === id)) {
+                    member = porNombre;
+                    if (!id && pfEsId(porNombre.discordId)) id = String(porNombre.discordId).trim();
+                }
+            }
+
+            if (!id) {
+                try {
+                    const u = JSON.parse(localStorage.getItem('discord_user') || '{}') || {};
+                    if (pfEsId(u.id) && (mismoNombre(u.username) || mismoNombre(u.displayName))) id = String(u.id).trim();
+                } catch (e) {}
+            }
+            if (!id) {
+                try {
+                    const logins = JSON.parse(localStorage.getItem('recent_logins') || '[]');
+                    const f = Array.isArray(logins) ? logins.find(u => u && pfEsId(u.id) && mismoNombre(u.username)) : null;
+                    if (f) id = String(f.id).trim();
+                } catch (e) {}
+            }
+
+            if (!member) {
+                member = {
+                    id: 'autor-' + (id || low), discordId: id, usuario: nombre,
+                    rango: 'Miembro', categoria: 'Comunidad', especialidad: 'Ninguna', fechaRegistro: null
+                };
+            }
+            return { id, member };
+        }
+
+        function pfBreadcrumb(nombre) {
+            if (!pfBread) return;
+            pfBread.innerHTML = nombre
+                ? `<a data-pf="cerrar" role="button" tabindex="0">Home</a><span class="bc-sep">›</span><span style="color:#fff;">${nvEsc(nombre)}</span>`
+                : 'Home';
+        }
+
+        function pfShell(html) {
+            pfMain.classList.add('pv-open');
+            pfView.style.display = 'block';
+            pfView.innerHTML = html;
+            window.scrollTo(0, 0);
+        }
+
+        const PF_BACK_BTN = `<button type="button" class="pv-back" data-pf="cerrar"><i class="fa-solid fa-arrow-left"></i> Volver a Home</button>`;
+
+        function pfRenderLoading() {
+            pfShell(`<div class="pv-center"><i class="fa-solid fa-circle-notch fa-spin spin"></i><span style="color:#94a3b8;">Cargando perfil...</span></div>`);
+        }
+        function pfRenderPrivate() {
+            pfShell(`
+                <div class="pv-center">
+                    <div class="pv-lock"><i class="fa-solid fa-lock"></i></div>
+                    <h3>Este perfil es privado</h3>
+                    <p>Este usuario ha decidido no mostrar su información en la web, así que no puedes acceder a su perfil.</p>
+                    <button type="button" class="pv-btn" data-pf="cerrar">Volver a Home</button>
+                </div>`);
+        }
+        function pfRenderError(texto, conReintento) {
+            pfShell(`
+                <div class="pv-center">
+                    <div class="pv-lock warn"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <h3>No se puede mostrar el perfil</h3>
+                    <p>${nvEsc(texto)}</p>
+                    <div style="display:flex;gap:10px;">
+                        ${conReintento ? '<button type="button" class="pv-btn" data-pf="reintentar">Reintentar</button>' : ''}
+                        <button type="button" class="pv-btn alt" data-pf="cerrar">Volver a Home</button>
+                    </div>
+                </div>`);
+        }
+
+        function pfSection(icon, title, body, open) {
+            return `
+                <div class="pv-sec ${open ? 'open' : ''}">
+                    <button type="button" class="pv-sec-head" data-pf="seccion">
+                        <i class="${icon}"></i><span>${title}</span><i class="fa-solid fa-chevron-down pv-chev"></i>
+                    </button>
+                    <div class="pv-sec-body"><div class="pv-sec-inner"><div class="pv-sec-pad">${body}</div></div></div>
+                </div>`;
+        }
+
+        function pfInfoHtml(member, webDate) {
+            let esp = '<div class="pv-empty">Sin especialidades.</div>';
+            const raw = String(member.especialidad || 'Ninguna');
+            const list = raw === 'Ninguna' ? [] : raw.split(',').map(e => e.trim()).filter(e => e && e !== 'Ninguna');
+            if (list.length) esp = `<div class="pv-pills">${list.map(e => `<span class="pv-pill"><span class="pv-dot" style="background:#3b82f6;"></span>${nvEsc(e)}</span>`).join('')}</div>`;
+            return `
+                <div class="pv-label" style="margin-top:0;">Especialidad</div>${esp}
+                <div class="pv-label">Registro en la web</div><div style="font-size:14px;">${nvEsc(webDate)}</div>`;
+        }
+
+        function pfRedesHtml(redes) {
+            let html = '';
+            Object.keys(PF_BASE).forEach(k => {
+                const url = pfSafeSocialUrl(k, redes && redes[k]);
+                if (url) html += `<a class="pv-social" href="${nvEsc(url)}" target="_blank" rel="noopener noreferrer"><i class="${PF_BASE[k].icon}" style="color:${PF_BASE[k].color};"></i> ${PF_BASE[k].label}</a>`;
+            });
+            return html ? `<div class="pv-socials">${html}</div>` : `<div class="pv-empty"><b>Sin redes</b>No ha añadido redes sociales.</div>`;
+        }
+
+        function pfFotosHtml(lista) {
+            const urls = (Array.isArray(lista) ? lista : [])
+                .map(f => typeof f === 'string' ? f : (f && (f.url || f.src)))
+                .filter(u => typeof u === 'string' && (/^https?:\/\//i.test(u) || /^\/fotos\/[\w-]+\.(jpg|png|webp)$/i.test(u))).slice(0, 12);
+            if (!urls.length) return `<div class="pv-empty"><b>Sin fotos</b>Aún no ha publicado imágenes.</div>`;
+            return `<div class="pv-photos">${urls.map(u => `<a class="pv-photo" href="${nvEsc(u)}" target="_blank" rel="noopener noreferrer"><img src="${nvEsc(u)}" alt="" loading="lazy"></a>`).join('')}</div>`;
+        }
+
+        function pfSugerenciasHtml(mias) {
+            if (!mias.length) return `<div class="pv-empty"><b>Sin actividad</b>No ha enviado sugerencias.</div>`;
+            const items = mias.slice(0, 6).map(s => {
+                const est = sugEstado(s);   // mismo estado y color que en el tablero de sugerencias
+                return `
+                    <div class="pv-sug">
+                        <div class="pv-sug-title">${nvEsc(s.titulo)}</div>
+                        <div class="pv-sug-meta">
+                            <span style="color:${est.color};font-weight:700;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> ${nvEsc(est.texto)}</span>
+                            <span><span class="up"><i class="fa-solid fa-thumbs-up"></i> ${Number(s.upvotes) || 0}</span><span class="down"><i class="fa-solid fa-thumbs-down"></i> ${Number(s.downvotes) || 0}</span></span>
+                        </div>
+                    </div>`;
+            }).join('');
+            return items + (mias.length > 6 ? `<div class="pv-more">+${mias.length - 6} sugerencias más</div>` : '');
+        }
+
+        // Abre el perfil del autor de la novedad.
+        // Antes de enseñar nada se comprueba la privacidad en el servidor:
+        //   - perfil privado          -> pantalla "Este perfil es privado"
+        //   - no se puede comprobar   -> no se muestra información
+        //   - perfil público          -> perfil completo, igual que en Equipo
+        async function abrirPerfilAutor(n, nombre, avatar, pushState = true) {
+            const { id, member } = pfResolverAutor(n || {}, nombre, avatar);
+            const myToken = ++pfToken;
+            const av = avatar || PF_AVATAR_DEF;
+
+            if (!pfAbierto) pfScrollPrevio = window.scrollY;
+            pfAbierto = true;
+            pfActual = { n, nombre, avatar, member, id };
+
+            document.getElementById('novedadModal')?.classList.remove('active');
+            document.getElementById('supportDropdownMenu')?.classList.remove('show');
+            document.getElementById('nvDropdownMenu')?.classList.remove('show');
+            document.getElementById('nvDropdownBtn')?.classList.remove('active');
+
+            // Entrada en el historial para que el botón "atrás" del navegador vuelva a Home
+            if (pushState) { try { history.pushState({ pfPerfil: true }, ''); } catch (e) {} }
+
+            pfBreadcrumb(member.usuario);
+            pfRenderLoading();
+
+            if (!id) {
+                pfRenderError('No hemos podido identificar la cuenta de Discord de quien publicó esta novedad, así que no se puede comprobar la privacidad de su perfil. Por seguridad no se muestra su información.', false);
+                return;
+            }
+
+            const res = await pfFetchJson('/api/perfil-settings?userId=' + encodeURIComponent(id));
+            if (myToken !== pfToken) return;
+            if (!res.ok || !res.data || typeof res.data !== 'object') {
+                pfRenderError('No hemos podido comprobar la privacidad de este perfil. Por seguridad no se muestra su información.', true);
+                return;
+            }
+            if (res.data.publico === false) { pfRenderPrivate(); return; }
+
+            const ajustes = res.data;
+            const mostrar = ajustes.mostrar || {};
+            const showRedes = mostrar.redes !== false, showFotos = mostrar.fotos !== false, showSug = mostrar.sugerencias !== false;
+
+            const [sug, fot] = await Promise.all([
+                showSug ? pfFetchJson('/api/sugerencias') : Promise.resolve({ ok: false }),
+                showFotos ? pfFetchJson('/api/fotografias?userId=' + encodeURIComponent(id)) : Promise.resolve({ ok: false })
+            ]);
+            if (myToken !== pfToken) return;
+
+            const sugerencias = (sug.ok && Array.isArray(sug.data)) ? sug.data : [];
+            const fotos = fot.ok ? fot.data : [];
+
+            const mias = sugerencias
+                .filter(s => s && String(s.discordId || s.discord_id || '').trim() === id)
+                .sort((a, b) => new Date(b.fechaRegistro || 0) - new Date(a.fechaRegistro || 0));
+            const votos = mias.reduce((t, s) => t + (Number(s.upvotes) || 0), 0);
+
+            let webDate = 'No registrada';
+            if (member.fechaRegistro) {
+                const d = new Date(member.fechaRegistro);
+                if (!isNaN(d.getTime())) webDate = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            }
+            const discordDate = pfDiscordDate(id);
+
+            const stat = (ico, color, bg, label, val) => `
+                <div class="pv-stat"><div class="pv-stat-ico" style="background:${bg};color:${color};"><i class="${ico}"></i></div>
+                <div><small>${label}</small><strong>${val}</strong></div></div>`;
+
+            const secciones = [
+                pfSection('fa-solid fa-circle-info', 'Información', pfInfoHtml(member, webDate), true),
+                showRedes ? pfSection('fa-solid fa-share-nodes', 'Redes sociales', pfRedesHtml(ajustes.redes), false) : '',
+                showSug ? pfSection('fa-solid fa-wave-square', 'Actividad', pfSugerenciasHtml(mias), false) : '',
+                showFotos ? pfSection('fa-regular fa-images', 'Fotografías', pfFotosHtml(fotos), true) : ''
+            ].join('');
+
+            pfShell(`
+                <div class="pv">
+                    <div class="pv-banner">${PF_BACK_BTN}<div class="pv-banner-title">${nvEsc(member.rango || 'Staff')}</div></div>
+
+                    <div class="pv-grid">
+                        <div>
+                            <img class="pv-avatar" src="${nvEsc(av)}" alt="${nvEsc(member.usuario)}" onerror="this.onerror=null;this.src='${PF_AVATAR_DEF}';">
+                            <h1 class="pv-name">${nvEsc(member.usuario)}
+                                <button type="button" class="pv-copy" data-pf="copiar" title="Copiar nombre"><i class="fa-solid fa-copy"></i></button>
+                            </h1>
+                            <p class="pv-id">ID de Discord · ${nvEsc(id)}</p>
+
+                            <div class="pv-label">Roles</div>
+                            <div class="pv-pills">
+                                <span class="pv-pill"><span class="pv-dot" style="background:#f59e0b;"></span>${nvEsc(member.rango || 'Staff')}</span>
+                                <span class="pv-pill"><span class="pv-dot" style="background:#3b82f6;"></span>${nvEsc(member.categoria || 'General')}</span>
+                            </div>
+
+                            <div class="pv-label">Info</div>
+                            <ul class="pv-info">
+                                <li><i class="fa-regular fa-calendar"></i> Registrado en la web el ${nvEsc(webDate)}</li>
+                                <li><i class="fa-brands fa-discord"></i> Discord desde el ${nvEsc(discordDate)}</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <div class="pv-stats">
+                                ${stat('fa-regular fa-lightbulb', '#a855f7', 'rgba(168,85,247,.15)', 'Sugerencias', showSug ? mias.length : 'Oculto')}
+                                ${stat('fa-regular fa-thumbs-up', '#34d399', 'rgba(16,185,129,.15)', 'Votos recibidos', showSug ? votos : 'Oculto')}
+                            </div>
+                            <div class="pv-sections">${secciones}</div>
+                        </div>
+                    </div>
+                </div>`);
+        }
+
+        // Oculta el perfil y vuelve a mostrar Home
+        function pfCerrarVista(restaurarScroll) {
+            pfToken++;
+            pfAbierto = false;
+            pfMain.classList.remove('pv-open');
+            pfView.style.display = 'none';
+            pfView.innerHTML = '';
+            pfBreadcrumb('');
+            if (restaurarScroll) window.scrollTo(0, pfScrollPrevio);
+        }
+
+        // Cierre pedido por el usuario (botón Volver, migas de pan o Esc)
+        function cerrarPerfilAutor() {
+            if (!pfAbierto) return;
+            if (history.state && history.state.pfPerfil) { history.back(); return; } // el cierre lo hace "popstate"
+            pfCerrarVista(true);
+        }
+
+        // Botones dentro del perfil (delegación: funciona aunque el perfil se vuelva a pintar)
+        document.addEventListener('click', (e) => {
+            const t = e.target.closest ? e.target.closest('[data-pf]') : null;
+            if (!t) return;
+            const accion = t.dataset.pf;
+            if (accion === 'cerrar') {
+                cerrarPerfilAutor();
+            } else if (accion === 'reintentar') {
+                if (pfActual) abrirPerfilAutor(pfActual.n, pfActual.nombre, pfActual.avatar, false);
+            } else if (accion === 'seccion') {
+                t.parentElement.classList.toggle('open');
+            } else if (accion === 'copiar') {
+                const texto = pfActual ? String(pfActual.member.usuario || '') : '';
+                if (navigator.clipboard && texto) {
+                    navigator.clipboard.writeText(texto)
+                        .then(() => nvBellToast('Nombre copiado al portapapeles.'))
+                        .catch(() => nvBellToast('No se pudo copiar el nombre.'));
+                }
+            }
+        });
+
+        // Enlaces del menú hacia apartados de esta misma página (p. ej. "Novedades"):
+        // se cierra el perfil antes para que el navegador pueda desplazarse hasta el apartado.
+        document.addEventListener('click', (e) => {
+            if (!pfAbierto) return;
+            const a = e.target.closest ? e.target.closest('a[href*="#"]') : null;
+            if (a && a.hash && a.pathname === location.pathname) pfCerrarVista(false);
+        }, true);
+
+        document.addEventListener('keydown', (e) => {
+            if (!pfAbierto) return;
+            if (e.key === 'Escape') { cerrarPerfilAutor(); return; }
+            if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('a[data-pf="cerrar"]')) {
+                e.preventDefault();
+                cerrarPerfilAutor();
+            }
+        });
+
+        // Botones atrás / adelante del navegador
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.pfPerfil && pfActual) abrirPerfilAutor(pfActual.n, pfActual.nombre, pfActual.avatar, false);
+            else if (pfAbierto) pfCerrarVista(true);
+        });
+
+        // Si se recarga la página con el perfil abierto, se limpia esa marca del historial
+        try { if (history.state && history.state.pfPerfil) history.replaceState(null, ''); } catch (e) {}
+    </script>
+
+    <!-- Visor de imágenes: galería "ClickSense en imágenes" -->
+    <script>
+    (function () {
+        const cards = Array.from(document.querySelectorAll('#galleryGrid .gallery-card-item'));
+        const overlay = document.getElementById('lbOverlay');
+        const lbImg = document.getElementById('lbImg');
+        const lbCounter = document.getElementById('lbCounter');
+        const lbThumbs = document.getElementById('lbThumbs');
+        const btnPrev = document.getElementById('lbPrev');
+        const btnNext = document.getElementById('lbNext');
+        const btnClose = document.getElementById('lbClose');
+        const stage = document.getElementById('lbStage');
+        if (!cards.length || !overlay) return;
+
+        const fullSrc = c => { const i = c.querySelector('img'); return i.dataset.full || i.src; };
+        const thumbSrc = c => c.querySelector('img').src;
+
+        let current = 0;
+        let animating = false;
+        let isOpen = false;
+
+        // Miniaturas (las 9, debajo de la imagen grande)
+        const thumbBtns = cards.map((c, i) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'lb-thumb';
+            b.setAttribute('aria-label', 'Ir a la imagen ' + (i + 1));
+            b.innerHTML = '<img src="' + thumbSrc(c) + '" alt="">';
+            b.addEventListener('click', () => goTo(i));
+            lbThumbs.appendChild(b);
+            return b;
+        });
+
+        function updateUI() {
+            lbCounter.textContent = (current + 1) + ' / ' + cards.length;
+            thumbBtns.forEach((b, i) => b.classList.toggle('active', i === current));
+            const act = thumbBtns[current];
+            if (act && act.scrollIntoView) act.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+
+        // Cambia de imagen con animación (dir: 1 = siguiente, -1 = anterior)
+        function show(index, dir) {
+            current = (index + cards.length) % cards.length;
+            updateUI();
+            const next = fullSrc(cards[current]);
+
+            if (dir === 0) {
+                lbImg.src = next;
+                lbImg.alt = cards[current].querySelector('img').alt || '';
+                return;
+            }
+
+            animating = true;
+            lbImg.classList.add(dir > 0 ? 'out-left' : 'out-right');
+            setTimeout(() => {
+                const pre = new Image();
+                const apply = () => {
+                    lbImg.src = next;
+                    lbImg.alt = cards[current].querySelector('img').alt || '';
+                    lbImg.classList.remove('out-left', 'out-right');
+                    lbImg.classList.add(dir > 0 ? 'in-right' : 'in-left');
+                    void lbImg.offsetWidth; // reinicia la transición
+                    lbImg.classList.remove('in-left', 'in-right');
+                    setTimeout(() => { animating = false; }, 230);
+                };
+                pre.onload = apply;
+                pre.onerror = apply;
+                pre.src = next;
+            }, 200);
+        }
+
+        function goTo(i) {
+            if (animating || i === current) return;
+            show(i, i > current ? 1 : -1);
+        }
+        function next() { if (!animating) show(current + 1, 1); }
+        function prev() { if (!animating) show(current - 1, -1); }
+
+        function openLb(i) {
+            isOpen = true;
+            current = i;
+            overlay.setAttribute('aria-hidden', 'false');
+            show(i, 0);
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeLb() {
+            isOpen = false;
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        cards.forEach((c, i) => {
+            c.addEventListener('click', () => openLb(i));
+            c.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(i); }
+            });
+        });
+
+        btnNext.addEventListener('click', (e) => { e.stopPropagation(); next(); });
+        btnPrev.addEventListener('click', (e) => { e.stopPropagation(); prev(); });
+        btnClose.addEventListener('click', closeLb);
+
+        // Clic en el fondo (fuera de imagen, botones y miniaturas) = cerrar
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay || e.target === stage) closeLb();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!isOpen) return;
+            if (e.key === 'Escape') closeLb();
+            else if (e.key === 'ArrowRight') next();
+            else if (e.key === 'ArrowLeft') prev();
+        });
+
+        // Deslizar con el dedo en móvil
+        let touchX = null;
+        stage.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+        stage.addEventListener('touchend', (e) => {
+            if (touchX === null) return;
+            const dx = e.changedTouches[0].clientX - touchX;
+            if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+            touchX = null;
+        });
+    })();
+    </script>
+
+    <!-- Panel de actividad: Tickets activos del usuario + sugerencias de la comunidad (últimas 3) -->
+    <script>
+        let actTickets = [];
+        let actSugerencias = [];
+        let actServerOk = false;
+        let actVotando = false;
+
+        // Estado que tenía cada sugerencia la última vez que se pintó el panel.
+        // Sirve para detectar que una ha cambiado de estado y resaltarla.
+        let actEstadosPrevios = null;      // { clave: 'nueva' | 'revision' | 'implementada' | 'rechazada' }
+        let actConteosPrevios = null;
+
+        function actUsuario() {
+            try { return JSON.parse(localStorage.getItem('discord_user') || '{}') || {}; } catch (e) { return {}; }
+        }
+        // ID de Discord real del usuario (tickets / autoría / votos). Vacío si no hay sesión.
+        function actDiscordId() {
+            const id = String(actUsuario().id || actUsuario().discordId || '').trim();
+            return id === 'demo-local-user' ? '' : id;
+        }
+        // ID con el que se vota: el mismo que usa sugerencias.html (la sesión real; sin sesión no se vota)
+        function actUserId() {
+            return actDiscordId();
+        }
+
+        async function actFetchJson(url) {
+            try {
+                const r = await fetch(url, { cache: 'no-store' });
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                const d = await r.json();
+                return Array.isArray(d) ? d : [];
+            } catch (e) {
+                console.error('Error cargando ' + url + ':', e);
+                return null; // null = fallo (no es lo mismo que lista vacía)
+            }
+        }
+
+        // ---------- TICKETS ----------
+        // Solo tickets ACTIVOS cuyo discordId coincide con el del usuario logueado.
+        function actMisTicketsActivos() {
+            const me = actDiscordId();
+            if (!me) return [];
+
+            let backup = [];
+            try {
+                const b = JSON.parse(localStorage.getItem('click_tickets_backup_' + me) || '[]');
+                if (Array.isArray(b)) backup = b;
+            } catch (e) {}
+
+            const porId = new Map();
+            backup.forEach(t => { if (t && t.id) porId.set(t.id, t); });
+            actTickets.forEach(t => { if (t && t.id) porId.set(t.id, t); });
+
+            return [...porId.values()]
+                .filter(t => String(t.discordId || '') === me)
+                .filter(t => String(t.status || t.estado || 'open').toLowerCase() === 'open')
+                .sort((a, b) => new Date(b.fechaCreacion || 0) - new Date(a.fechaCreacion || 0));
+        }
+
+        function renderActTickets() {
+            const body = document.getElementById('actTicketsBody');
+            if (!body) return;
+            const lista = actMisTicketsActivos();
+
+            if (!lista.length) {
+                body.innerHTML = `
+                    <div class="act-empty">
+                        <div class="act-empty-icon"><i class="fa-regular fa-comment-dots"></i></div>
+                        <h4>Ningún ticket abierto</h4>
+                        <p>Si necesitas ayuda del staff, puedes abrir un ticket y seguirlo desde aquí.</p>
+                        <a href="/tickets.html" class="act-empty-btn">Abrir ticket</a>
+                    </div>`;
+                return;
+            }
+
+            body.innerHTML = lista.slice(0, 4).map(t => `
+                <a class="act-row" href="/tickets.html?ticket=${encodeURIComponent(t.id)}" title="Abrir ticket">
+                    <div class="act-row-top">
+                        <span class="act-row-title">${nvEsc(t.title || t.asunto || '(Sin título)')}</span>
+                        <span class="act-row-time">${nvEsc(formatTimeAgo(t.fechaCreacion))}</span>
+                    </div>
+                    <div class="act-row-meta">
+                        <span class="act-pill id">${nvEsc(t.id)}</span>
+                        <span class="act-pill ok"><i class="fa-solid fa-lock-open"></i> Activo</span>
+                        <span><i class="fa-solid fa-tag"></i> ${nvEsc(t.category || t.categoria || 'General')}</span>
+                    </div>
+                </a>`).join('') + (lista.length > 4
+                    ? `<a href="/tickets.html" class="act-see-all" style="text-align:center;font-weight:600;">+${lista.length - 4} más</a>` : '');
+        }
+
+        // ---------- SUGERENCIAS ----------
+        // Clave única (igual que en sugerencias.html): fecha + título
+        function actKey(s) { return String(s.fechaRegistro || '') + '|' + String(s.titulo || ''); }
+
+        // Todo lo guardado localmente en este navegador: sugerencias antiguas + copias de seguridad
+        function actLeerLocal() {
+            const out = [];
+            const push = arr => { if (Array.isArray(arr)) arr.forEach(s => { if (s && s.titulo) out.push(s); }); };
+            try { push(JSON.parse(localStorage.getItem('sugerencias_data') || '[]')); } catch (e) {}
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && k.startsWith('sugerencias_backup_')) {
+                        try { push(JSON.parse(localStorage.getItem(k) || '[]')); } catch (e) {}
+                    }
+                }
+            } catch (e) {}
+            return out;
+        }
+
+        // Une a la lista base lo local que falte (sin duplicar). Devuelve cuántas se han añadido.
+        function actMezclarLocal(lista) {
+            const keys = new Set(lista.map(actKey));
+            const ids = new Set(lista.map(s => s.id));
+            let added = 0;
+            actLeerLocal().forEach(b => {
+                const k = actKey(b);
+                if (keys.has(k)) return;
+                const copy = JSON.parse(JSON.stringify(b));
+                if (!copy.id || ids.has(copy.id)) {
+                    let max = -1;
+                    lista.forEach(s => { const m = /(\d+)$/.exec(String(s.id || '')); if (m) max = Math.max(max, parseInt(m[1], 10)); });
+                    copy.id = '#SUG-' + String(max + 1).padStart(4, '0');
+                }
+                lista.push(copy); keys.add(k); ids.add(copy.id);
+                added++;
+            });
+            return added;
+        }
+
+        function actSugerenciasMezcladas() {
+            const lista = actSugerencias.slice();
+            actMezclarLocal(lista);
+            return lista;
+        }
+
+        // Momento de la última actividad de una sugerencia: cuando se creó o cuando cambió de estado
+        function actUltimaActividad(s) {
+            const creada = new Date(s.fechaRegistro || 0).getTime() || 0;
+            const cambio = new Date(s.fechaEstado || 0).getTime() || 0;
+            return Math.max(creada, cambio);
+        }
+
+        function renderActSugerencias() {
+            const body = document.getElementById('actSugBody');
+            if (!body) return;
+
+            const todas = actSugerenciasMezcladas();
+
+            if (!todas.length) {
+                body.innerHTML = `
+                    <div class="act-empty">
+                        <div class="act-empty-icon"><i class="fa-regular fa-lightbulb"></i></div>
+                        <h4>Todavía no hay sugerencias</h4>
+                        <p>Si algo te chirría o se te ocurre una mejora, cuéntanoslo y aquí verás en qué queda.</p>
+                        <a href="/sugerencias.html" class="act-empty-btn">Enviar sugerencia</a>
+                    </div>`;
+                if (actServerOk) {
+                    actEstadosPrevios = {};
+                    actConteosPrevios = { nueva: 0, revision: 0, implementada: 0, rechazada: 0 };
+                }
+                return;
+            }
+
+            const me = actUserId();
+
+            // Totales de TODAS las sugerencias, votos registrados y cuántas hay en cada estado
+            let totalUp = 0, totalDown = 0;
+            const conteos = { nueva: 0, revision: 0, implementada: 0, rechazada: 0 };
+            const estadosAhora = {};
+            const cambiadas = [];      // sugerencias que han cambiado de estado desde la última vez
+            todas.forEach(s => {
+                totalUp += (s.upvotes || 0);
+                totalDown += (s.downvotes || 0);
+                const est = sugEstado(s);
+                const k = actKey(s);
+                conteos[est.col]++;
+                estadosAhora[k] = est.col;
+                if (actEstadosPrevios && actEstadosPrevios[k] !== undefined && actEstadosPrevios[k] !== est.col) cambiadas.push(s);
+            });
+            const clavesCambiadas = new Set(cambiadas.map(actKey));
+
+            // Las 3 con actividad más reciente (de cualquier usuario): recién creadas o recién cambiadas de estado.
+            // Así, cuando el staff mueve una sugerencia, aparece aquí arriba con su nuevo estado.
+            const lista = todas
+                .slice()
+                .sort((a, b) => actUltimaActividad(b) - actUltimaActividad(a))
+                .slice(0, 3);
+
+            const resumen = `
+                <div class="act-summary">
+                    <span><strong>${todas.length}</strong> sugerencia${todas.length === 1 ? '' : 's'} registrada${todas.length === 1 ? '' : 's'}</span>
+                    <span>·</span>
+                    <span class="up"><i class="fa-solid fa-thumbs-up"></i> <strong>${totalUp}</strong></span>
+                    <span class="down"><i class="fa-solid fa-thumbs-down"></i> <strong>${totalDown}</strong></span>
+                    <span>votos</span>
+                </div>
+                <div class="act-states">
+                    ${Object.keys(SUG_ESTADOS).map(col => `
+                        <a class="act-state ${actConteosPrevios && actConteosPrevios[col] !== conteos[col] ? 'changed' : ''}" href="/sugerencias.html" style="--c:${SUG_ESTADOS[col].color};" title="Ver en Sugerencias">
+                            <b>${conteos[col]}</b><span>${conteos[col] === 1 ? SUG_ESTADOS[col].texto : SUG_ESTADOS[col].plural}</span>
+                        </a>`).join('')}
+                </div>`;
+
+            body.innerHTML = resumen + lista.map(s => {
+                const est = sugEstado(s);
+                const voto = me ? ((s.voters || {})[me] || null) : null;
+                const k = encodeURIComponent(actKey(s));
+                const cambiada = clavesCambiadas.has(actKey(s));
+                const staff = est.col !== 'nueva' ? sugStaffNombre(s) : '';
+                const movida = est.col !== 'nueva' && s.fechaEstado && actUltimaActividad(s) === (new Date(s.fechaEstado).getTime() || 0);
+                const enlace = '/sugerencias.html' + (s.id ? '?sugerencia=' + encodeURIComponent(s.id) : '');
+                return `
+                <div class="act-row ${cambiada ? 'changed' : ''}" style="--c:${est.color};">
+                    <div class="act-row-top">
+                        <a class="act-row-title" href="${nvEsc(enlace)}" title="Ver en Sugerencias">${nvEsc(s.titulo)}</a>
+                        <span class="act-row-time">${nvEsc(formatTimeAgo(movida ? s.fechaEstado : s.fechaRegistro))}</span>
+                    </div>
+                    <div class="act-row-meta">
+                        <span class="act-pill ${est.cls} ${cambiada ? 'changed' : ''}" title="${nvEsc(staff ? est.texto + ' por ' + staff : est.texto)}"><i class="fa-solid fa-circle" style="font-size:6px;"></i> ${nvEsc(est.texto)}</span>
+                        <span>${nvEsc(s.categoria)}</span>
+                        <span>· por ${nvEsc(s.usuario || 'Anónimo')}</span>
+                        <div class="act-vote-box">
+                            <button type="button" class="act-vote-btn ${voto === 'up' ? 'voted-up' : ''}" data-key="${k}" data-type="up" title="A favor">
+                                <i class="fa-solid fa-thumbs-up"></i> <span>${s.upvotes || 0}</span>
+                            </button>
+                            <button type="button" class="act-vote-btn ${voto === 'down' ? 'voted-down' : ''}" data-key="${k}" data-type="down" title="En contra">
+                                <i class="fa-solid fa-thumbs-down"></i> <span>${s.downvotes || 0}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Aviso si una sugerencia TUYA acaba de cambiar de estado mientras tenías Home abierto
+            const mia = me ? cambiadas.find(s => String(s.discordId || '') === me) : null;
+            if (mia) nvBellToast(`Tu sugerencia «${mia.titulo}» ha pasado a: ${sugEstado(mia).texto}.`);
+
+            // Solo se empieza a comparar cuando los datos vienen del servidor (no de copias locales antiguas)
+            if (actServerOk) {
+                actEstadosPrevios = estadosAhora;
+                actConteosPrevios = conteos;
+            }
+        }
+
+        // Votar desde Home: misma lógica que sugerencias.html.
+        // Se aplica sobre la última versión del servidor y se guarda allí (votos compartidos).
+                function actAplicarVoto(s, me, type) {
+            if (!s.upvotes) s.upvotes = 0;
+            if (!s.downvotes) s.downvotes = 0;
+            if (!s.voters) s.voters = {};
+            const previo = s.voters[me] || null;
+            if (previo === type) {
+                if (type === 'up') s.upvotes--; else s.downvotes--;
+                delete s.voters[me];
+                return 'Has retirado tu voto de la sugerencia.';
+            }
+            if (previo === 'up') s.upvotes--;
+            if (previo === 'down') s.downvotes--;
+            s.voters[me] = type;
+            if (type === 'up') { s.upvotes++; return '¡Has votado a favor de la sugerencia!'; }
+            s.downvotes++;
+            return 'Has votado en contra de la sugerencia.';
+        }
+
+        function actGuardarVotoLocal(key, type, me) {
+            const claves = ['sugerencias_data'];
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith('sugerencias_backup_')) claves.push(k);
+            }
+            claves.forEach(k => {
+                try {
+                    const arr = JSON.parse(localStorage.getItem(k) || '[]');
+                    if (!Array.isArray(arr)) return;
+                    let ch = false;
+                    arr.forEach(s => { if (s && actKey(s) === key) { actAplicarVoto(s, me, type); ch = true; } });
+                    if (ch) localStorage.setItem(k, JSON.stringify(arr));
+                } catch (e) {}
+            });
+        }
+
+        async function actVotar(key, type) {
+            if (actVotando) return;
+            const me = actUserId();
+            if (!me) { nvBellToast('Inicia sesión con Discord para votar.'); return; }
+            actVotando = true;
+            document.querySelectorAll('.act-vote-btn').forEach(b => b.disabled = true);
+            let motivo = '';
+            try {
+                let fresh = null;
+                try {
+                    const r = await fetch('/api/sugerencias', { cache: 'no-store' });
+                    if (r.ok) {
+                        const d = await r.json();
+                        if (Array.isArray(d)) fresh = d; else motivo = 'respuesta no válida';
+                    } else {
+                        motivo = 'GET ' + r.status;
+                    }
+                } catch (e) { motivo = 'sin conexión'; }
+
+                if (fresh !== null) actSugerencias = fresh;
+                const lista = fresh !== null ? actSugerencias : actSugerenciasMezcladas();
+                if (fresh !== null) actMezclarLocal(lista);
+
+                const s = lista.find(x => actKey(x) === key);
+                if (!s) { nvBellToast('No se ha encontrado la sugerencia. Recarga la página.'); return; }
+
+                const msg = actAplicarVoto(s, me, type);
+                let guardado = false;
+
+                if (fresh !== null) {
+                    try {
+                        const r = await fetch('/api/sugerencias', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(lista)
+                        });
+                        if (r.ok) guardado = true; else motivo = 'POST ' + r.status;
+                    } catch (e) { motivo = 'sin conexión'; }
+                }
+
+                // Siempre se guarda también en este navegador, para que el voto no se pierda
+                actGuardarVotoLocal(key, type, me);
+
+                renderActSugerencias();
+                nvBellToast(guardado
+                    ? msg
+                    : 'Voto guardado solo en este navegador. El servidor no responde en /api/sugerencias (' + motivo + ').');
+            } catch (e) {
+                console.error('Error al votar:', e);
+                nvBellToast('No se pudo registrar el voto: ' + (e.message || 'error'));
+            } finally {
+                actVotando = false;
+                document.querySelectorAll('.act-vote-btn').forEach(b => b.disabled = false);
+            }
+        }
+
+        // Delegación de eventos sobre el documento: funciona aunque la lista se vuelva a pintar
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest ? e.target.closest('.act-vote-btn') : null;
+            if (!btn) return;
+            e.preventDefault();
+            e.stopPropagation();
+            actVotar(decodeURIComponent(btn.dataset.key), btn.dataset.type);
+        });
+
+        async function cargarActividad() {
+            const [t, s] = await Promise.all([actFetchJson('/api/tickets'), actFetchJson('/api/sugerencias')]);
+            if (t) actTickets = t;
+            if (s) { actSugerencias = s; actServerOk = true; }
+            renderActTickets();
+            renderActSugerencias();
+        }
+
+        cargarActividad();
+        // Cada 20 s (igual que sugerencias.html) se comprueba si alguna sugerencia ha cambiado de estado
+        setInterval(() => { if (!actVotando) cargarActividad(); }, 20000);
+        window.addEventListener('focus', () => { if (!actVotando) cargarActividad(); });
+        // Si se crea/modifica un ticket o sugerencia en otra pestaña, Home se actualiza
+        window.addEventListener('storage', (e) => {
+            if (!e.key) return;
+            if (e.key.startsWith('click_tickets_backup_')) renderActTickets();
+            if (e.key.startsWith('sugerencias_backup_') || e.key === 'sugerencias_data') renderActSugerencias();
+        });
+    </script>
+    <script>
+(function () {
+    const targets = document.querySelectorAll(
+        'main.main-content > section, .welcome-banner-card, .site-footer, .gallery-card-item, .act-card, .normativa-card, .live-card'
+    );
+    targets.forEach((el, i) => {
+        el.classList.add('reveal');
+        // escalonado dentro de cada cuadrícula
+        const sibs = el.parentElement ? Array.from(el.parentElement.children).filter(c => c.classList.contains(el.classList[0])) : [];
+        const idx = sibs.indexOf(el);
+        if (el.matches('.gallery-card-item, .act-card, .normativa-card, .live-card') && idx > -1) {
+            el.style.setProperty('--rd', (idx % 3) * 0.1 + 's');
+        }
+    });
+    if (!('IntersectionObserver' in window)) {
+        targets.forEach(el => el.classList.add('in'));
+        return;
+    }
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+            if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    targets.forEach(el => io.observe(el));
+})();
+</script>
+
+    <script>
+(function () {
+    // Lista por defecto: cámbiala por tus canales. "live: true" los marca en directo.
+    let canales = [
+        { nombre: 'Canal 1', url: 'https://twitch.tv/canal1', avatar: '', titulo: 'Rol en ClickSense RP', viewers: 0, live: false },
+        { nombre: 'Canal 2', url: 'https://twitch.tv/canal2', avatar: '', titulo: 'Rol en ClickSense RP', viewers: 0, live: false }
+    ];
+    const grid = document.getElementById('liveGrid');
+    function pintar() {
+        const orden = canales.slice().sort((a, b) => (b.live ? 1 : 0) - (a.live ? 1 : 0));
+        grid.innerHTML = orden.map(c => `
+            <a class="live-card ${c.live ? '' : 'off'}" href="${nvEsc(c.url)}" target="_blank" rel="noopener">
+                <div class="live-top">
+                    <img class="live-avatar" src="${nvEsc(c.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop')}" alt="">
+                    <div><div class="live-name">${nvEsc(c.nombre)}</div>
+                    <span class="live-badge ${c.live ? 'on' : ''}">${c.live ? 'EN DIRECTO' : 'OFFLINE'}</span></div>
+                </div>
+                <div class="live-title">${nvEsc(c.titulo || '')}</div>
+                <div class="live-foot"><span>${c.live ? '<i class="fa-solid fa-eye"></i> ' + (c.viewers || 0) : ''}</span><span>Ver canal <i class="fa-solid fa-arrow-up-right-from-square"></i></span></div>
+            </a>`).join('');
+        grid.querySelectorAll('.live-card').forEach((el, i) => { el.classList.add('reveal', 'in'); });
+    }
+    pintar();
+    // Si tu servidor expone /api/directos (array con la misma forma), se usa automáticamente
+    fetch('/api/directos', { cache: 'no-store' }).then(r => r.ok ? r.json() : null)
+        .then(d => { if (Array.isArray(d) && d.length) { canales = d; pintar(); } }).catch(() => {});
+    setInterval(() => fetch('/api/directos', { cache: 'no-store' }).then(r => r.ok ? r.json() : null)
+        .then(d => { if (Array.isArray(d)) { canales = d; pintar(); } }).catch(() => {}), 60000);
+})();
+</script>
+
+    <script src="/guards.js"></script>
+</body>
+</html>

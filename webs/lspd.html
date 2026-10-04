@@ -1,0 +1,3612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Los Santos Police Department | ClickSense RP</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../src/assets/main.css">
+    <style>
+        :root {
+            --bg-navbar: #0b0b0e;
+            --bg-main: #07040c;
+            --bg-card: rgba(18, 12, 28, 0.8);
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --accent-gold: #eab308;
+            --accent-red: #ef4444;
+            --accent-blue: #38bdf8;
+            --accent-metro: #71717a;
+            --text-primary: #e5e7eb;
+            --text-muted: #94a3b8;
+        }
+
+        /* Scrollbar Moderna */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07040c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.3);
+            border-radius: 4px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        @keyframes pageEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes sectionEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.97);
+                filter: blur(8px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-primary);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            overflow-y: auto;
+            animation: pageEntrance 0.8s ease forwards;
+        }
+
+        .grid-background {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Barra de Navegación Superior */
+        .lspd-navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            background: var(--bg-navbar);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 35px;
+            height: 72px;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .lspd-nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+        }
+
+        .lspd-nav-brand img {
+            height: 46px;
+            width: 46px;
+            object-fit: contain;
+        }
+
+        .lspd-nav-links {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .lspd-nav-item {
+            position: relative;
+        }
+
+        .lspd-nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: color 0.2s ease;
+        }
+
+        .lspd-nav-link:hover, .lspd-nav-link.active {
+            color: var(--accent-purple);
+        }
+
+        .lspd-nav-link i {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+
+        /* Menú Desplegable */
+        .lspd-dropdown {
+            position: absolute;
+            top: 140%;
+            left: 0;
+            background: rgba(14, 9, 22, 0.96);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 10px;
+            padding: 8px 0;
+            width: 200px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.85);
+            backdrop-filter: blur(14px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1001;
+        }
+
+        .lspd-nav-item:hover .lspd-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .lspd-dropdown a {
+            display: block;
+            padding: 9px 18px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .lspd-dropdown a:hover {
+            background: rgba(168, 85, 247, 0.2);
+            color: #fff;
+            padding-left: 22px;
+        }
+
+        .lspd-nav-right-spacer {
+            width: 150px;
+        }
+
+        @media(max-width: 1024px) {
+            .lspd-nav-links { display: none; }
+            .lspd-nav-right-spacer { width: auto; }
+        }
+
+        .view-section {
+            display: none;
+            width: 100%;
+            flex: 1;
+            flex-direction: column;
+        }
+        .view-section.active {
+            display: flex;
+        }
+
+        /* Portada */
+        .lspd-hero-container {
+            position: relative;
+            width: 100%;
+            height: 620px;
+            margin-top: 72px;
+            background: url('https://i.imgur.com/qltvmW6.jpeg') no-repeat center center/cover;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .lspd-hero-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(7,4,12,0.2) 40%, rgba(7,4,12,0.95) 100%);
+            z-index: 1;
+        }
+
+        .hero-bottom-left {
+            position: absolute;
+            bottom: 35px;
+            left: 5%;
+            z-index: 10;
+        }
+
+        .btn-back-home {
+            background: rgba(18, 12, 28, 0.85);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.6px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back-home:hover {
+            background-color: var(--accent-purple);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Historia y Banners generales */
+        .lspd-hero-banner {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.65), rgba(7, 4, 12, 0.9)), url('https://i.imgur.com/U9yPIhh.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-purple);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .lspd-hero-seal {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 6px 20px rgba(168, 85, 247, 0.4));
+            animation: pulseSeal 3s infinite ease-in-out;
+        }
+
+        @keyframes pulseSeal {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .lspd-hero-title {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            margin: 0;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+        }
+
+        .lspd-history-wrapper {
+            max-width: 1050px;
+            margin: 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .lspd-history-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 40px;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(16px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .lspd-history-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-4px);
+        }
+
+        .lspd-history-card.reverse {
+            grid-template-columns: 1fr 1.2fr;
+        }
+
+        .lspd-history-card.reverse .history-content {
+            order: 2;
+        }
+
+        .lspd-history-card.reverse .history-media {
+            order: 1;
+        }
+
+        .history-badge {
+            display: inline-block;
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            color: #d8b4fe;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .history-content h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 15px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .history-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .history-media img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            transition: transform 0.4s ease;
+        }
+
+        .history-media img:hover {
+            transform: scale(1.02);
+        }
+
+        .history-media.seal-only {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .history-media.seal-only img {
+            height: 160px;
+            width: 160px;
+            object-fit: contain;
+            border: none;
+            box-shadow: none;
+            filter: drop-shadow(0 8px 25px rgba(168, 85, 247, 0.5));
+        }
+
+        /* Estilos específicos para la vista Código Penal */
+        .codigo-penal-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.5), rgba(7, 4, 12, 0.85)), url('https://i.imgur.com/qltvmW6.jpeg') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-purple);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .codigo-penal-banner h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            margin: 0 0 10px 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.9);
+        }
+
+        .codigo-penal-banner p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .codigo-penal-bar {
+            width: 100%;
+            background-color: var(--accent-purple);
+            height: 12px;
+            margin-bottom: 50px;
+        }
+
+        .codigo-penal-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .penal-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+        }
+
+        .penal-card h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+            padding-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+
+        .article-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .article-item {
+            background: rgba(7, 4, 12, 0.6);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            padding: 20px 24px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-purple);
+            transition: border-color 0.3s ease;
+        }
+
+        .article-item:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .article-title {
+            color: #d8b4fe;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin: 0 0 8px 0;
+        }
+
+        .article-desc {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin: 0 0 12px 0;
+        }
+
+        .article-sanction {
+            color: var(--accent-pink);
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin: 0;
+            display: inline-flex;
+            gap: 15px;
+            background: rgba(236, 72, 153, 0.1);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(236, 72, 153, 0.25);
+        }
+
+        /* Divisiones */
+        .lspd-section-bar {
+            width: 100%;
+            background-color: #120c1c;
+            border-top: 2px solid rgba(168, 85, 247, 0.3);
+            border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+            text-align: center;
+            padding: 18px 20px;
+            box-sizing: border-box;
+            margin: 0;
+        }
+
+        .lspd-section-bar h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #d8b4fe;
+            font-style: italic;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .lspd-divisions-wrapper {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .lspd-divisions-intro {
+            background: var(--bg-card);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 16px;
+            padding: 30px 40px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            backdrop-filter: blur(14px);
+        }
+
+        .lspd-divisions-intro p {
+            color: var(--text-muted);
+            font-size: 0.98rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .lspd-divisions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media(max-width: 1024px) {
+            .lspd-divisions-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media(max-width: 650px) {
+            .lspd-divisions-grid { grid-template-columns: 1fr; }
+        }
+
+        .division-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+            backdrop-filter: blur(12px);
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding: 0;
+        }
+
+        .division-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.3);
+        }
+
+        .division-img-wrapper {
+            width: 100%;
+            height: 180px;
+            background: #0b0b0e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+            overflow: hidden;
+        }
+
+        .division-img-wrapper img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8));
+            transition: transform 0.4s ease;
+        }
+
+        .division-card:hover .division-img-wrapper img {
+            transform: scale(1.08);
+        }
+
+        .division-info {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .division-info h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .division-info p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Estilos específicos para la vista SAHP */
+        .sahp-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.5), rgba(7, 4, 12, 0.85)), url('https://i.imgur.com/vZ1w843.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-gold);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .sahp-banner h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            margin: 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.9);
+        }
+
+        .sahp-gold-bar {
+            width: 100%;
+            background-color: var(--accent-gold);
+            height: 12px;
+            margin-bottom: 50px;
+        }
+
+        .sahp-content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .sahp-main-row {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 40px;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+        }
+
+        .sahp-main-row img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(234, 179, 8, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+
+        .sahp-text-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sahp-text-col p {
+            color: var(--text-muted);
+            font-size: 0.94rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .sahp-bottom-images-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .sahp-bottom-images-grid img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+        }
+
+        .sahp-bottom-images-grid img:hover {
+            transform: scale(1.02);
+        }
+
+        @media(max-width: 900px) {
+            .sahp-main-row {
+                grid-template-columns: 1fr;
+                padding: 25px;
+            }
+            .sahp-bottom-images-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Estilos específicos para la vista HSIU */
+        .hsiu-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.5), rgba(7, 4, 12, 0.85)), url('https://i.imgur.com/h1bOZPn.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-red);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .hsiu-banner h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            margin: 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.9);
+        }
+
+        .hsiu-red-bar {
+            width: 100%;
+            background-color: var(--accent-red);
+            height: 12px;
+            margin-bottom: 50px;
+        }
+
+        .hsiu-content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .hsiu-main-row {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 40px;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+        }
+
+        .hsiu-main-row img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+
+        .hsiu-text-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .hsiu-text-col p {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .hsiu-text-col ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .hsiu-text-col li {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.6;
+        }
+
+        .hsiu-text-col li strong {
+            color: #fff;
+        }
+
+        .hsiu-bottom-images-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .hsiu-bottom-images-grid img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+        }
+
+        .hsiu-bottom-images-grid img:hover {
+            transform: scale(1.02);
+        }
+
+        @media(max-width: 900px) {
+            .hsiu-main-row {
+                grid-template-columns: 1fr;
+                padding: 25px;
+            }
+            .hsiu-bottom-images-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Estilos específicos para la vista ASD */
+        .asd-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.5), rgba(7, 4, 12, 0.85)), url('https://i.imgur.com/Vz0aF6D.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-blue);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .asd-banner h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            margin: 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.9);
+        }
+
+        .asd-blue-bar {
+            width: 100%;
+            background-color: var(--accent-blue);
+            height: 12px;
+            margin-bottom: 50px;
+        }
+
+        .asd-content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .asd-main-row {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 40px;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+        }
+
+        .asd-main-row img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+
+        .asd-text-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .asd-text-col h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #38bdf8;
+            margin: 5px 0 0 0;
+        }
+
+        .asd-text-col p {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .asd-text-col ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .asd-text-col li {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.6;
+        }
+
+        .asd-text-col li strong {
+            color: #fff;
+        }
+
+        .asd-bottom-images-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .asd-bottom-images-grid img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+        }
+
+        .asd-bottom-images-grid img:hover {
+            transform: scale(1.02);
+        }
+
+        @media(max-width: 900px) {
+            .asd-main-row {
+                grid-template-columns: 1fr;
+                padding: 25px;
+            }
+            .asd-bottom-images-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Estilos específicos para la vista Training Bureau (TB) */
+        .tb-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.5), rgba(7, 4, 12, 0.85)), url('https://i.imgur.com/e1m92WN.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-red);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .tb-banner h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.2px;
+            margin: 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.9);
+        }
+
+        .tb-red-bar {
+            width: 100%;
+            background-color: var(--accent-red);
+            height: 12px;
+            margin-bottom: 50px;
+        }
+
+        .tb-content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .tb-main-row {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 40px;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+        }
+
+        .tb-main-row img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+
+        .tb-text-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .tb-text-col h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ef4444;
+            margin: 5px 0 0 0;
+        }
+
+        .tb-text-col p {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .tb-text-col ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tb-text-col li {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.6;
+        }
+
+        .tb-text-col li strong {
+            color: #fff;
+        }
+
+        .tb-bottom-images-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .tb-bottom-images-grid img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+        }
+
+        .tb-bottom-images-grid img:hover {
+            transform: scale(1.02);
+        }
+
+        @media(max-width: 900px) {
+            .tb-main-row {
+                grid-template-columns: 1fr;
+                padding: 25px;
+            }
+            .tb-bottom-images-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Estilos específicos para la vista Metropolitan Division (Metro) */
+        .metro-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.5), rgba(7, 4, 12, 0.85)), url('https://i.imgur.com/z0HQ25N.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-metro);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .metro-banner h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            margin: 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.9);
+        }
+
+        .metro-bar {
+            width: 100%;
+            background-color: var(--accent-metro);
+            height: 12px;
+            margin-bottom: 50px;
+        }
+
+        .metro-content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .metro-main-row {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 40px;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(113, 113, 122, 0.3);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+        }
+
+        .metro-main-row img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(113, 113, 122, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+
+        .metro-text-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .metro-text-col p {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .metro-text-col ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .metro-text-col li {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.6;
+        }
+
+        .metro-text-col li strong {
+            color: #fff;
+        }
+
+        .metro-bottom-images-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .metro-bottom-images-grid img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 14px;
+            border: 1px solid rgba(113, 113, 122, 0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease;
+        }
+
+        .metro-bottom-images-grid img:hover {
+            transform: scale(1.02);
+        }
+
+        @media(max-width: 900px) {
+            .metro-main-row {
+                grid-template-columns: 1fr;
+                padding: 25px;
+            }
+            .metro-bottom-images-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Estilos específicos para la vista Detective Bureau (DB) */
+        .db-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.5), rgba(7, 4, 12, 0.85)), url('https://i.imgur.com/0Aw7Xwz.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-gold);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .db-banner h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            margin: 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.9);
+        }
+
+        .db-gold-bar {
+            width: 100%;
+            background-color: var(--accent-gold);
+            height: 12px;
+            margin-bottom: 50px;
+        }
+
+        .db-content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .db-main-row {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 40px;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+        }
+
+        .db-main-row img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(234, 179, 8, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+
+        .db-text-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .db-text-col p {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* Estilos específicos para la vista Administrative Services Bureau (ASB) */
+        .asb-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.5), rgba(7, 4, 12, 0.85)), url('https://i.imgur.com/C7XPO3g.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-blue);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .asb-banner h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            margin: 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.9);
+        }
+
+        .asb-blue-bar {
+            width: 100%;
+            background-color: var(--accent-blue);
+            height: 12px;
+            margin-bottom: 50px;
+        }
+
+        .asb-content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .asb-main-row {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 40px;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+        }
+
+        .asb-main-row img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+
+        .asb-text-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .asb-text-col h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #38bdf8;
+            margin: 5px 0 0 0;
+        }
+
+        .asb-text-col p {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .asb-text-col ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .asb-text-col li {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.6;
+        }
+
+        .asb-text-col li strong {
+            color: #fff;
+        }
+
+        /* Estilos específicos para la vista Internal Affairs Division (IAD) */
+        .iad-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.5), rgba(7, 4, 12, 0.85)), url('https://i.imgur.com/U9yPIhh.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-red);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .iad-banner h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            margin: 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.9);
+        }
+
+        .iad-red-bar {
+            width: 100%;
+            background-color: var(--accent-red);
+            height: 12px;
+            margin-bottom: 50px;
+        }
+
+        .iad-content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .iad-main-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .iad-text-col p {
+            color: var(--text-muted);
+            font-size: 0.94rem;
+            line-height: 1.8;
+            margin: 0 0 15px 0;
+        }
+
+        .iad-text-col h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ef4444;
+            margin: 15px 0 10px 0;
+        }
+
+        /* Estilos específicos para la vista NOOSE */
+        .noose-banner {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.5), rgba(7, 4, 12, 0.85)), url('https://i.imgur.com/sDeozxc.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-purple);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .noose-banner h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1.5px;
+            margin: 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.9);
+        }
+
+        .noose-bar {
+            width: 100%;
+            background-color: var(--accent-purple);
+            height: 12px;
+            margin-bottom: 50px;
+        }
+
+        .noose-content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .noose-main-row {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 40px;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+        }
+
+        .noose-main-row img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+
+        .noose-text-col {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .noose-text-col h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #d8b4fe;
+            margin: 5px 0 0 0;
+        }
+
+        .noose-text-col p {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .noose-text-col ul {
+            list-style: disc;
+            padding-left: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .noose-text-col li {
+            color: var(--text-muted);
+            font-size: 0.91rem;
+            line-height: 1.6;
+        }
+
+        .noose-text-col li strong {
+            color: #fff;
+        }
+
+        /* Estilos detallados para Rangos */
+        .rangos-banner {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin-top: 72px;
+            background: linear-gradient(rgba(7, 4, 12, 0.6), rgba(7, 4, 12, 0.9)), url('https://i.imgur.com/U9yPIhh.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-purple);
+            box-sizing: border-box;
+            padding: 0 20px;
+        }
+
+        .rangos-banner h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 2px;
+            margin: 0 0 10px 0;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+        }
+
+        .rangos-banner p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .rangos-container {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .ranks-detailed-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .rank-detailed-card {
+            background: linear-gradient(135deg, rgba(20, 12, 32, 0.95) 0%, rgba(12, 7, 20, 0.95) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 18px;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 25px;
+            align-items: start;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            backdrop-filter: blur(14px);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .rank-detailed-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: linear-gradient(to bottom, var(--accent-purple), var(--accent-pink));
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .rank-detailed-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 45px rgba(168, 85, 247, 0.25);
+        }
+
+        .rank-detailed-card:hover::before {
+            opacity: 1;
+        }
+
+        .rank-icon-large {
+            width: 80px;
+            height: 80px;
+            background: rgba(168, 85, 247, 0.12);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d8b4fe;
+            font-size: 2rem;
+            box-shadow: inset 0 2px 8px rgba(168, 85, 247, 0.2);
+            flex-shrink: 0;
+        }
+
+        .rank-content-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .rank-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .rank-content-box h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .rank-badge-level {
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            color: #d8b4fe;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rank-desc {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .rank-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .rank-achievement-box {
+            background: rgba(7, 4, 12, 0.5);
+            border-left: 3px solid var(--accent-purple);
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .rank-divisions-box {
+            background: rgba(7, 4, 12, 0.5);
+            border-left: 3px solid var(--accent-pink);
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .rank-box-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin: 0;
+        }
+
+        .rank-divisions-box .rank-box-title {
+            color: var(--accent-pink);
+        }
+
+        .rank-box-text {
+            color: #e2e8f0;
+            font-size: 0.86rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .division-tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .division-mini-tag {
+            background: rgba(236, 72, 153, 0.15);
+            border: 1px solid rgba(236, 72, 153, 0.35);
+            color: #fbcfe8;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        @media(max-width: 900px) {
+            .rank-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 768px) {
+            .rank-detailed-card {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                text-align: center;
+            }
+            .rank-detailed-card::before {
+                top: 0; left: 0; width: 100%; height: 4px;
+            }
+            .rank-icon-large {
+                margin: 0 auto;
+            }
+            .rank-header-row {
+                justify-content: center;
+            }
+            .rank-achievement-box, .rank-divisions-box {
+                border-left: none;
+                border-top: 3px solid var(--accent-purple);
+                border-radius: 0 0 8px 8px;
+                text-align: left;
+            }
+            .rank-divisions-box {
+                border-top-color: var(--accent-pink);
+            }
+        }
+
+        /* Video Card Section */
+        .lspd-video-card-wrapper {
+            background: var(--bg-card);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .lspd-video-card-wrapper h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .video-box-container {
+            width: 100%;
+            max-width: 800px;
+            height: 450px;
+            background: #040206;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+        }
+
+        .video-play-icon {
+            font-size: 3.5rem;
+            color: rgba(168, 85, 247, 0.5);
+            margin-bottom: 15px;
+            animation: pulseIcon 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseIcon {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.9; }
+        }
+
+        .video-box-container p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .video-status-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent-purple);
+            letter-spacing: 2px;
+            margin: 0;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+
+        @media(max-width: 900px) {
+            .video-box-container {
+                height: 280px;
+            }
+            .lspd-video-card-wrapper {
+                padding: 25px;
+            }
+        }
+
+        .lspd-quote-banner {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            background: url('https://i.imgur.com/b9p3ysf.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-top: 3px solid rgba(168, 85, 247, 0.4);
+            border-bottom: 3px solid rgba(168, 85, 247, 0.4);
+            margin: 40px 0 0 0;
+            box-sizing: border-box;
+        }
+
+        .lspd-quote-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(7, 4, 12, 0.8);
+        }
+
+        .lspd-quote-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 20px;
+        }
+
+        .lspd-quote-content h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            font-style: italic;
+            color: #ffffff;
+            margin: 0 0 10px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .lspd-quote-content p {
+            font-size: 1.15rem;
+            font-weight: 600;
+            font-style: italic;
+            color: #d8b4fe;
+            margin: 0;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        /* Footer */
+        .landing-footer {
+            position: relative;
+            background: url('https://i.imgur.com/IHEed1p.jpeg') no-repeat center center/cover;
+            color: var(--text-muted);
+            padding: 60px 5% 30px 5%;
+            border-top: 1px solid rgba(168, 85, 247, 0.2);
+            box-sizing: border-box;
+            width: 100%;
+            margin-top: auto;
+        }
+        .landing-footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(7, 4, 12, 0.92);
+            z-index: 1;
+        }
+        .footer-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: center;
+        }
+        .footer-brand-col {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 25px;
+            margin-left: -25px;
+        }
+        .footer-brand-logo {
+            height: 175px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .footer-brand-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin: 0;
+            text-align: left;
+        }
+        .footer-links-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .footer-links-col h4 {
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+            letter-spacing: 0.5px;
+        }
+        .footer-links-col a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.2s ease;
+        }
+        .footer-links-col a:hover {
+            color: var(--accent-purple);
+        }
+        .footer-bottom {
+            position: relative;
+            z-index: 2;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 25px;
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+        @media(max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .footer-brand-col {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                margin-left: 0;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-background"></div>
+
+    <!-- Barra de Navegación Superior -->
+    <header class="lspd-navbar">
+        <a onclick="showView('portada')" class="lspd-nav-brand">
+            <img src="https://i.imgur.com/mDzV0j5.png" alt="LSPD Logo">
+            Los Santos Police Department
+        </a>
+
+        <!-- Enlaces centrados -->
+        <nav class="lspd-nav-links">
+            <a onclick="showView('portada')" class="lspd-nav-link active" id="navPortada">Portada</a>
+
+            <!-- Conócenos -->
+            <div class="lspd-nav-item">
+                <button class="lspd-nav-link">Conócenos <i class="fa-solid fa-chevron-down"></i></button>
+                <div class="lspd-dropdown">
+                    <a onclick="showView('historia')">Nuestra historia</a>
+                    <a onclick="showView('divisiones')">Divisiones</a>
+                    <a onclick="showView('rangos')">Rangos</a>
+                    <a href="#">Condecoraciones</a>
+                </div>
+            </div>
+
+            <!-- Portal Judicial -->
+            <div class="lspd-nav-item">
+                <button class="lspd-nav-link">Portal Judicial <i class="fa-solid fa-chevron-down"></i></button>
+                <div class="lspd-dropdown">
+                    <a onclick="showView('codigo-penal')">Código Penal</a>
+                    <a href="#">Los más buscados</a>
+                </div>
+            </div>
+
+            <!-- Únete al equipo -->
+            <div class="lspd-nav-item">
+                <button class="lspd-nav-link">Únete al equipo <i class="fa-solid fa-chevron-down"></i></button>
+                <div class="lspd-dropdown">
+                    <a href="../../whitelist.html">Oposición</a>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Traslado</a>
+                </div>
+            </div>
+
+            <!-- Servicios -->
+            <div class="lspd-nav-item">
+                <button class="lspd-nav-link">Servicios <i class="fa-solid fa-chevron-down"></i></button>
+                <div class="lspd-dropdown">
+                    <a href="#">Servicios administrativos</a>
+                    <a href="#">Portal de denuncias</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="lspd-nav-right-spacer"></div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- VISTA 1: PORTADA                           -->
+    <!-- ========================================== -->
+    <div id="view-portada" class="view-section active">
+        <section class="lspd-hero-container">
+            <div class="lspd-hero-overlay"></div>
+            <div class="hero-bottom-left">
+                <a href="../../index.html" class="btn-back-home"><i class="fa-solid fa-house"></i> Volver a ClickSense RP</a>
+            </div>
+        </section>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- NUEVA VISTA: CÓDIGO PENAL                  -->
+    <!-- ========================================== -->
+    <div id="view-codigo-penal" class="view-section">
+        <section class="codigo-penal-banner">
+            <h1>Código Penal del Estado de San Andreas</h1>
+            <p>Marco legal, tipificación de delitos, multas y penas privativas de libertad oficiales del LSPD</p>
+        </section>
+        <div class="codigo-penal-bar"></div>
+
+        <div class="codigo-penal-wrapper">
+            <div class="penal-card">
+                <h3>Título I: Delitos contra la Autoridad y el Orden Público</h3>
+                <div class="article-grid">
+                    <div class="article-item">
+                        <h4 class="article-title">Artículo 1: Desacato a la Autoridad</h4>
+                        <p class="article-desc">Falta de respeto verbal grave, insultos u obstrucción pasiva a la labor de un oficial de policía en el ejercicio de sus funciones.</p>
+                        <p class="article-sanction"><span><i class="fa-solid fa-money-bill-wave"></i> Multa: $5,000</span> <span><i class="fa-solid fa-lock"></i> Prisión: 10 meses</span></p>
+                    </div>
+                    <div class="article-item">
+                        <h4 class="article-title">Artículo 2: Resistencia al Arresto</h4>
+                        <p class="article-desc">Oponer resistencia física activa, huir a pie de las autoridades o negarse a acatar las órdenes legales de detención.</p>
+                        <p class="article-sanction"><span><i class="fa-solid fa-money-bill-wave"></i> Multa: $8,000</span> <span><i class="fa-solid fa-lock"></i> Prisión: 15 meses</span></p>
+                    </div>
+                    <div class="article-item">
+                        <h4 class="article-title">Artículo 3: Agresión a la Autoridad</h4>
+                        <p class="article-desc">Atentar mediante fuerza física contra la integridad de un oficial de policía, médico o personal de emergencias.</p>
+                        <p class="article-sanction"><span><i class="fa-solid fa-money-bill-wave"></i> Multa: $15,000</span> <span><i class="fa-solid fa-lock"></i> Prisión: 30 meses</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="penal-card">
+                <h3>Título II: Delitos contra la Propiedad y Seguridad Vial</h3>
+                <div class="article-grid">
+                    <div class="article-item">
+                        <h4 class="article-title">Artículo 4: Conducción Temeraria</h4>
+                        <p class="article-desc">Manejar un vehículo poniendo en riesgo evidente la vida de transeúntes, circular en dirección contraria u omitir altos obligatorios en persecución.</p>
+                        <p class="article-sanction"><span><i class="fa-solid fa-money-bill-wave"></i> Multa: $10,000</span> <span><i class="fa-solid fa-lock"></i> Prisión: 20 meses</span></p>
+                    </div>
+                    <div class="article-item">
+                        <h4 class="article-title">Artículo 5: Robo de Vehículo</h4>
+                        <p class="article-desc">Sustracción no autorizada de vehículos motorizados particulares o comerciales ajenos.</p>
+                        <p class="article-sanction"><span><i class="fa-solid fa-money-bill-wave"></i> Multa: $12,000</span> <span><i class="fa-solid fa-lock"></i> Prisión: 25 meses</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VISTA 2: NUESTRA HISTORIA                  -->
+    <!-- ========================================== -->
+    <div id="view-historia" class="view-section">
+        <section class="lspd-hero-banner">
+            <img src="https://i.imgur.com/mDzV0j5.png" alt="Sello LSPD" class="lspd-hero-seal">
+            <h1 class="lspd-hero-title">LOS SANTOS POLICE DEPARTMENT</h1>
+        </section>
+
+        <div class="lspd-history-wrapper">
+            <div class="lspd-history-card">
+                <div class="history-content">
+                    <span class="history-badge">Orígenes (1889)</span>
+                    <h3>Los Comienzos: El Nacimiento de la LSPD</h3>
+                    <p>La Policía de Los Santos nació en 1889, cuando la ciudad pasaba de ser un pueblo costero a un centro urbano en expansión. Hasta entonces, el orden lo llevaban unos pocos alguaciles, pero el aumento de habitantes y la llegada del ferrocarril hicieron necesaria una fuerza más organizada con apenas una docena de oficiales bajo el mando del jefe Theodore S. Henderson.</p>
+                </div>
+                <div class="history-media seal-only">
+                    <img src="https://i.imgur.com/mDzV0j5.png" alt="Escudo LSPD">
+                </div>
+            </div>
+
+            <div class="lspd-history-card reverse">
+                <div class="history-content">
+                    <span class="history-badge">Evolución (1900-1950)</span>
+                    <h3>Crecimiento y Profesionalización</h3>
+                    <p>El auge petrolero y la industria del cine impulsaron la transformación de Los Santos. La LSPD creció creando unidades de tránsito e investigación, incorporando patrullas motorizadas en los años 20 y radios en los 30. En 1938 se fundó el primer cuerpo de investigación criminal.</p>
+                </div>
+                <div class="history-media">
+                    <img src="https://i.imgur.com/qltvmW6.jpeg" alt="Patrulla LSPD Histórica">
+                </div>
+            </div>
+
+            <div class="lspd-history-card">
+                <div class="history-content">
+                    <span class="history-badge">Modernización (1950-1990)</span>
+                    <h3>Posguerra y Nuevos Retos</h3>
+                    <p>La expansión urbana, las tensiones sociales y el narcotráfico marcaron la segunda mitad del siglo XX. La LSPD respondió con la creación de su equipo táctico especial (SWAT) y con reformas internas tras casos de corrupción e investigaciones federales en los 80.</p>
+                </div>
+                <div class="history-media">
+                    <img src="https://images.unsplash.com/photo-1555848962-6e79363ec58f?q=80&w=800&auto=format&fit=crop" alt="Agente LSPD">
+                </div>
+            </div>
+
+            <div class="lspd-history-card reverse">
+                <div class="history-content">
+                    <span class="history-badge">Actualidad</span>
+                    <h3>Misión Actual</h3>
+                    <p>Actualmente la LSPD cuenta con múltiples divisiones altamente especializadas, comprometidas con su lema de "Protect and Serve", defendiendo la seguridad, la justicia y la transparencia para mantener a Los Santos como una ciudad segura.</p>
+                </div>
+                <div class="history-media">
+                    <img src="https://i.imgur.com/WoOWChm.jpeg" alt="Patrulla Actual LSPD">
+                </div>
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VISTA 3: DIVISIONES                        -->
+    <!-- ========================================== -->
+    <div id="view-divisiones" class="view-section">
+        <section class="lspd-hero-banner">
+            <img src="https://i.imgur.com/mDzV0j5.png" alt="Sello LSPD" class="lspd-hero-seal">
+            <h1 class="lspd-hero-title">Serving and Protecting Los Santos</h1>
+        </section>
+
+        <div class="lspd-section-bar">
+            <h2>Divisiones del Departamento de Policía de Los Santos</h2>
+        </div>
+
+        <div class="lspd-divisions-wrapper">
+            <div class="lspd-divisions-intro">
+                <p>El Departamento de Policía de Los Santos actualmente cuenta con un total de 9 oficinas, unidades y divisiones que conllevan a tareas especiales internas para el combate del crimen en el condado al igual que mejora en el lado profesional de nuestros oficiales de policía. Estas unidades especiales serán listadas a continuación</p>
+            </div>
+
+            <div class="lspd-divisions-grid">
+                <!-- 1. SAHP -->
+                <button class="division-card" onclick="showView('sahp')">
+                    <div class="division-img-wrapper">
+                        <img src="https://i.imgur.com/vZ1w843.png" alt="SAHP">
+                    </div>
+                    <div class="division-info">
+                        <h4>San Andreas Highway Patrol - S.A.H.P.</h4>
+                        <p>Control de carreteras, autopistas y seguridad vial en todo el estado de San Andreas.</p>
+                    </div>
+                </button>
+
+                <!-- 2. HSIU -->
+                <button class="division-card" onclick="showView('hsiu')">
+                    <div class="division-img-wrapper">
+                        <img src="https://i.imgur.com/ReChtzO.png" alt="HSIU">
+                    </div>
+                    <div class="division-info">
+                        <h4>High Speed Interception Unit - H.S.I.U.</h4>
+                        <p>Intercepción táctica avanzada de vehículos sospechosos a alta velocidad.</p>
+                    </div>
+                </button>
+
+                <!-- 3. ASD -->
+                <button class="division-card" onclick="showView('asd')">
+                    <div class="division-img-wrapper">
+                        <img src="https://i.imgur.com/4bH9y9s.png" alt="ASD">
+                    </div>
+                    <div class="division-info">
+                        <h4>Air Support Division - A.S.D.</h4>
+                        <p>Vigilancia aérea, persecuciones y apoyo visual táctico en tierra.</p>
+                    </div>
+                </button>
+
+                <!-- 4. Training Bureau -->
+                <button class="division-card" onclick="showView('tb')">
+                    <div class="division-img-wrapper">
+                        <img src="https://i.imgur.com/w1qv2qc.png" alt="Training Bureau">
+                    </div>
+                    <div class="division-info">
+                        <h4>Training Bureau - T.B.</h4>
+                        <p>Academia de formación, instrucción y capacitación continua para cadetes.</p>
+                    </div>
+                </button>
+
+                <!-- 5. Metropolitan Division -->
+                <button class="division-card" onclick="showView('metro')">
+                    <div class="division-img-wrapper">
+                        <img src="https://i.imgur.com/xduUhK5.png" alt="Metropolitan Division">
+                    </div>
+                    <div class="division-info">
+                        <h4>Metropolitan Division</h4>
+                        <p>Operativos urbanos de alto impacto, respuesta táctica y control especial.</p>
+                    </div>
+                </button>
+
+                <!-- 6. Detective Bureau -->
+                <button class="division-card" onclick="showView('db')">
+                    <div class="division-img-wrapper">
+                        <img src="https://i.imgur.com/LFrGLhg.png" alt="Detective Bureau">
+                    </div>
+                    <div class="division-info">
+                        <h4>Detective Bureau - D.B.</h4>
+                        <p>Investigación criminal compleja, homicidios y seguimiento de bandas.</p>
+                    </div>
+                </button>
+
+                <!-- 7. ASB -->
+                <button class="division-card" onclick="showView('asb')">
+                    <div class="division-img-wrapper">
+                        <img src="https://i.imgur.com/UjtzrQW.png" alt="ASB">
+                    </div>
+                    <div class="division-info">
+                        <h4>Administrative Services Bureau - A.S.B.</h4>
+                        <p>Gestión de recursos internos, licencias, permisos y atención al ciudadano.</p>
+                    </div>
+                </button>
+
+                <!-- 8. IAD -->
+                <button class="division-card" onclick="showView('iad')">
+                    <div class="division-img-wrapper">
+                        <img src="https://i.imgur.com/FJPbMkN.png" alt="IAD">
+                    </div>
+                    <div class="division-info">
+                        <h4>Internal Affairs División - I.A.D.</h4>
+                        <p>Supervisión interna, ética policial y control de cumplimiento normativo.</p>
+                    </div>
+                </button>
+
+                <!-- 9. NOOSE -->
+                <button class="division-card" onclick="showView('noose')">
+                    <div class="division-img-wrapper">
+                        <img src="https://i.imgur.com/LMb9JiS.png" alt="NOOSE">
+                    </div>
+                    <div class="division-info">
+                        <h4>National Operations of Special Enforcement - N.O.O.S.E.</h4>
+                        <p>Operaciones especiales federales, contención de crisis y seguridad mayor.</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VISTA: RANGOS                              -->
+    <!-- ========================================== -->
+    <div id="view-rangos" class="view-section">
+        <section class="rangos-banner">
+            <h1>Escala de Rangos del LSPD</h1>
+            <p>Estructura jerárquica, requisitos, formas de ascenso y divisiones accesibles</p>
+        </section>
+
+        <div class="rangos-container">
+            <div class="ranks-detailed-grid">
+                <!-- 1. Aspirante -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-user"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Aspirante (Tú)</h3>
+                            <span class="rank-badge-level">Punto de Partida</span>
+                        </div>
+                        <p class="rank-desc">Candidato inicial que busca ingresar formalmente en el cuerpo policial del servidor.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Superando la whitelist del servidor y enviando tu solicitud en el portal de la oposición de la LSPD.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Superando la entrevista de admisión y las pruebas de selección iniciales del Training Bureau.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Ninguna (Acceso inicial al cuerpo base)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Cadete -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-user-graduate"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Cadete</h3>
+                            <span class="rank-badge-level">Academia / Formación</span>
+                        </div>
+                        <p class="rank-desc">Oficial en periodo de instrucción y capacitación intensiva dentro de la Academia.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Tras ser aceptado formalmente en las oposiciones del departamento por el equipo de reclutamiento.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Aprobando los exámenes teóricos, prácticos y superando el periodo de FTO (Field Training Officer).</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Training Bureau (Cadet Program)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Oficial I/II -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-shield"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Oficial I / II</h3>
+                            <span class="rank-badge-level">Patrulla Activa</span>
+                        </div>
+                        <p class="rank-desc">Agente de patrulla en servicio activo encargado de la seguridad ciudadana ordinaria y respuesta a llamadas.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Superando con éxito la academia policial y el periodo de prácticas junto a un instructor FTO.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Cumpliendo el tiempo mínimo de servicio activo en calle, expediente limpio y evaluación positiva de mandos.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">San Andreas Highway Patrol (SAHP)</span>
+                                <span class="division-mini-tag">Air Support Division (Observador - ASD)</span>
+                                <span class="division-mini-tag">Metropolitan Division (TRT / K-9 básico)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Oficial III -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-shield"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Oficial III</h3>
+                            <span class="rank-badge-level">Patrulla Veterano</span>
+                        </div>
+                        <p class="rank-desc">Agente de patrulla veterano con experiencia consolidada en la calle y resolución de incidentes complejos.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Acumulando las horas estipuladas de patrulla y demostrando un comportamiento ejemplar y profesional.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Demostrando un rendimiento superior continuado, liderazgo táctico en calle y antigüedad requerida.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">High Speed Interception Unit (HSIU)</span>
+                                <span class="division-mini-tag">Air Support Division (Piloto - ASD)</span>
+                                <span class="division-mini-tag">Detective Bureau (Aspirante - DB)</span>
+                                <span class="division-mini-tag">Training Bureau (Instructor FTO)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Oficial III+1 -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-shield"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Oficial III+1</h3>
+                            <span class="rank-badge-level">Patrulla Senior</span>
+                        </div>
+                        <p class="rank-desc">Agente de patrulla senior con funciones de apoyo avanzado y liderazgo operativo sobre oficiales junior.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Tras un largo historial como Oficial III impecable y siendo propuesto por supervisores de turno.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Aprobando las oposiciones a mandos intermedios o postulando formalmente a plazas de especialización.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Detective Bureau (DB)</span>
+                                <span class="division-mini-tag">Metropolitan Division (Completa)</span>
+                                <span class="division-mini-tag">Training Bureau (Instructor Academia)</span>
+                                <span class="division-mini-tag">Administrative Services (ASB)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Sargento I/II -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-star"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Sargento I / II</h3>
+                            <span class="rank-badge-level">Mando Intermedio</span>
+                        </div>
+                        <p class="rank-desc">Encargado de la supervisión directa de turnos de patrulla, coordinación de unidades en código y mando operativo en calle.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Mediante promoción interna aprobando el curso de mandos intermedios y superando examen ejecutivo.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Mediante evaluación ejecutiva continuada, gestión de turnos impecable y méritos para Teniente.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Comandancias de Turno y Operativas</span>
+                                <span class="division-mini-tag">Supervisión general de Divisiones (SAHP, HSIU, Metro, DB, TB)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Detective I/II/III -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-user-secret"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Detective I / II / III</h3>
+                            <span class="rank-badge-level">Investigación Criminal</span>
+                        </div>
+                        <p class="rank-desc">Especialistas en investigaciones complejas, homicidios, crimen organizado, narcotráfico e inteligencia policial.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Aplicando mediante un riguroso proceso de selección interna hacia el Detective Bureau (DB).</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Ascendiendo internamente dentro de la escala de detective (I a III) por casos de alto impacto o postulando a Teniente.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Detective Bureau (DB) Exclusivo</span>
+                                <span class="division-mini-tag">Enlace con Internal Affairs (IAD)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Teniente I/II -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-award"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Teniente I / II</h3>
+                            <span class="rank-badge-level">Capitanía / Mando</span>
+                        </div>
+                        <p class="rank-desc">Capitanía y mando superior encargado de la dirección general de divisiones completas o turnos complejos de guardia.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Por méritos extraordinarios, antigüedad demostrada como Sargento y comités de evaluación ejecutiva.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Por vacante directiva y gestión excepcional de divisiones para el rango de Capitán.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Mando de Divisiones (SAHP, Metro, DB, TB, ASB, IAD)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. Capitán -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Capitán</h3>
+                            <span class="rank-badge-level">Responsable de División</span>
+                        </div>
+                        <p class="rank-desc">Máximo responsable administrativo y operativo al frente de una división o área específica del LSPD.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Por asignación directa de la Jefatura basada en la gestión sobresaliente y liderazgo como Teniente.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Postulación a la alta plana directiva (Comandante o Jefe Adjunto) por vacantes ejecutivas.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Dirección General de Oficinas (SOB, ASB, Training Bureau)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10. Comandante -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-star"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Comandante</h3>
+                            <span class="rank-badge-level">Alta Jefatura</span>
+                        </div>
+                        <p class="rank-desc">Miembro de la alta plana encargado de la coordinación general entre las distintas oficinas, SOB y ASB.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Promoción interna a la cúpula directiva tras un desempeño ejemplar como Capitán.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Nombramiento para Jefe Adjunto o Jefe de la Policía por parte del staff directivo del servidor.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Plana Mayor y Coordinación General del LSPD</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 11. Jefe Supervisor -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-user-gear"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Jefe Supervisor</h3>
+                            <span class="rank-badge-level">Supervisión Operativa</span>
+                        </div>
+                        <p class="rank-desc">Supervisión táctica y estratégica a nivel estatal y metropolitano de todas las operaciones del departamento.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Nombramiento ejecutivo directo de la cúpula directiva para supervisar y auditar la operatividad.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Posición directiva de alta asesoría ejecutiva y control de mandos.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Auditoría y Supervisión de todas las Divisiones</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 12. Jefe Adjunto -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-crown"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Jefe Adjunto</h3>
+                            <span class="rank-badge-level">Segundo al Mando</span>
+                        </div>
+                        <p class="rank-desc">Mano derecha del Jefe de la Policía, supervisa la administración interna global y ejerce de sustituto oficial ante su ausencia.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Designación de máxima confianza por parte del Jefe de la Policía y el staff del servidor.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Ascenso al cargo supremo de Jefe de la Policía en caso de vacante directiva.</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Control Total (SOB, ASB, NOOSE, Unidades Federales)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 13. Jefe de la Policía -->
+                <div class="rank-detailed-card">
+                    <div class="rank-icon-large"><i class="fa-solid fa-chess-king"></i></div>
+                    <div class="rank-content-box">
+                        <div class="rank-header-row">
+                            <h3>Jefe de la Policía</h3>
+                            <span class="rank-badge-level">Mando Supremo</span>
+                        </div>
+                        <p class="rank-desc">Máxima autoridad ejecutiva y directiva del Departamento de Policía de Los Santos.</p>
+                        <div class="rank-info-grid">
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo alcanzarlo?</h4>
+                                <p class="rank-box-text">Puesto ejecutivo máximo otorgado por la administración gubernamental del servidor.</p>
+                            </div>
+                            <div class="rank-achievement-box">
+                                <h4 class="rank-box-title">¿Cómo ascender?</h4>
+                                <p class="rank-box-text">Rango máximo institucional (Cúspide de la carrera policial).</p>
+                            </div>
+                        </div>
+                        <div class="rank-divisions-box">
+                            <h4 class="rank-box-title">Divisiones a las que puedes acceder</h4>
+                            <div class="division-tags-container">
+                                <span class="division-mini-tag">Acceso Absoluto a todas las Divisiones y Unidades del Departamento</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Card Section -->
+            <div class="lspd-video-card-wrapper">
+                <h3>Video Institucional de Rangos</h3>
+                <div class="video-box-container">
+                    <div class="video-play-icon">
+                        <i class="fa-solid fa-circle-play"></i>
+                    </div>
+                    <p>Contenido Audiovisual</p>
+                </div>
+                <p class="video-status-text">PRÓXIMAMENTE...</p>
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- VISTAS DE DIVISIONES (SAHP, HSIU, ASD, etc.) -->
+    <div id="view-sahp" class="view-section">
+        <section class="sahp-banner">
+            <h1>San Andreas Highway Patrol (SAHP)</h1>
+        </section>
+        <div class="sahp-gold-bar"></div>
+
+        <div class="sahp-content-wrapper">
+            <div class="sahp-main-row">
+                <img src="https://i.imgur.com/vZ1w843.png" alt="SAHP Badge">
+                <div class="sahp-text-col">
+                    <p>La San Andreas Highway Patrol (SAHP) es una institución policial especializada en garantizar la seguridad vial y el orden en las carreteras del estado de San Andreas. Fue fundada el 14 de agosto de 1929 como respuesta al rápido crecimiento del tráfico automovilístico y a la necesidad de contar con una fuerza capacitada que pudiera regular y supervisar la red de autopistas en expansión.</p>
+                    <p>La misión de la SAHP es proteger la vida y la propiedad de los ciudadanos, prevenir accidentes y reducir víctimas en carretera, además de combatir el crimen en un entorno tan complejo como el de las autopistas. Para ello, combina labores de patrullaje constante, la estricta aplicación de la ley y programas de educación vial destinados a fomentar una cultura de responsabilidad entre conductores, pasajeros y peatones.</p>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid rgba(234, 179, 8, 0.3); border-radius: 18px; padding: 35px 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); backdrop-filter: blur(14px);">
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.8; margin-bottom: 20px;">En su estructura organizativa, la institución cuenta con una amplia variedad de profesionales: oficiales de patrulla, investigadores de accidentes, técnicos en emergencias médicas y especialistas en tráfico y seguridad vial. Dentro de la jerarquía están los agentes SAHP aunque también destacan los Troopers, quienes realizan labores de vigilancia, control y asistencia en carretera, y los Senior Troopers, con mayor experiencia, que asumen responsabilidades de liderazgo, apoyo en operaciones especiales y guía en la formación de nuevos agentes.</p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.8; margin: 0;">En lo que respecta a la capacitación, los miembros de la SAHP reciben un entrenamiento exhaustivo que abarca conducción defensiva y deportiva, manejo de armas de fuego, técnicas de intervención en crisis, primeros auxilios y rescate en carretera. Además, la institución promueve la formación continua con cursos de actualización y especialización en distintas áreas, garantizando así que cada oficial esté plenamente preparado para afrontar los desafíos de mantener la seguridad en las autopistas y carreteras del estado.</p>
+            </div>
+
+            <div class="sahp-bottom-images-grid">
+                <img src="https://i.imgur.com/Nmd8nWJ.png" alt="SAHP Operativa 1">
+                <img src="https://i.imgur.com/G2jdIgs.png" alt="SAHP Operativa 2">
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- VISTA HSIU -->
+    <div id="view-hsiu" class="view-section">
+        <section class="hsiu-banner">
+            <h1>High Speed Intercepción Unit (HSIU)</h1>
+        </section>
+        <div class="hsiu-red-bar"></div>
+
+        <div class="hsiu-content-wrapper">
+            <div class="hsiu-main-row">
+                <img src="https://i.imgur.com/h1bOZPn.png" alt="HSIU Interceptor">
+                <div class="hsiu-text-col">
+                    <p>La High Speed Interception Unit (HSIU) es la división especializada de la San Andreas Highway Patrol (SAHP), destinada a combatir las amenazas más peligrosas que se presentan en carreteras. Nuestro objetivo principal es garantizar la seguridad de los ciudadanos mediante la interceptación y neutralización de vehículos a gran velocidad, evitando que el crimen utilice la huida como herramienta para evadir la justicia.</p>
+                    <p>La HSIU representa la respuesta más contundente frente a situaciones críticas en las que la rapidez y la precisión son determinantes. Para ello, contamos con:</p>
+                    <ul>
+                        <li><strong>Agentes altamente entrenados:</strong> Seleccionados entre los mejores de la SAHP, preparados para actuar bajo presión, con disciplina, estrategia y máxima eficacia.</li>
+                        <li><strong>Flota de vehículos de gran potencia:</strong> Máquinas diseñadas para alcanzar y superar las prestaciones de cualquier amenaza en carretera, garantizando superioridad táctica en persecuciones de alto riesgo.</li>
+                        <li><strong>Tecnología avanzada y protocolos especializados:</strong> Cada operación es planificada y ejecutada con precisión quirúrgica, asegurando resultados rápidos y seguros.</li>
+                    </ul>
+                    <p>Pero más allá de los recursos, lo que define a la HSIU es nuestro espíritu depredador. Creemos firmemente en el principio de que "siempre hay un pez más grande". En este terreno, nosotros somos ese pez, dispuesto a imponer el orden donde otros buscan el caos y a demostrar que ninguna velocidad es suficiente para escapar de la ley.</p>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 18px; padding: 35px 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); backdrop-filter: blur(14px);">
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.8; margin-bottom: 20px;">Los operativos de la HSIU son desplegados de manera estratégica en los puntos críticos de alta siniestralidad y rutas de escape habituales de bandas organizadas, operando en coordinación directa con el resto de unidades aéreas y terrestres del departamento.</p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.8; margin: 0;">La HSIU no solo persigue; asegura, protege y vence. Somos el muro de contención frente al crimen en movimiento y la última línea de defensa en las autopistas.</p>
+            </div>
+
+            <div class="hsiu-bottom-images-grid">
+                <img src="https://i.imgur.com/ChdKWxA.png" alt="HSIU Operativa 1">
+                <img src="https://i.imgur.com/94qmnVJ.png" alt="HSIU Operativa 2">
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- VISTA ASD -->
+    <div id="view-asd" class="view-section">
+        <section class="asd-banner">
+            <h1>Air Support División (ASD)</h1>
+        </section>
+        <div class="asd-blue-bar"></div>
+
+        <div class="asd-content-wrapper">
+            <div class="asd-main-row">
+                <img src="https://i.imgur.com/Vz0aF6D.png" alt="ASD Helo">
+                <div class="asd-text-col">
+                    <p>La División de Apoyo Aéreo (ASD) del LSPD unida como una unidad especial del SOB. La ASD nació en 1953 como Unidad de Helicópteros con un solo Hiller UH-12C. Con los años, fue creciendo y modernizándose: en 1968 incorporó su primer helicóptero a turbina (Bell 206A JetRanger), en 1974 adoptó oficialmente el nombre de Air Support Division y para finales de los 80 ya contaba con aeronaves más avanzadas como el AS350 B1. Hoy en día, el ASD es una de las divisiones aéreas policiales más completas, brindando apoyo en vigilancia, persecuciones, robos, multitudes, interdicción de drogas y misiones de búsqueda y rescate.</p>
+                    
+                    <h3>Misión</h3>
+                    <p>El ASD tiene como objetivo proporcionar apoyo aéreo a las unidades de patrullaje y especializadas del LSPD, mejorando la seguridad pública, reduciendo la criminalidad y aumentando la capacidad de respuesta en incidentes de alto riesgo.</p>
+                    
+                    <h3>Operaciones principales</h3>
+                    <ul>
+                        <li><strong>Vigilancia aérea y apoyo en persecuciones.</strong></li>
+                        <li><strong>Respuesta rápida en emergencias y desastres.</strong></li>
+                        <li><strong>Transporte de oficiales y apoyo a unidades especiales como Metro, SWAT y Robos Grandes/Medianos.</strong></li>
+                        <li><strong>Evaluaciones tácticas desde el aire con el uso de foco nocturno, binoculares giro estabilizados, GPS en tiempo real, LOJACK y sistemas de videograbación.</strong></li>
+                    </ul>
+                    <p>La ASD es clave para que el LSPD actúe con rapidez, precisión y seguridad en operaciones críticas.</p>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 18px; padding: 35px 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); backdrop-filter: blur(14px);">
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.8; margin-bottom: 20px;">Los pilotos y observadores tácticos de la ASD se someten a rigurosos entrenamientos de vuelo nocturno, formaciones en espacio aéreo complejo y tácticas de seguimiento aéreo sin perder contacto visual, garantizando la cobertura de cualquier área del condado.</p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.8; margin: 0;">Desde los cielos de Los Santos, la ASD proporciona los ojos y oídos estratégicos necesarios para mantener el dominio táctico en cualquier operación policial.</p>
+            </div>
+
+            <div class="asd-bottom-images-grid">
+                <img src="https://i.imgur.com/CLYdXtB.png" alt="ASD Operativa 1">
+                <img src="https://i.imgur.com/WJq0cwS.png" alt="ASD Operativa 2">
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- VISTA TB -->
+    <div id="view-tb" class="view-section">
+        <section class="tb-banner">
+            <h1>Recruit & Employment Division (RED) & Training Division (TD)</h1>
+        </section>
+        <div class="tb-red-bar"></div>
+
+        <div class="tb-content-wrapper">
+            <div class="tb-main-row">
+                <img src="https://i.imgur.com/e1m92WN.png" alt="Training Bureau Instructor">
+                <div class="tb-text-col">
+                    <p>Fundada en 1934, la División de Reclutamiento, Empleo y Entrenamiento (RED & TD) desempeña un papel central en el Departamento de Policía de Los Santos, al encargarse de atraer, seleccionar y formar a los futuros agentes, así como de capacitar y perfeccionar a los oficiales en activo.</p>
+                    
+                    <h3>Funciones principales</h3>
+                    <ul>
+                        <li><strong>Reclutamiento:</strong> Promoción de oportunidades laborales, organización de eventos comunitarios y selección de candidatos mediante pruebas físicas, entrevistas y verificación de antecedentes.</li>
+                        <li><strong>Formación:</strong> Desarrollo de programas integrales que abarcan desde el manejo de armas y la aplicación de la ley hasta la ética profesional, resolución de conflictos y derechos civiles.</li>
+                        <li><strong>Entrenamiento continuo:</strong> Perfeccionamiento de las habilidades intelectuales y físicas de los oficiales en activo mediante prácticas y evaluaciones periódicas.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 18px; padding: 35px 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); backdrop-filter: blur(14px);">
+                <h3 style="color: #ef4444; font-size: 1.15rem; font-weight: 700; margin-top: 0; margin-bottom: 15px;">Jerarquía RED & TD</h3>
+                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                    <li style="color: var(--text-muted); font-size: 0.91rem; line-height: 1.6;"><strong>Coordinador/a:</strong> Supervisa y organiza las actividades de la división.</li>
+                    <li style="color: var(--text-muted); font-size: 0.91rem; line-height: 1.6;"><strong>Instructores:</strong> Agentes con experiencia encargados de la formación de cadetes, oficiales en prácticas y aspirantes en la Academia.</li>
+                    <li style="color: var(--text-muted); font-size: 0.91rem; line-height: 1.6;"><strong>Examinadores:</strong> Evalúan a los cadetes para su ascenso a Oficial I.</li>
+                    <li style="color: var(--text-muted); font-size: 0.91rem; line-height: 1.6;"><strong>Instructores especializados:</strong> Se centran en mejorar las capacidades de los oficiales ya en servicio, tanto a nivel físico como intelectual.</li>
+                </ul>
+            </div>
+
+            <div class="tb-bottom-images-grid">
+                <img src="https://i.imgur.com/UuCVixe.png" alt="Training Bureau Operativa 1">
+                <img src="https://i.imgur.com/B6Uzvvy.png" alt="Training Bureau Operativa 2">
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- VISTA METRO -->
+    <div id="view-metro" class="view-section">
+        <section class="metro-banner">
+            <h1>Metropolitan División</h1>
+        </section>
+        <div class="metro-bar"></div>
+
+        <div class="metro-content-wrapper">
+            <div class="metro-main-row">
+                <img src="https://i.imgur.com/z0HQ25N.png" alt="Metropolitan Division Officer">
+                <div class="metro-text-col">
+                    <p><strong>Historia:</strong><br>La División Metropolitana del Departamento de Policía de Los Santos (LSPD) se originó en 1933 como la Unidad de Reserva, creada para combatir el crimen en toda la ciudad. En 1968 pasó de 70 a 200 oficiales, y tras el robo a un banco en 1997 creció a 350 oficiales y 16 civiles de apoyo. A lo largo de su historia ha enfrentado grandes retos como los disturbios de los 60 y la ola criminal de los 80, consolidándose como una unidad clave en la seguridad de Los Santos.</p>
+                    
+                    <p><strong>Dependencia:</strong><br>La División Metropolitana forma parte del SOB - Special Operations Bureau, el grupo encargado de coordinar y supervisar las unidades tácticas y especializadas del LSPD.</p>
+                    
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #d4d4d8; margin: 5px 0 0 0;">Jerarquía y organización:</h3>
+                    <ul>
+                        <li><strong>Coordinación Metropolitana.</strong></li>
+                        <li><strong>Unidades Especializadas:</strong>
+                            <ul style="list-style: disc; padding-left: 20px; margin-top: 5px; display: flex; flex-direction: column; gap: 6px;">
+                                <li><strong>TRT (Alpha, Bravo, Charlie):</strong> Agentes con entrenamiento superior para crisis, actúan en ausencia de SWAT.</li>
+                                <li><strong>K-9 Platoon:</strong> Oficiales con perros entrenados para detección de drogas, explosivos, rastreo y rescates.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-card); border: 1px solid rgba(113, 113, 122, 0.3); border-radius: 18px; padding: 35px 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); backdrop-filter: blur(14px);">
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: #d4d4d8; margin-top: 0; margin-bottom: 15px;">Misión:</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.8; margin-bottom: 15px;">La División Metropolitana brinda apoyo estratégico al LSPD para mantener el orden en situaciones críticas. Sus funciones principales incluyen:</p>
+                <ul style="list-style: disc; padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 8px; color: var(--text-muted);">
+                    <li>Rescate de rehenes.</li>
+                    <li>Respuesta a tiroteos activos.</li>
+                    <li>Arrestos de alto riesgo.</li>
+                    <li>Evacuaciones y rescates.</li>
+                </ul>
+            </div>
+
+            <div class="metro-bottom-images-grid">
+                <img src="https://i.imgur.com/fdKDEWP.png" alt="Metropolitan Operativa 1">
+                <img src="https://i.imgur.com/fdKDEWP.png" alt="Metropolitan Operativa 2">
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- VISTA DB -->
+    <div id="view-db" class="view-section">
+        <section class="db-banner">
+            <h1>Detective Bureau (DB)</h1>
+        </section>
+        <div class="db-gold-bar"></div>
+
+        <div class="db-content-wrapper">
+            <div class="db-main-row">
+                <img src="https://i.imgur.com/0Aw7Xwz.png" alt="Detective Bureau Officer">
+                <div class="db-text-col">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #eab308; margin: 0;">HISTORIA</h3>
+                    <p>El Departamento de Detective Bureau es parte fundamental de las agencias policiales, encargado de llevar a cabo investigaciones exhaustivas para resolver una amplia gama de crímenes que envuelven de manera general al narcotráfico, tráfico de armas, homicidios, pandillas y grupos organizados. Compuesto por un equipo de detectives altamente capacitados, el departamento trabaja para garantizar la seguridad de la comunidad y disminuir la actividad criminal desde 1869.</p>
+                    
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #eab308; margin: 10px 0 0 0;">MISIÓN</h3>
+                    <p>Los servicios de investigación, a cargo de detectives y sus equipos especializados, consisten en la realización de todas aquellas averiguaciones necesarias para la obtención, análisis y aportación de información y pruebas relacionadas con conductas o hechos delictivos. El Departamento de Detective Bureau trabaja con un alto compromiso ético y profesional, aplicando técnicas de investigación modernas, métodos científicos y estrategias de inteligencia policial que permitan esclarecer los crímenes y garantizar que la justicia prevalezca.</p>
+                    <p>La misión también contempla la protección de la comunidad a través de la prevención del delito, la identificación de patrones delictivos y el desmantelamiento de organizaciones criminales que amenazan la paz social. Cada investigación está orientada no solo a resolver un caso en particular, sino también a fortalecer la confianza ciudadana en las instituciones de seguridad y justicia.</p>
+                </div>
+            </div>
+
+            <div style="width: 100%;">
+                <img src="https://i.imgur.com/IayZupW.png" alt="Detective Bureau Operativa" style="width: 100%; border-radius: 14px; border: 1px solid rgba(234, 179, 8, 0.3); box-shadow: 0 15px 30px rgba(0,0,0,0.6); object-fit: cover;">
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- VISTA ASB -->
+    <div id="view-asb" class="view-section">
+        <section class="asb-banner">
+            <h1>Administrative Services Bureau (ASB)</h1>
+        </section>
+        <div class="asb-blue-bar"></div>
+
+        <div class="asb-content-wrapper">
+            <div class="asb-main-row">
+                <img src="https://i.imgur.com/C7XPO3g.png" alt="ASB Officer">
+                <div class="asb-text-col">
+                    <p>La Oficina de Servicios Administrativos (ASB) del Departamento de Policía de Los Santos es la encargada de proporcionar todo el apoyo administrativo necesario para el funcionamiento eficaz y eficiente del Departamento. A través de divisiones internas altamente especializadas, el ASB gestiona los recursos humanos, tecnológicos, financieros y logísticos que permiten fortalecer la misión policial.</p>
+                    
+                    <h3>Misión</h3>
+                    <p>Brindar una amplia gama de servicios y funciones de apoyo que garanticen el correcto desempeño del LSPD y respalden a cada una de sus operaciones.</p>
+                    
+                    <h3>Commanding Officer</h3>
+                    <p>El Oficial al Mando del ASB supervisa y coordina los recursos internos de la Oficina, además de desarrollar y recomendar políticas y procedimientos que optimicen sus funciones.</p>
+                    
+                    <h3>Divisiones Internas</h3>
+                    <ul>
+                        <li><strong>Communications Division & Support Services Group (SSG):</strong> Encargados de la gestión de comunicaciones, personal, instalaciones, flota vehicular, operaciones fiscales y otros servicios de apoyo esenciales para el LSPD.</li>
+                        <li><strong>Personnel Division & Records and Identification Division (R&I):</strong> La División de Personal se ocupa de la gestión de recursos humanos, incluyendo investigaciones de antecedentes, entrevistas y selección de candidatos civiles, además de mantener la base de datos de personal y la Tabla de Organización. La División de Registros e Identificación opera las 24 horas, gestionando sistemas y servicios de registros civiles y administrativos que son clave para el trabajo policial.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="width: 100%;">
+                <img src="https://i.imgur.com/vpdzSZ5.png" alt="ASB Operativa" style="width: 100%; border-radius: 14px; border: 1px solid rgba(56, 189, 248, 0.3); box-shadow: 0 15px 30px rgba(0,0,0,0.6); object-fit: cover;">
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- VISTA IAD -->
+    <div id="view-iad" class="view-section">
+        <section class="iad-banner">
+            <h1>Internal Affairs División (IAD)</h1>
+        </section>
+        <div class="iad-red-bar"></div>
+
+        <div class="iad-content-wrapper">
+            <div class="iad-main-card">
+                <div class="iad-text-col">
+                    <p>La División de Asuntos Internos (IAD) del Departamento de Policía de Los Santos actúa como el brazo de investigación responsable de supervisar la conducta de los miembros del cuerpo. Todas las denuncias y quejas recibidas son evaluadas cuidadosamente para determinar el tipo de investigación necesaria y las medidas correspondientes.</p>
+                    <p>La IAD tiene la responsabilidad de investigar casos de mala conducta, ya sean de carácter administrativo o con posibles implicaciones delictivas. Su labor es esencial para garantizar la integridad del Departamento, reforzar la confianza pública y asegurar que cada agente cumpla con los más altos estándares de profesionalismo.</p>
+                    
+                    <h3>Misión</h3>
+                    <p>La misión de la IAD es velar porque los agentes del LSPD desarrollen sus funciones conforme a los procedimientos establecidos y dentro del marco legal. Además, supervisa la disciplina interna y administra todas las quejas en estricto cumplimiento con la Ley, preservando así la credibilidad y la transparencia de la institución.</p>
+                    
+                    <h3>Commanding Officer</h3>
+                    <p>El oficial al mando de la IAD dirige, supervisa y coordina los recursos de la división. Asimismo, es responsable de diseñar y recomendar políticas internas, así como de aplicar sanciones disciplinarias cuando corresponda. Su autoridad garantiza la imparcialidad y la correcta ejecución de todas las investigaciones.</p>
+                    <p>La IAD es, en definitiva, el pilar que asegura que la ética, la legalidad y la responsabilidad se mantengan como principios inquebrantables dentro del LSPD.</p>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; align-items: center; padding: 20px 0;">
+                <img src="https://i.imgur.com/xhrjRO2.png" alt="IAD Seal" style="max-width: 240px; height: auto; filter: drop-shadow(0 8px 25px rgba(239, 68, 68, 0.4));">
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- VISTA NOOSE -->
+    <div id="view-noose" class="view-section">
+        <section class="noose-banner">
+            <h1>National Operations of Special Enforcement</h1>
+        </section>
+        <div class="noose-bar"></div>
+
+        <div class="noose-content-wrapper">
+            <div class="noose-main-row">
+                <img src="https://i.imgur.com/sDeozxc.png" alt="NOOSE Tactical Vehicle">
+                <div class="noose-text-col">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #d8b4fe; margin: 0;">Historia</h3>
+                    <p>La NOOSE (originalmente conocida como la National Operations of Special Enforcement) es la unidad de élite del LSPD, especializada en operaciones de alto riesgo y situaciones críticas que superan la capacidad de la policía convencional. Fue creada en los años 70 en respuesta al aumento del crimen organizado, los disturbios urbanos y las amenazas a la seguridad de Los Santos, consolidándose como la fuerza táctica más avanzada de la ciudad.</p>
+                    <p>Los agentes de la NOOSE reciben un entrenamiento especializado en tácticas avanzadas de intervención, coordinación de equipos y manejo de situaciones de crisis. Están equipados con armamento pesado, vehículos blindados, helicópteros y tecnología avanzada que les permite actuar con rapidez y eficacia, garantizando el control absoluto en escenarios de alto riesgo.</p>
+                    <p>Con el paso de los años, la NOOSE se ha consolidado como la última línea de defensa de Los Santos, colaborando estrechamente con otras divisiones del LSPD y manteniendo la seguridad en los momentos más críticos de la ciudad.</p>
+                    
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #d8b4fe; margin: 10px 0 0 0;">MISION</h3>
+                    <p>Se encarga de enfrentar las situaciones más peligrosas, incluyendo:</p>
+                    <ul>
+                        <li><strong>Atracos armados y secuestros de alto nivel</strong></li>
+                        <li><strong>Disturbios masivos y motines urbanos</strong></li>
+                        <li><strong>Amenazas de terrorismo y ataques coordinados</strong></li>
+                        <li><strong>Operaciones de rescate en entornos hostiles</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="width: 100%;">
+                <img src="https://i.imgur.com/rz4110t.png" alt="NOOSE Operativa" style="width: 100%; border-radius: 14px; border: 1px solid rgba(168, 85, 247, 0.3); box-shadow: 0 15px 30px rgba(0,0,0,0.6); object-fit: cover;">
+            </div>
+        </div>
+
+        <div class="lspd-quote-banner">
+            <div class="lspd-quote-content">
+                <h2>"Protect and Serve"</h2>
+                <p>Yesterday, today and always</p>
+            </div>
+        </div>
+
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <div class="footer-brand-col">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Información</h4>
+                    <a href="../../normativa.html">Normativa del servidor</a>
+                    <a href="#">Política de privacidad</a>
+                    <a href="../../términos.html">Términos y condiciones</a>
+                    <a href="../../terminos-donaciones.html">Términos y condiciones de compra</a>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Comunidad</h4>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                    <a href="../../equipo.html">Staff</a>
+                    <a href="../../whitelist.html">Whitelist</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+                <span>Developed by Gallegoo</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function showView(viewName) {
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            const target = document.getElementById('view-' + viewName);
+            if(target) {
+                target.classList.add('active');
+
+                if (viewName === 'historia' || viewName === 'divisiones' || viewName === 'sahp' || viewName === 'hsiu' || viewName === 'asd' || viewName === 'tb' || viewName === 'metro' || viewName === 'db' || viewName === 'asb' || viewName === 'iad' || viewName === 'noose' || viewName === 'rangos' || viewName === 'codigo-penal') {
+                    target.style.animation = 'none';
+                    target.offsetHeight; /* Forzar reflow */
+                    target.style.animation = 'sectionEntrance 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                }
+            }
+
+            window.scrollTo(0, 0);
+
+            const portadaLink = document.getElementById('navPortada');
+            if (viewName === 'portada') {
+                portadaLink.classList.add('active');
+            } else {
+                portadaLink.classList.remove('active');
+            }
+        }
+
+        window.addEventListener('load', () => {
+            window.scrollTo(0, 0);
+        });
+    </script>
+</body>
+</html>

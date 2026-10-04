@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whitelist | ClickSense RP</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Lexend:wght@600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/src/assets/home.css">
+    <link rel="stylesheet" href="/src/assets/whitelist.css">
+    <link rel="stylesheet" href="/src/assets/perfil.css">
+
+    <style>
+        .whitelist-content-wrapper {
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .welcome-banner-card,
+        .modern-cta-card {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .modern-cta-card {
+            background: linear-gradient(135deg, rgba(20, 24, 33, 0.85) 0%, rgba(30, 27, 45, 0.9) 100%);
+            border: 1px solid rgba(236, 72, 153, 0.25);
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 0px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-cta-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #ec4899, #8b5cf6);
+        }
+
+        .cta-left-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cta-icon-box {
+            background: rgba(236, 72, 153, 0.15);
+            color: #f472b6;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+
+        .cta-text h3 {
+            margin: 0 0 6px 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .cta-text p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        .btn-modern-action {
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.3);
+            text-decoration: none;
+        }
+
+        .btn-modern-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(236, 72, 153, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .btn-modern-action:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .modern-cta-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .btn-modern-action {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* =========================================================
+           TEST DE WHITELIST (ventana del test)
+           ========================================================= */
+        .wq-overlay {
+            position: fixed; inset: 0; z-index: 9000;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+            background: rgba(6, 4, 12, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity .3s ease, visibility 0s linear .3s;
+        }
+        .wq-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .3s ease, visibility 0s; }
+
+        .wq-card {
+            width: 100%; max-width: 780px; max-height: calc(100vh - 40px);
+            display: flex; flex-direction: column;
+            background: #13141f; color: #fff;
+            border: 1px solid rgba(168, 85, 247, 0.45); border-radius: 22px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 40px rgba(168, 85, 247, 0.22);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transform: translateY(18px) scale(.97); opacity: 0;
+            transition: transform .4s cubic-bezier(.16, 1, .3, 1), opacity .3s ease;
+            overflow: hidden;
+        }
+        .wq-overlay.open .wq-card { transform: none; opacity: 1; }
+
+        .wq-head { display: flex; align-items: center; gap: 14px; padding: 18px 22px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+        .wq-logo { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+        .wq-head-text { flex: 1; min-width: 0; }
+        .wq-head-text h2 { margin: 0; font-family: 'Lexend', sans-serif; font-size: 1.1rem; font-weight: 600; }
+        .wq-head-text span { display: block; font-size: .82rem; color: #94a3b8; margin-top: 2px; }
+        .wq-close {
+            width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; cursor: pointer;
+            background: rgba(168, 85, 247, 0.14); border: 1px solid rgba(168, 85, 247, 0.3); color: #cbd5e1;
+            transition: background .25s, color .25s, transform .25s;
+        }
+        .wq-close:hover { background: #a855f7; color: #fff; transform: rotate(90deg); }
+
+        .wq-progress { height: 4px; background: rgba(255, 255, 255, 0.06); flex-shrink: 0; }
+        .wq-progress-bar { height: 100%; width: 0; background: linear-gradient(90deg, #ec4899, #8b5cf6); border-radius: 0 4px 4px 0; transition: width .4s cubic-bezier(.16, 1, .3, 1); }
+
+        .wq-body { padding: 26px 26px 22px; overflow-y: auto; flex: 1; min-height: 0; }
+        .wq-foot { padding: 14px 22px 18px; border-top: 1px solid rgba(255, 255, 255, 0.07); display: flex; flex-direction: column; gap: 12px; }
+        .wq-foot:empty { display: none; }
+
+        .wq-overlay :focus-visible { outline: 2px solid #c084fc; outline-offset: 2px; }
+
+        /* Botones */
+        .wq-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+            padding: 11px 22px; border-radius: 12px; cursor: pointer; text-decoration: none;
+            font-family: inherit; font-size: .92rem; font-weight: 600; white-space: nowrap;
+            background: transparent; border: 1px solid rgba(255, 255, 255, 0.14); color: #e2e8f0;
+            transition: background .2s, border-color .2s, color .2s, transform .15s, box-shadow .2s, filter .2s;
+        }
+        .wq-btn:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+        .wq-btn:active { transform: scale(.98); }
+        .wq-btn:disabled { opacity: .45; cursor: not-allowed; }
+        .wq-btn.primario { border: none; color: #fff; background: linear-gradient(135deg, #ec4899, #8b5cf6); box-shadow: 0 4px 20px rgba(236, 72, 153, 0.3); }
+        .wq-btn.primario:hover { filter: brightness(1.12); box-shadow: 0 6px 26px rgba(236, 72, 153, 0.5); }
+        .wq-btn.verde { border: none; color: #fff; background: linear-gradient(135deg, #22c55e, #10b981); box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3); }
+        .wq-btn.verde:hover { filter: brightness(1.1); }
+
+        /* Introducción */
+        .wq-intro h3 { margin: 0 0 8px; font-family: 'Lexend', sans-serif; font-size: 1.45rem; font-weight: 600; line-height: 1.25; }
+        .wq-intro > p { margin: 0 0 20px; color: #94a3b8; font-size: .95rem; line-height: 1.6; max-width: 62ch; }
+        .wq-reglas { list-style: none; margin: 0 0 22px; padding: 0; display: grid; gap: 10px; }
+        .wq-reglas li {
+            display: grid; grid-template-columns: 38px 1fr; gap: 14px; align-items: center;
+            padding: 12px 14px; border-radius: 12px; font-size: .92rem; line-height: 1.5; color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .wq-reglas li i { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+        .wq-reglas strong { color: #fff; }
+        .wq-bloques { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+        .wq-chip {
+            display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px;
+            font-size: .78rem; font-weight: 600; color: #e9d5ff;
+            background: rgba(168, 85, 247, 0.14); border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+        .wq-acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+
+        /* Pregunta */
+        .wq-q { animation: wqEntrada .35s cubic-bezier(.16, 1, .3, 1) both; }
+        @keyframes wqEntrada { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+        .wq-q-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .wq-tema { font-size: .82rem; color: #94a3b8; }
+        .wq-enunciado { margin: 0 0 20px; font-size: 1.08rem; font-weight: 600; line-height: 1.55; color: #fff; }
+        .wq-opciones { display: grid; gap: 10px; }
+        .wq-opcion {
+            display: grid; grid-template-columns: 34px 1fr; gap: 14px; align-items: start;
+            width: 100%; text-align: left; padding: 14px 16px; border-radius: 14px; cursor: pointer;
+            font-family: inherit; font-size: .93rem; line-height: 1.5; color: #cbd5e1;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.09);
+            transition: background .2s, border-color .2s, color .2s, box-shadow .2s;
+        }
+        .wq-opcion:hover { border-color: rgba(168, 85, 247, 0.5); background: rgba(168, 85, 247, 0.07); color: #fff; }
+        .wq-letra {
+            width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .88rem; color: #94a3b8;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background .2s, color .2s, border-color .2s;
+        }
+        .wq-opcion.sel { border-color: #a855f7; background: rgba(168, 85, 247, 0.14); color: #fff; box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.16); }
+        .wq-opcion.sel .wq-letra { background: linear-gradient(135deg, #ec4899, #8b5cf6); color: #fff; border-color: transparent; }
+
+        /* Pie de la pregunta: navegación */
+        .wq-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+        .wq-contador { font-size: .85rem; color: #94a3b8; }
+        .wq-contador strong { color: #fff; }
+        .wq-nav-btns { display: flex; gap: 10px; }
+        .wq-dots { display: flex; flex-wrap: wrap; gap: 5px; }
+        .wq-dot {
+            width: 26px; height: 26px; border-radius: 8px; cursor: pointer; padding: 0;
+            font-family: inherit; font-size: .7rem; font-weight: 600; color: #64748b;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: background .2s, color .2s, border-color .2s;
+        }
+        .wq-dot:hover { color: #fff; border-color: rgba(168, 85, 247, 0.6); }
+        .wq-dot.hecha { background: rgba(168, 85, 247, 0.22); border-color: rgba(168, 85, 247, 0.4); color: #e9d5ff; }
+        .wq-dot.actual { border-color: #ec4899; color: #fff; box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.25); }
+
+        /* Estados centrados: cargando, analizando, resultado, error */
+        .wq-centro { min-height: 360px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 14px; padding: 34px 0 10px; }
+        .wq-centro h3 { margin: 0; font-family: 'Lexend', sans-serif; font-size: 1.5rem; font-weight: 600; line-height: 1.25; }
+        .wq-centro p { margin: 0; max-width: 46ch; color: #94a3b8; font-size: .95rem; line-height: 1.6; }
+        .wq-centro .wq-acciones { justify-content: center; margin-top: 10px; }
+
+        /* Analizando */
+        .wq-analiza-logo { position: relative; width: 130px; height: 130px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+        .wq-analiza-logo img { width: 78px; height: 78px; object-fit: contain; animation: wqLatido 1.2s ease-in-out infinite; }
+        .wq-analiza-logo::before, .wq-analiza-logo::after { content: ''; position: absolute; border-radius: 50%; }
+        .wq-analiza-logo::before { inset: 0; border: 3px solid rgba(168, 85, 247, 0.15); border-top-color: #a855f7; border-right-color: #ec4899; animation: wqGiro 1s linear infinite; }
+        .wq-analiza-logo::after { inset: 12px; border: 2px dashed rgba(236, 72, 153, 0.35); animation: wqGiro 3s linear infinite reverse; }
+        @keyframes wqGiro { to { transform: rotate(360deg); } }
+        @keyframes wqLatido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+        .wq-analiza-barra { width: min(320px, 80%); height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.07); overflow: hidden; margin-top: 8px; }
+        .wq-analiza-barra span { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #ec4899, #8b5cf6); animation: wqLlenar 2.4s cubic-bezier(.4, 0, .2, 1) forwards; }
+        @keyframes wqLlenar { to { width: 100%; } }
+
+        /* Resultado */
+        .wq-sello { position: relative; width: 124px; height: 124px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 56px; margin-bottom: 8px; }
+        .wq-sello.ok { color: #22c55e; background: radial-gradient(circle, rgba(34, 197, 94, 0.25), rgba(34, 197, 94, 0.05)); border: 2px solid rgba(34, 197, 94, 0.5); box-shadow: 0 0 60px rgba(34, 197, 94, 0.3); animation: wqSello .7s cubic-bezier(.34, 1.56, .64, 1) both; }
+        .wq-sello.ko { color: #f87171; background: radial-gradient(circle, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.04)); border: 2px solid rgba(239, 68, 68, 0.45); box-shadow: 0 0 50px rgba(239, 68, 68, 0.2); animation: wqSello .6s cubic-bezier(.34, 1.56, .64, 1) both, wqTemblor .5s ease .6s; }
+        @keyframes wqSello { from { transform: scale(0) rotate(-25deg); opacity: 0; } to { transform: none; opacity: 1; } }
+        @keyframes wqTemblor { 0%, 100% { transform: none; } 20% { transform: translateX(-7px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+        .wq-sello.ok::before, .wq-sello.ok::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid rgba(34, 197, 94, 0.55); animation: wqOnda 1.8s ease-out .35s infinite; }
+        .wq-sello.ok::after { animation-delay: 1.25s; }
+        @keyframes wqOnda { from { transform: scale(1); opacity: .8; } to { transform: scale(1.45); opacity: 0; } }
+
+        /* Confeti del aprobado */
+        .wq-confeti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }   /* ocupa toda la pantalla */
+        .wq-confeti i { position: absolute; top: -14px; width: 8px; height: 14px; border-radius: 2px; opacity: 0; animation: wqCaer linear forwards; }
+        @keyframes wqCaer { 0% { opacity: 1; transform: translateY(0) rotate(0); } 100% { opacity: 0; transform: translateY(100vh) rotate(680deg); } }
+
+        .wq-marcador { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: min(460px, 100%); margin: 8px 0 4px; }
+        .wq-marcador div { padding: 14px 10px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .wq-marcador b { display: block; font-family: 'Lexend', sans-serif; font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
+        .wq-marcador small { display: block; margin-top: 4px; font-size: .78rem; color: #94a3b8; }
+        .wq-marcador .v { color: #34d399; }
+        .wq-marcador .r { color: #f87171; }
+
+        .wq-spinner { font-size: 30px; color: #a855f7; }
+        .wq-icono-error { width: 84px; height: 84px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #fbbf24; background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.4); }
+
+        @media (max-width: 600px) {
+            .wq-overlay { padding: 0; }
+            .wq-card { max-height: 100vh; height: 100%; border-radius: 0; border: none; }
+            .wq-body { padding: 20px 18px; }
+            .wq-foot { padding: 12px 16px 16px; }
+            .wq-nav-btns { width: 100%; }
+            .wq-nav-btns .wq-btn { flex: 1; padding: 11px 12px; }
+            .wq-dot { width: 24px; height: 24px; }
+            .wq-enunciado { font-size: 1rem; }
+            .wq-centro h3 { font-size: 1.3rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .wq-card, .wq-q, .wq-sello, .wq-sello::before, .wq-sello::after, .wq-analiza-logo img, .wq-analiza-logo::after { animation: none !important; transition: none !important; }
+            .wq-confeti { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-notification-banner" id="topNotificationBanner">
+        <div class="top-notification-inner">
+            <span class="top-notification-icon-wrap" id="topNotificationIconWrap">
+                <i class="fa-solid fa-triangle-exclamation" id="topNotificationIcon"></i>
+            </span>
+            <span id="topNotificationText">Por favor, responde todas las preguntas para continuar.</span>
+        </div>
+    </div>
+
+    <div class="grid-background"></div>
+    
+    <div class="app-container">
+        
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+                    <span class="server-main-title">ClickSense</span>
+                </div>
+                <button class="sidebar-toggle-icon" id="sidebarToggleBtn" title="Colapsar menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- El menú lateral se gestiona mediante guards.js -->
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-mini" id="userProfileMini">
+                    <div class="avatar-placeholder" id="userAvatarContainer">
+                        <span id="userAvatarFallback">?</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">Usuario</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@tag</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <main class="main-content">
+            
+            <header class="top-action-bar animate-fade-down">
+                <div class="breadcrumb">Whitelist</div>
+                <div class="top-buttons">
+                    <a href="/tickets.html" class="top-btn highlight-btn">
+                        <i class="fa-solid fa-circle-question"></i> Ayuda
+                    </a>
+                </div>
+            </header>
+
+            <div class="whitelist-content-wrapper">
+                
+                <div class="welcome-banner-card animate-fade-up">
+                    <div class="welcome-avatar" style="background: rgba(236, 72, 153, 0.15); display: flex; align-items: center; justify-content: center; border-radius: 50%; width: 48px; height: 48px; border: 1px solid rgba(236, 72, 153, 0.3);">
+                        <i class="fa-solid fa-id-card" style="font-size: 20px; color: #f472b6;"></i>
+                    </div>
+                    <div class="welcome-text-content">
+                        <h1>Test de Whitelist</h1>
+                        <p>Demuestra que conoces la normativa de ClickSense RP. Supera el test y tendrás acceso a la ciudad.</p>
+                    </div>
+                </div>
+
+                <div class="modern-cta-card animate-fade-up" id="whitelistCtaCard">
+                    <div class="cta-left-content">
+                        <div class="cta-icon-box">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </div>
+                        <div class="cta-text">
+                            <h3>Comienza tu whitelist</h3>
+                            <p>Un test de preguntas tipo test sobre la normativa del servidor. Se corrige al momento y, si no lo superas, puedes repetirlo.</p>
+                        </div>
+                    </div>
+                    <button class="btn-modern-action" data-wq-abrir>
+                        <i class="fa-solid fa-file-lines"></i> Iniciar Whitelist
+                    </button>
+                </div>
+            </div>
+
+            <div class="normativas-grid animate-fade-up">
+                <a href="/normativa-general.html" class="normativa-card">
+                    <div class="normativa-image" style="background-image: url('https://i.imgur.com/c6TISFN.png');">
+                        <h2>NORMATIVA GENERAL</h2>
+                    </div>
+                    <div class="normativa-content">
+                        <h3>Normativa</h3>
+                        <p>Reglas generales del servidor</p>
+                    </div>
+                </a>
+                
+                <a href="/normativa-ilegales.html" class="normativa-card">
+                    <div class="normativa-image" style="background-image: url('https://i.imgur.com/YmrZGiw.png');">
+                        <h2>NORMATIVA ILEGAL</h2>
+                    </div>
+                    <div class="normativa-content">
+                        <h3>Normativa ilegal</h3>
+                        <p>Normas para bandas y mafias</p>
+                    </div>
+                </a>
+
+                <a href="/normativa-locales.html" class="normativa-card">
+                    <div class="normativa-image" style="background-image: url('https://i.imgur.com/quxYcMX.png');">
+                        <h2>NORMATIVA LOCALES</h2>
+                    </div>
+                    <div class="normativa-content">
+                        <h3>Normativa locales</h3>
+                        <p>Regulación de negocios y tiendas</p>
+                    </div>
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <!-- Ventana del test de whitelist -->
+    <div class="wq-overlay" id="wqOverlay" role="dialog" aria-modal="true" aria-labelledby="wqTitle">
+        <div class="wq-card" id="wqCard">
+            <header class="wq-head">
+                <img class="wq-logo" src="https://i.imgur.com/ibt9508.png" alt="">
+                <div class="wq-head-text">
+                    <h2 id="wqTitle">Test de whitelist</h2>
+                    <span id="wqSub">ClickSense RP</span>
+                </div>
+                <button type="button" class="wq-close" id="wqClose" aria-label="Cerrar el test"><i class="fa-solid fa-xmark"></i></button>
+            </header>
+            <div class="wq-progress" aria-hidden="true"><div class="wq-progress-bar" id="wqProgressBar"></div></div>
+            <div class="wq-body" id="wqBody" aria-live="polite"></div>
+            <footer class="wq-foot" id="wqFoot"></footer>
+        </div>
+    </div>
+
+    <script>
+    async function loadDiscordSessionData() {
+        const storedUser = localStorage.getItem('discord_user');
+        const avatarContainer = document.getElementById('userAvatarContainer');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userHandleDisplay = document.getElementById('userHandleDisplay');
+        
+        if (!storedUser) return;
+        
+        try {
+            const discordUser = JSON.parse(storedUser);
+            if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+            if (userHandleDisplay) userHandleDisplay.textContent = "@" + (discordUser.username || "discord");
+            if (avatarContainer && discordUser.avatarUrl) {
+                avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            }
+        } catch (e) {
+            console.error("Error al cargar sesión de Discord:", e);
+        }
+    }
+
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const revealBtn = document.getElementById('sidebarRevealBtn');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (toggleBtn && revealBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+        revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+    }
+
+    const topBanner = document.getElementById('topNotificationBanner');
+    const topNotificationIcon = document.getElementById('topNotificationIcon');
+    const topNotificationIconWrap = document.getElementById('topNotificationIconWrap');
+    let notificationTimeout;
+
+    function showTopNotification(message, iconClass = "fa-solid fa-triangle-exclamation", isSuccess = false) {
+        const textEl = document.getElementById('topNotificationText');
+        if (textEl) textEl.textContent = message;
+        if (topNotificationIcon) topNotificationIcon.className = iconClass;
+        
+        if (isSuccess) {
+            topNotificationIconWrap.style.background = "rgba(34, 197, 94, 0.15)";
+            topNotificationIconWrap.style.color = "#22c55e";
+        } else {
+            topNotificationIconWrap.style.background = "rgba(239, 68, 68, 0.15)";
+            topNotificationIconWrap.style.color = "#ef4444";
+        }
+        
+        topBanner.classList.add('show');
+        clearTimeout(notificationTimeout);
+        notificationTimeout = setTimeout(() => {
+            topBanner.classList.remove('show');
+        }, 5000);
+    }
+
+    /* =====================================================================
+       TEST DE WHITELIST
+       Las preguntas llegan del servidor SIN la respuesta correcta y el
+       servidor es quien corrige (/api/whitelist/intento). Cada intento queda
+       registrado para el panel admin/whitelist.html.
+       ===================================================================== */
+    const WQ_LOGO = 'https://i.imgur.com/ibt9508.png';
+    const WQ_ESPERA_ANALISIS = 2400;   // milisegundos que dura la pantalla "Analizando..."
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const esperar = ms => new Promise(r => setTimeout(r, ms));
+    const porcentajeTxt = n => String(Math.round(Number(n) * 10) / 10).replace('.', ',') + ' %';
+
+    const wq = {
+        datos: null,        // lo que devuelve /api/whitelist/preguntas
+        respuestas: {},     // { p1: idOpcion, ... }
+        indice: 0,
+        inicio: 0,
+        vista: 'cerrado',   // cargando | intro | pregunta | analizando | resultado | error
+        ocupado: false
+    };
+
+    const wqOverlay = document.getElementById('wqOverlay');
+    const wqCard = document.getElementById('wqCard');
+    const wqBody = document.getElementById('wqBody');
+    const wqFoot = document.getElementById('wqFoot');
+    const wqSub = document.getElementById('wqSub');
+    const wqBar = document.getElementById('wqProgressBar');
+    let wqFocoPrevio = null;
+
+    function wqPintar(vista, htmlCuerpo, htmlPie, subtitulo, progreso) {
+        wq.vista = vista;
+        wqOverlay.querySelectorAll('.wq-confeti').forEach(c => c.remove());
+        wqBody.innerHTML = htmlCuerpo;
+        wqFoot.innerHTML = htmlPie || '';
+        wqSub.textContent = subtitulo || 'ClickSense RP';
+        wqBar.style.width = (progreso || 0) + '%';
+        wqBody.scrollTop = 0;
+    }
+
+    /* ---------- Estado de la whitelist del usuario (tarjeta de la página) ---------- */
+    async function wqMisIntentos() {
+        const r = await fetch('/api/whitelist', { cache: 'no-store', credentials: 'same-origin' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const lista = await r.json();
+        return Array.isArray(lista) ? lista : [];
+    }
+
+    function wqPintarTarjeta(intentos) {
+        const card = document.getElementById('whitelistCtaCard');
+        if (!card) return;
+        const aprobado = intentos.find(i => i.status === 'Aprobado');
+        const ultimo = intentos[0];
+
+        if (aprobado) {
+            card.innerHTML = `
+                <div class="cta-left-content">
+                    <div class="cta-icon-box" style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border-color: rgba(34, 197, 94, 0.3);">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div class="cta-text">
+                        <h3>¡Whitelist aprobada!</h3>
+                        <p>Has superado el test de normativa${aprobado.total ? ` con ${esc(aprobado.aciertos)} de ${esc(aprobado.total)} aciertos` : ''}. Ya tienes acceso completo a todos los apartados y academias de la ciudad.</p>
+                    </div>
+                </div>
+                <button class="btn-modern-action" disabled style="background: linear-gradient(135deg, #22c55e 0%, #10b981 100%); cursor: default; opacity: 0.9;">
+                    <i class="fa-solid fa-check"></i> Acceso concedido
+                </button>`;
+        } else if (ultimo) {
+            card.innerHTML = `
+                <div class="cta-left-content">
+                    <div class="cta-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3);">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </div>
+                    <div class="cta-text">
+                        <h3>Aún no has superado el test</h3>
+                        <p>En tu último intento acertaste ${esc(ultimo.aciertos)} de ${esc(ultimo.total)} preguntas (${esc(porcentajeTxt(ultimo.porcentaje))}). Necesitas un ${esc(ultimo.minimoPorcentaje || 60)} %. Repasa la normativa y vuelve a intentarlo cuando quieras.</p>
+                    </div>
+                </div>
+                <button class="btn-modern-action" data-wq-abrir>
+                    <i class="fa-solid fa-rotate-right"></i> Reintentar el test
+                </button>`;
+        } else {
+            card.innerHTML = `
+                <div class="cta-left-content">
+                    <div class="cta-icon-box">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <div class="cta-text">
+                        <h3>Comienza tu whitelist</h3>
+                        <p>Un test de preguntas tipo test sobre la normativa del servidor. Se corrige al momento y, si no lo superas, puedes repetirlo.</p>
+                    </div>
+                </div>
+                <button class="btn-modern-action" data-wq-abrir>
+                    <i class="fa-solid fa-file-lines"></i> Iniciar Whitelist
+                </button>`;
+        }
+    }
+
+    // El estado real está en el servidor. Estas claves del navegador son las que
+    // usaba la versión anterior (y otras páginas): se ponen de acuerdo con el servidor,
+    // así las whitelist antiguas dejan de contar.
+    function wqSincronizarNavegador(intentos) {
+        try {
+            if (intentos.some(i => i.status === 'Aprobado')) {
+                localStorage.setItem('user_whitelisted', 'true');
+                localStorage.setItem('whitelist_status', 'aprobado');
+            } else {
+                localStorage.removeItem('user_whitelisted');
+                localStorage.removeItem('whitelist_status');
+            }
+            localStorage.removeItem('my_whitelist_id');
+        } catch (e) {}
+    }
+
+    async function wqActualizarEstado() {
+        try {
+            const intentos = await wqMisIntentos();
+            wqSincronizarNavegador(intentos);
+            wqPintarTarjeta(intentos);
+        } catch (e) {
+            console.error('No se pudo consultar el estado de la whitelist:', e);
+        }
+    }
+
+    /* ---------- Abrir / cerrar ---------- */
+    function wqAbrir() {
+        wqFocoPrevio = document.activeElement;
+        wqOverlay.classList.add('open');
+        document.getElementById('wqClose').focus();
+        // Si había un test a medias, se continúa donde se dejó
+        if (wq.datos && (wq.vista === 'pregunta' || wq.vista === 'intro')) {
+            wq.vista === 'pregunta' ? wqVistaPregunta() : wqVistaIntro();
+            return;
+        }
+        wqCargarPreguntas();
+    }
+
+    function wqCerrar() {
+        if (wq.vista === 'analizando') return;   // no se cierra mientras se corrige
+        wqOverlay.classList.remove('open');
+        if (wq.vista === 'resultado' || wq.vista === 'error') { wq.datos = null; wq.vista = 'cerrado'; }
+        if (wqFocoPrevio && wqFocoPrevio.focus) wqFocoPrevio.focus();
+    }
+
+    /* ---------- Cargar preguntas ---------- */
+    async function wqCargarPreguntas() {
+        wq.datos = null;
+        wq.respuestas = {};
+        wq.indice = 0;
+        wqPintar('cargando', `<div class="wq-centro"><i class="fa-solid fa-circle-notch fa-spin wq-spinner"></i><p>Preparando el test...</p></div>`);
+
+        try {
+            const r = await fetch('/api/whitelist/preguntas', { cache: 'no-store', credentials: 'same-origin' });
+            if (r.status === 409) {     // ya tiene la whitelist aprobada
+                wqOverlay.classList.remove('open');
+                wq.vista = 'cerrado';
+                showTopNotification('Ya tienes la whitelist aprobada.', 'fa-solid fa-check', true);
+                wqActualizarEstado();
+                return;
+            }
+            if (!r.ok) throw new Error(wqMotivo(r.status));
+            const datos = await r.json();
+            if (!datos || !Array.isArray(datos.preguntas) || datos.preguntas.length === 0) throw new Error('El servidor no ha devuelto preguntas.');
+            wq.datos = datos;
+            wqVistaIntro();
+        } catch (e) {
+            wqVistaError(e.message === 'Failed to fetch' ? 'No se ha podido conectar con el servidor.' : e.message, 'cargar');
+        }
+    }
+
+    function wqMotivo(status) {
+        if (status === 401) return 'Tienes que iniciar sesión con Discord para hacer el test.';
+        if (status === 404 || status === 405) return 'El servidor todavía no tiene instalado el test de whitelist (falta whitelist_api.py o las dos líneas en main.py).';
+        return 'El servidor ha respondido con un error (' + status + ').';
+    }
+
+    /* ---------- Vistas ---------- */
+    function wqVistaIntro() {
+        const d = wq.datos;
+        const bloques = (d.bloques || []).map(b => `<span class="wq-chip">${esc(b.nombre)} <span style="opacity:.7;">${esc(b.preguntas)}</span></span>`).join('');
+        wqPintar('intro', `
+            <div class="wq-intro">
+                <h3>Antes de empezar</h3>
+                <p>Este test comprueba que conoces la normativa de ClickSense RP. Léela con calma antes de empezar: las preguntas son situaciones reales de rol.</p>
+                <ul class="wq-reglas">
+                    <li><i class="fa-solid fa-list-check"></i><span><strong>${esc(d.total)} preguntas</strong> con cuatro opciones. Solo una es correcta.</span></li>
+                    <li><i class="fa-solid fa-bullseye"></i><span>Apruebas con <strong>${esc(d.minimoAciertos)} aciertos o más</strong> (el ${esc(d.minimoPorcentaje)} %).</span></li>
+                    <li><i class="fa-solid fa-hourglass-half"></i><span>No hay límite de tiempo y puedes volver atrás para cambiar una respuesta.</span></li>
+                    <li><i class="fa-solid fa-rotate-right"></i><span>Si no lo superas, puedes repetirlo.</span></li>
+                </ul>
+                <div class="wq-bloques">${bloques}</div>
+                <div class="wq-acciones">
+                    <button type="button" class="wq-btn primario" data-wq="empezar"><i class="fa-solid fa-play"></i> Empezar el test</button>
+                    <button type="button" class="wq-btn" data-wq="cerrar">Ahora no</button>
+                </div>
+            </div>`, '', 'Instrucciones', 0);
+    }
+
+    function wqRespondidas() {
+        return wq.datos.preguntas.filter(p => wq.respuestas[p.id]).length;
+    }
+
+    function wqVistaPregunta() {
+        const total = wq.datos.preguntas.length;
+        const p = wq.datos.preguntas[wq.indice];
+        const marcada = wq.respuestas[p.id];
+        const hechas = wqRespondidas();
+        const esUltima = wq.indice === total - 1;
+
+        const opciones = p.opciones.map((o, i) => `
+            <button type="button" class="wq-opcion ${marcada === o.id ? 'sel' : ''}" role="radio" aria-checked="${marcada === o.id}" data-opcion="${esc(o.id)}">
+                <span class="wq-letra">${'ABCD'[i] || i + 1}</span><span>${esc(o.texto)}</span>
+            </button>`).join('');
+
+        const puntos = wq.datos.preguntas.map((q, i) =>
+            `<button type="button" class="wq-dot ${wq.respuestas[q.id] ? 'hecha' : ''} ${i === wq.indice ? 'actual' : ''}" data-ir="${i}" aria-label="Ir a la pregunta ${i + 1}${wq.respuestas[q.id] ? ', respondida' : ', sin responder'}">${i + 1}</button>`).join('');
+
+        wqPintar('pregunta', `
+            <div class="wq-q">
+                <div class="wq-q-meta">
+                    <span class="wq-chip">${esc(p.bloqueNombre)}</span>
+                    <span class="wq-tema">Tema ${esc(p.tema)}: ${esc(p.titulo)}</span>
+                </div>
+                <h3 class="wq-enunciado" id="wqEnunciado">${esc(p.enunciado)}</h3>
+                <div class="wq-opciones" role="radiogroup" aria-labelledby="wqEnunciado">${opciones}</div>
+            </div>`, `
+            <div class="wq-nav">
+                <span class="wq-contador">Pregunta <strong>${wq.indice + 1}</strong> de ${total}. Respondidas: <strong id="wqHechas">${hechas}</strong></span>
+                <div class="wq-nav-btns">
+                    <button type="button" class="wq-btn" data-wq="anterior" ${wq.indice === 0 ? 'disabled' : ''}><i class="fa-solid fa-arrow-left"></i> Anterior</button>
+                    ${esUltima
+                        ? `<button type="button" class="wq-btn primario" data-wq="finalizar"><i class="fa-solid fa-flag-checkered"></i> Finalizar test</button>`
+                        : `<button type="button" class="wq-btn primario" data-wq="siguiente">Siguiente <i class="fa-solid fa-arrow-right"></i></button>`}
+                </div>
+            </div>
+            <div class="wq-dots">${puntos}</div>`,
+            `Pregunta ${wq.indice + 1} de ${total}`, Math.round(hechas * 100 / total));
+    }
+
+    function wqVistaAnalizando() {
+        wqPintar('analizando', `
+            <div class="wq-centro">
+                <div class="wq-analiza-logo"><img src="${WQ_LOGO}" alt=""></div>
+                <h3>Analizando tus respuestas</h3>
+                <p>Estamos corrigiendo el test. Tardará solo un momento.</p>
+                <div class="wq-analiza-barra"><span></span></div>
+            </div>`, '', 'Corrigiendo el test', 100);
+    }
+
+    function wqConfeti() {
+        const caja = document.createElement('div');
+        caja.className = 'wq-confeti';
+        const colores = ['#ec4899', '#a855f7', '#22c55e', '#fbbf24', '#60a5fa', '#f472b6'];
+        for (let i = 0; i < 46; i++) {
+            const c = document.createElement('i');
+            c.style.left = (Math.random() * 100) + '%';
+            c.style.background = colores[i % colores.length];
+            c.style.animationDuration = (1.6 + Math.random() * 1.6) + 's';
+            c.style.animationDelay = (Math.random() * 0.7) + 's';
+            c.style.transform = `rotate(${Math.random() * 360}deg)`;
+            caja.appendChild(c);
+        }
+        wqOverlay.appendChild(caja);
+        setTimeout(() => caja.remove(), 4200);
+    }
+
+    function wqVistaResultado(res) {
+        const marcador = `
+            <div class="wq-marcador">
+                <div><b class="v">${esc(res.aciertos)}</b><small>Aciertos</small></div>
+                <div><b class="r">${esc(res.fallos)}</b><small>Fallos</small></div>
+                <div><b>${esc(porcentajeTxt(res.porcentaje))}</b><small>Nota</small></div>
+            </div>`;
+
+        if (res.aprobado) {
+            wqPintar('resultado', `
+                <div class="wq-centro">
+                    <div class="wq-sello ok"><i class="fa-solid fa-circle-check"></i></div>
+                    <h3>¡Enhorabuena, has aprobado la whitelist!</h3>
+                    <p>Has acertado ${esc(res.aciertos)} de ${esc(res.total)} preguntas. Ya formas parte de ClickSense RP: nos vemos en la ciudad.</p>
+                    ${marcador}
+                    <div class="wq-acciones">
+                        <a class="wq-btn verde" href="/home.html"><i class="fa-solid fa-house"></i> Ir al inicio</a>
+                        <button type="button" class="wq-btn" data-wq="cerrar">Cerrar</button>
+                    </div>
+                </div>`, '', 'Resultado del test', 100);
+            wqConfeti();
+        } else {
+            wqPintar('resultado', `
+                <div class="wq-centro">
+                    <div class="wq-sello ko"><i class="fa-solid fa-circle-xmark"></i></div>
+                    <h3>Esta vez no has superado el test</h3>
+                    <p>Has acertado ${esc(res.aciertos)} de ${esc(res.total)} preguntas y necesitas al menos ${esc(res.minimoAciertos)} (el ${esc(res.minimoPorcentaje)} %). Puedes volver a intentarlo más tarde: te recomendamos repasar antes la normativa.</p>
+                    ${marcador}
+                    <div class="wq-acciones">
+                        <button type="button" class="wq-btn primario" data-wq="reintentar"><i class="fa-solid fa-rotate-right"></i> Reintentar ahora</button>
+                        <a class="wq-btn" href="/normativa-general.html"><i class="fa-solid fa-book"></i> Repasar la normativa</a>
+                        <button type="button" class="wq-btn" data-wq="cerrar">Cerrar</button>
+                    </div>
+                </div>`, '', 'Resultado del test', 100);
+        }
+        const titulo = wqBody.querySelector('h3');
+        if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus(); }
+    }
+
+    // tipo: 'cargar' (fallo al pedir las preguntas) o 'enviar' (fallo al corregir: no se pierden las respuestas)
+    function wqVistaError(mensaje, tipo) {
+        const reintento = tipo === 'enviar'
+            ? `<button type="button" class="wq-btn primario" data-wq="reenviar"><i class="fa-solid fa-paper-plane"></i> Volver a enviar</button>
+               <button type="button" class="wq-btn" data-wq="volver-test">Volver al test</button>`
+            : `<button type="button" class="wq-btn primario" data-wq="recargar"><i class="fa-solid fa-rotate-right"></i> Reintentar</button>`;
+        const login = /iniciar sesión/i.test(mensaje) ? `<a class="wq-btn" href="/login.html"><i class="fa-brands fa-discord"></i> Iniciar sesión</a>` : '';
+        wqPintar('error', `
+            <div class="wq-centro">
+                <div class="wq-icono-error"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <h3>${tipo === 'enviar' ? 'No se ha podido corregir el test' : 'No se ha podido cargar el test'}</h3>
+                <p>${esc(mensaje)}${tipo === 'enviar' ? ' Tus respuestas siguen guardadas en esta ventana.' : ''}</p>
+                <div class="wq-acciones">${reintento}${login}<button type="button" class="wq-btn" data-wq="cerrar">Cerrar</button></div>
+            </div>`, '', 'Ha habido un problema', 0);
+    }
+
+    /* ---------- Acciones ---------- */
+    function wqIr(indice) {
+        const total = wq.datos.preguntas.length;
+        wq.indice = Math.max(0, Math.min(total - 1, indice));
+        wqVistaPregunta();
+    }
+
+    // Marca la opción sin volver a pintar la pregunta entera (así no parpadea)
+    function wqElegir(idOpcion) {
+        const total = wq.datos.preguntas.length;
+        const p = wq.datos.preguntas[wq.indice];
+        wq.respuestas[p.id] = idOpcion;
+
+        wqBody.querySelectorAll('.wq-opcion').forEach(b => {
+            const elegida = b.dataset.opcion === idOpcion;
+            b.classList.toggle('sel', elegida);
+            b.setAttribute('aria-checked', elegida);
+        });
+        const hechas = wqRespondidas();
+        const punto = wqFoot.querySelector(`[data-ir="${wq.indice}"]`);
+        if (punto) { punto.classList.add('hecha'); punto.setAttribute('aria-label', `Ir a la pregunta ${wq.indice + 1}, respondida`); }
+        const contador = document.getElementById('wqHechas');
+        if (contador) contador.textContent = hechas;
+        wqBar.style.width = Math.round(hechas * 100 / total) + '%';
+    }
+
+    async function wqFinalizar() {
+        if (wq.ocupado) return;
+        const sinResponder = wq.datos.preguntas.findIndex(p => !wq.respuestas[p.id]);
+        if (sinResponder !== -1) {
+            const faltan = wq.datos.preguntas.length - wqRespondidas();
+            showTopNotification(faltan === 1 ? 'Te falta 1 pregunta por responder.' : `Te faltan ${faltan} preguntas por responder.`);
+            wqIr(sinResponder);
+            return;
+        }
+
+        wq.ocupado = true;
+        wqVistaAnalizando();
+        const duracion = Math.round((Date.now() - wq.inicio) / 1000);
+
+        try {
+            // La pantalla de análisis dura como mínimo 2,4 s aunque el servidor responda antes
+            const [r] = await Promise.all([
+                fetch('/api/whitelist/intento', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ respuestas: wq.respuestas, duracion })
+                }),
+                esperar(WQ_ESPERA_ANALISIS)
+            ]);
+
+            if (r.status === 409) {
+                wqOverlay.classList.remove('open');
+                wq.vista = 'cerrado'; wq.datos = null;
+                showTopNotification('Ya tenías la whitelist aprobada.', 'fa-solid fa-check', true);
+                wqActualizarEstado();
+                return;
+            }
+            if (!r.ok) throw new Error(wqMotivo(r.status));
+            const res = await r.json();
+            wqVistaResultado(res);
+            wqActualizarEstado();   // refresca la tarjeta de la página y el estado del navegador
+        } catch (e) {
+            await esperar(0);
+            wqVistaError(e.message === 'Failed to fetch' ? 'No se ha podido conectar con el servidor.' : e.message, 'enviar');
+        } finally {
+            wq.ocupado = false;
+        }
+    }
+
+    // Un solo manejador para todos los botones de la ventana
+    wqOverlay.addEventListener('click', (e) => {
+        if (e.target === wqOverlay) { wqCerrar(); return; }
+        const opcion = e.target.closest('[data-opcion]');
+        if (opcion) { wqElegir(opcion.dataset.opcion); return; }
+        const punto = e.target.closest('[data-ir]');
+        if (punto) { wqIr(Number(punto.dataset.ir)); return; }
+        const btn = e.target.closest('[data-wq]');
+        if (!btn || btn.disabled) return;
+
+        switch (btn.dataset.wq) {
+            case 'empezar': wq.inicio = Date.now(); wq.indice = 0; wqVistaPregunta(); break;
+            case 'anterior': wqIr(wq.indice - 1); break;
+            case 'siguiente': wqIr(wq.indice + 1); break;
+            case 'finalizar': wqFinalizar(); break;
+            case 'reenviar': wqFinalizar(); break;
+            case 'volver-test': wqVistaPregunta(); break;
+            case 'reintentar': wqCargarPreguntas(); break;   // preguntas de nuevo, con las opciones en otro orden
+            case 'recargar': wqCargarPreguntas(); break;
+            case 'cerrar': wqCerrar(); break;
+        }
+    });
+    document.getElementById('wqClose').addEventListener('click', wqCerrar);
+
+    // Teclado: Esc cierra, flechas cambian de pregunta, 1-4 o A-D eligen opción
+    document.addEventListener('keydown', (e) => {
+        if (!wqOverlay.classList.contains('open')) return;
+        if (e.key === 'Escape') { wqCerrar(); return; }
+        if (wq.vista !== 'pregunta' || e.ctrlKey || e.metaKey || e.altKey) return;
+        if (e.key === 'ArrowRight') { e.preventDefault(); wqIr(wq.indice + 1); return; }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); wqIr(wq.indice - 1); return; }
+        const pos = '1234'.indexOf(e.key) !== -1 ? '1234'.indexOf(e.key) : 'abcd'.indexOf(e.key.toLowerCase());
+        const p = wq.datos.preguntas[wq.indice];
+        if (pos >= 0 && p.opciones[pos]) { e.preventDefault(); wqElegir(p.opciones[pos].id); }
+    });
+
+    // Aviso si se intenta salir de la página con el test a medias
+    window.addEventListener('beforeunload', (e) => {
+        if (wq.vista === 'pregunta' && wq.datos && wqRespondidas() > 0) { e.preventDefault(); e.returnValue = ''; }
+    });
+
+    // El botón de la tarjeta se vuelve a pintar según el estado, así que se escucha en la tarjeta
+    document.getElementById('whitelistCtaCard').addEventListener('click', (e) => {
+        if (e.target.closest('[data-wq-abrir]')) wqAbrir();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadDiscordSessionData();
+        wqActualizarEstado();
+    });
+    </script>
+
+    <script src="/guards.js"></script>
+</body>
+</html>

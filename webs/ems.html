@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickSense RP | Roleplay Serio en Español</title>
+    <meta name="description" content="Servidor FiveM de roleplay serio en español. Whitelist, facciones activas, economía real y una comunidad que cuida el rol de calidad.">
+    <meta property="og:title" content="ClickSense RP | Roleplay serio en español">
+    <meta property="og:description" content="Entra en San Andreas y escribe tu propia historia. Whitelist abierta.">
+    <meta property="og:image" content="https://i.imgur.com/yUs7B3t.png">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/src/assets/main.css">
+    <style>
+        :root {
+            --bg-main: #07040c;
+            --bg-elev: #0c0812;
+            --bg-elev-2: #120c1c;
+            --bg-card: rgba(18, 12, 28, 0.75);
+            --border-glow: rgba(168, 85, 247, 0.25);
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --accent-lime: #a3e635;
+            --text-primary: #f3f4f6;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --nav-h: 74px;
+        }
+
+        * { box-sizing: border-box; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #07040c; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.3);
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.6); }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-primary);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        a { color: inherit; }
+
+        :focus-visible {
+            outline: 2px solid var(--accent-purple);
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+            .scroll-reveal { opacity: 1 !important; transform: none !important; }
+        }
+
+        .grid-background {
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -2;
+            pointer-events: none;
+        }
+        .aurora {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                radial-gradient(760px 420px at 12% 8%, rgba(168, 85, 247, 0.14), transparent 65%),
+                radial-gradient(640px 400px at 88% 18%, rgba(236, 72, 153, 0.10), transparent 65%);
+        }
+
+        /* Barra de progreso de lectura */
+        .read-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 2px;
+            width: 0;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+            z-index: 1200;
+            transition: width 0.1s linear;
+        }
+
+        /* =========================================================
+            BARRA DE NAVEGACIÓN
+            ========================================================= */
+        .landing-navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            background: rgba(7, 4, 12, 0.72);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(168, 85, 247, 0.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5%;
+            z-index: 1000;
+            height: var(--nav-h);
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .landing-navbar.scrolled {
+            background: rgba(7, 4, 12, 0.94);
+            border-bottom-color: rgba(168, 85, 247, 0.22);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .nav-left-group { display: flex; align-items: center; gap: 35px; }
+        .nav-brand { display: flex; align-items: center; text-decoration: none; }
+        .nav-brand img {
+            height: 48px;
+            object-fit: contain;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .nav-brand img:hover { transform: scale(1.04); }
+
+        .nav-links { display: flex; gap: 14px; align-items: center; }
+        .nav-links > a, .dropdown-trigger {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: color 0.25s ease;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: inline-flex;
+            align-items: center;
+        }
+        .nav-links > a.active, .dropdown-trigger.active {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--accent-purple);
+        }
+        .nav-links > a:hover, .dropdown-trigger:hover { color: var(--accent-purple); }
+
+        .dropdown-container { position: relative; display: inline-block; }
+        .dropdown-menu {
+            position: absolute;
+            top: 120%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px) scale(0.95);
+            background: rgba(14, 9, 22, 0.96);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            border-radius: 12px;
+            padding: 8px 0;
+            width: 175px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.85), 0 0 30px rgba(168, 85, 247, 0.2);
+            backdrop-filter: blur(16px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1001;
+        }
+        .dropdown-menu.show {
+            opacity: 1; visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            color: #ffffff;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .dropdown-menu a i {
+            color: var(--accent-purple);
+            font-size: 0.8rem;
+            transform-origin: center;
+        }
+        .dropdown-menu a:hover i { animation: iconWiggle 1s ease; }
+        .dropdown-menu a:hover { background: rgba(168, 85, 247, 0.2); }
+
+        @keyframes iconWiggle {
+            0% { transform: rotate(0deg) scale(1); }
+            20% { transform: rotate(-15deg) scale(1.1); }
+            40% { transform: rotate(15deg) scale(1.1); }
+            60% { transform: rotate(-10deg) scale(1.05); }
+            80% { transform: rotate(5deg) scale(1.02); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
+        .nav-right-actions { display: flex; align-items: center; gap: 12px; }
+
+        .nav-cart-icon {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            transition: color 0.2s, transform 0.2s, border-color 0.2s;
+        }
+        .nav-cart-icon:hover {
+            color: var(--accent-purple);
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .custom-lang-dropdown { position: relative; user-select: none; }
+        .lang-selected {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: space-between;
+            min-width: 95px;
+            transition: all 0.25s ease;
+        }
+        .lang-selected:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            background: rgba(168, 85, 247, 0.1);
+        }
+        .lang-flag { width: 16px; height: 12px; object-fit: cover; border-radius: 2px; }
+        .lang-options {
+            position: absolute;
+            top: 120%; right: 0;
+            background: rgba(14, 9, 22, 0.96);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            border-radius: 12px;
+            overflow: hidden;
+            width: 115px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.85), 0 0 30px rgba(168, 85, 247, 0.2);
+            backdrop-filter: blur(16px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1001;
+        }
+        .lang-options.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .lang-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .lang-option:hover { background: rgba(168, 85, 247, 0.2); }
+
+        .profile-dropdown-container { position: relative; display: inline-block; }
+        .user-avatar-circle {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #120c1c;
+            cursor: pointer;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .user-avatar-circle:hover { border-color: var(--accent-purple); transform: scale(1.05); }
+        .default-avatar-silhouette {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            background: #0a0710;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+        .profile-dropdown-menu {
+            position: absolute;
+            top: 120%; right: 0;
+            background: rgba(14, 9, 22, 0.96);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            border-radius: 14px;
+            padding: 8px 0;
+            width: 185px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.85), 0 0 30px rgba(168, 85, 247, 0.2);
+            backdrop-filter: blur(16px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1001;
+        }
+        .profile-dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .profile-dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .profile-dropdown-menu a i { color: var(--accent-purple); font-size: 0.8rem; transform-origin: center; }
+        .profile-dropdown-menu a:hover i { animation: iconWiggle 1s ease; }
+        .profile-dropdown-menu a:hover { background: rgba(168, 85, 247, 0.2); }
+
+        /* Menú móvil */
+        .nav-burger {
+            display: none;
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #fff;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+        }
+
+        @media(max-width: 980px) {
+            .nav-links {
+                position: fixed;
+                top: var(--nav-h); left: 0;
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 4px;
+                padding: 14px 5% 22px;
+                background: rgba(7, 4, 12, 0.98);
+                border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+                display: none;
+            }
+            .nav-links.open { display: flex; }
+            .nav-links > a, .dropdown-trigger { width: 100%; justify-content: space-between; padding: 13px 14px; }
+            .dropdown-container { width: 100%; }
+            .dropdown-menu {
+                position: static;
+                opacity: 1; visibility: visible;
+                transform: none;
+                width: 100%;
+                background: rgba(168, 85, 247, 0.05);
+                border-color: rgba(168, 85, 247, 0.2);
+                box-shadow: none;
+                margin-top: 6px;
+                display: none;
+            }
+            .dropdown-menu.show { display: block; }
+            .nav-burger { display: inline-flex; }
+            .lang-selected span, .lang-selected #currentLangText { display: none; }
+            .lang-selected { min-width: auto; }
+        }
+
+        /* =========================================================
+            UTILIDADES DE MAQUETACIÓN
+            ========================================================= */
+        .wrap {
+            width: 100%;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 22px;
+        }
+
+        .section { padding: 92px 0; }
+
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(38px);
+            transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .scroll-reveal.visible { opacity: 1; transform: translateY(0); }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--accent-purple);
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+        }
+        .eyebrow::before {
+            content: '';
+            width: 26px; height: 2px;
+            background: linear-gradient(90deg, var(--accent-purple), transparent);
+        }
+
+        .sec-title {
+            font-size: clamp(1.75rem, 3.6vw, 2.4rem);
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.8px;
+            margin: 0 0 12px;
+        }
+        .sec-title span {
+            background: linear-gradient(135deg, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sec-sub {
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 62ch;
+            margin: 0;
+        }
+        .sec-head { margin-bottom: 44px; }
+        .sec-head.center { text-align: center; }
+        .sec-head.center .sec-sub { margin: 0 auto; }
+
+        /* Botones */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 13px 26px;
+            border-radius: 11px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.4px;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: transform 0.25s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .btn-solid {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            color: #fff;
+            box-shadow: 0 12px 28px rgba(168, 85, 247, 0.35);
+        }
+        .btn-solid:hover { transform: translateY(-2px); filter: brightness(1.12); }
+        .btn-outline {
+            background: rgba(255,255,255,0.02);
+            border-color: rgba(168, 85, 247, 0.35);
+            color: #fff;
+        }
+        .btn-outline:hover {
+            border-color: var(--accent-purple);
+            background: rgba(168, 85, 247, 0.14);
+            transform: translateY(-2px);
+        }
+
+        /* Botón principal de whitelist */
+        .btn-wl {
+            position: relative;
+            overflow: hidden;
+            padding: 16px 32px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #fff;
+            border-radius: 13px;
+            background: linear-gradient(120deg, #7c3aed 0%, #a855f7 35%, #ec4899 72%, #f59e0b 120%);
+            background-size: 220% 220%;
+            background-position: 0% 50%;
+            box-shadow: 0 16px 36px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+            transition: transform 0.25s ease, box-shadow 0.35s ease, background-position 0.7s ease;
+        }
+        .btn-wl::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(120deg, rgba(255,255,255,0.55), rgba(255,255,255,0) 45%);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        .btn-wl::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -120%;
+            width: 55%; height: 100%;
+            background: linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
+            transform: skewX(-18deg);
+            transition: left 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+        .btn-wl:hover {
+            transform: translateY(-3px);
+            background-position: 100% 50%;
+            box-shadow: 0 20px 44px rgba(236, 72, 153, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        }
+        .btn-wl:hover::after { left: 130%; }
+        .btn-wl .wl-arrow { font-size: 0.78rem; transition: transform 0.3s ease; }
+        .btn-wl:hover .wl-arrow { transform: translateX(4px); }
+
+        /* =========================================================
+            HERO
+            ========================================================= */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: calc(var(--nav-h) + 60px) 0 70px;
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('https://i.imgur.com/qltvmW6.jpeg') no-repeat center center/cover;
+            transform: scale(1.06);
+            animation: heroDrift 26s ease-in-out infinite alternate;
+        }
+        @keyframes heroDrift {
+            from { transform: scale(1.06) translate3d(0,0,0); }
+            to { transform: scale(1.14) translate3d(-18px, -12px, 0); }
+        }
+        .hero-veil {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(100deg, rgba(7,4,12,0.97) 0%, rgba(7,4,12,0.88) 42%, rgba(7,4,12,0.55) 100%),
+                linear-gradient(to bottom, transparent 55%, var(--bg-main) 100%);
+        }
+
+        .hero-inner {
+            position: relative;
+            z-index: 3;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 60px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.6rem, 6.4vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.04;
+            letter-spacing: -2px;
+            margin: 0 0 20px;
+            color: #fff;
+        }
+        .hero h1 em {
+            font-style: normal;
+            display: block;
+            background: linear-gradient(120deg, #c084fc 10%, #f472b6 60%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-lead {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 56ch;
+            margin: 0 0 30px;
+        }
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 34px; }
+
+        .ip-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(12, 8, 18, 0.8);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 12px;
+            padding: 11px 13px 11px 18px;
+            backdrop-filter: blur(10px);
+            max-width: 100%;
+        }
+        .ip-box .ip-label {
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            color: var(--text-dim);
+            display: block;
+        }
+        .ip-box .ip-value {
+            font-family: 'Inter', monospace;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #e9d5ff;
+            word-break: break-all;
+        }
+        .btn-copy {
+            background: rgba(168, 85, 247, 0.16);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            color: #fff;
+            border-radius: 9px;
+            padding: 9px 14px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            white-space: nowrap;
+            transition: all 0.25s ease;
+        }
+        .btn-copy:hover { background: var(--accent-purple); }
+        .btn-copy.done { background: rgba(163,230,53,0.2); border-color: rgba(163,230,53,0.5); color: #d9f99d; }
+
+        /* Tarjeta lateral del hero */
+        .hero-panel {
+            background: rgba(14, 9, 22, 0.72);
+            border: 1px solid rgba(168, 85, 247, 0.22);
+            border-radius: 22px;
+            padding: 30px;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.75);
+        }
+        .hero-panel-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            margin-bottom: 20px;
+        }
+        .hero-panel-top img { height: 54px; object-fit: contain; }
+        .hero-panel-top h3 { margin: 0; font-size: 1.05rem; font-weight: 800; color: #fff; }
+        .hero-panel-top p { margin: 0; font-size: 0.78rem; color: var(--text-muted); }
+
+        .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; }
+        .hero-stats div { text-align: center; }
+        .hero-stats b {
+            display: block;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-stats span { font-size: 0.68rem; color: var(--text-dim); font-weight: 600; letter-spacing: 0.3px; }
+
+        .hero-list { display: flex; flex-direction: column; gap: 11px; margin: 0; padding: 0; list-style: none; }
+        .hero-list li {
+            display: flex;
+            gap: 11px;
+            align-items: flex-start;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .hero-list i { color: var(--accent-lime); margin-top: 4px; font-size: 0.78rem; }
+        .hero-list strong { color: #fff; font-weight: 600; }
+
+        .scroll-cue {
+            position: absolute;
+            bottom: 26px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .scroll-cue i { animation: cueBounce 2s infinite; color: var(--accent-purple); }
+        @keyframes cueBounce {
+            0%, 100% { transform: translateY(0); opacity: 0.5; }
+            50% { transform: translateY(6px); opacity: 1; }
+        }
+
+        @media(max-width: 980px) {
+            .hero { min-height: auto; padding: calc(var(--nav-h) + 50px) 0 60px; }
+            .hero-inner { grid-template-columns: 1fr; gap: 42px; }
+            .scroll-cue { display: none; }
+        }
+
+        /* =========================================================
+            PILARES
+            ========================================================= */
+        .pillars {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+        @media(max-width: 980px) { .pillars { grid-template-columns: repeat(2, 1fr); } }
+        @media(max-width: 560px) { .pillars { grid-template-columns: 1fr; } }
+
+        .pillar {
+            position: relative;
+            background: var(--bg-elev);
+            border: 1px solid rgba(168, 85, 247, 0.16);
+            border-radius: 18px;
+            padding: 28px 26px;
+            overflow: hidden;
+            transition: transform 0.35s ease, border-color 0.35s ease;
+        }
+        .pillar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+        .pillar:hover { transform: translateY(-5px); border-color: rgba(168, 85, 247, 0.45); }
+        .pillar:hover::before { opacity: 1; }
+        .pillar-icon {
+            width: 46px; height: 46px;
+            border-radius: 13px;
+            background: rgba(168, 85, 247, 0.12);
+            border: 1px solid rgba(168, 85, 247, 0.28);
+            display: flex; align-items: center; justify-content: center;
+            color: #d8b4fe;
+            font-size: 1.05rem;
+            margin-bottom: 16px;
+        }
+        .pillar h4 { margin: 0 0 8px; font-size: 1.08rem; font-weight: 800; color: #fff; }
+        .pillar p { margin: 0; color: var(--text-muted); font-size: 0.88rem; }
+
+        /* =========================================================
+            CÓMO EMPEZAR
+            ========================================================= */
+        .steps-rail {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            counter-reset: paso;
+            align-items: stretch;
+        }
+        @media(max-width: 900px) { .steps-rail { grid-template-columns: 1fr 1fr; } }
+        @media(max-width: 560px) { .steps-rail { grid-template-columns: 1fr; } }
+
+        .step-card {
+            position: relative;
+            background: linear-gradient(160deg, rgba(24, 16, 36, 0.9), rgba(12, 8, 18, 0.9));
+            border: 1px solid rgba(168, 85, 247, 0.18);
+            border-radius: 18px;
+            padding: 26px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .step-card:hover { border-color: rgba(168, 85, 247, 0.5); transform: translateY(-4px); }
+        .step-num {
+            counter-increment: paso;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+            color: var(--accent-pink);
+        }
+        .step-num::before { content: 'PASO 0' counter(paso); }
+        .step-card h4 { margin: 0; font-size: 1.1rem; font-weight: 800; color: #fff; }
+        .step-card p { margin: 0; color: var(--text-muted); font-size: 0.87rem; }
+
+        /* =========================================================
+            CARRUSEL PRINCIPAL
+            ========================================================= */
+        .carousel-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            width: 100%;
+        }
+        .carousel-container {
+            width: 100%;
+            position: relative;
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid rgba(168, 85, 247, 0.28);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 40px rgba(168, 85, 247, 0.12);
+            background: var(--bg-elev);
+        }
+        .carousel-track { display: flex; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .carousel-slide { min-width: 100%; height: 500px; position: relative; }
+        .carousel-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .slide-caption {
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            padding: 60px 34px 26px;
+            background: linear-gradient(to top, rgba(7,4,12,0.95), transparent);
+        }
+        .slide-caption h4 { margin: 0 0 4px; font-size: 1.3rem; font-weight: 800; color: #fff; }
+        .slide-caption p { margin: 0; font-size: 0.87rem; color: var(--text-muted); max-width: 60ch; }
+
+        .carousel-btn, .mini-btn {
+            background: rgba(14, 9, 22, 0.85);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            color: #fff;
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.05rem;
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+            z-index: 20;
+            transition: all 0.25s ease;
+        }
+        .carousel-btn:hover, .mini-btn:hover {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            transform: scale(1.08);
+        }
+
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+        }
+        .indicator-dot {
+            height: 5px; width: 6px;
+            padding: 0;
+            border: none;
+            border-radius: 3px;
+            background-color: #ffffff;
+            opacity: 0.35;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .indicator-dot.active { width: 28px; opacity: 1; }
+        .indicator-dot:hover:not(.active) { opacity: 0.7; }
+
+        @media(max-width: 900px) {
+            .carousel-slide { height: 300px; }
+            .carousel-btn, .mini-btn { width: 38px; height: 38px; font-size: 0.85rem; }
+            .slide-caption { padding: 40px 20px 18px; }
+            .slide-caption h4 { font-size: 1.05rem; }
+        }
+
+        /* =========================================================
+            FACCIONES
+            ========================================================= */
+        .factions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media(max-width: 980px) { .factions-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media(max-width: 620px) { .factions-grid { grid-template-columns: 1fr; } }
+
+        .faction-card {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            background: var(--bg-elev);
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            min-height: 300px;
+            box-shadow: 0 18px 38px rgba(0,0,0,0.6);
+            transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+        .faction-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 32px rgba(168, 85, 247, 0.25);
+        }
+        .faction-media { position: relative; height: 190px; overflow: hidden; }
+        .faction-media img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .faction-card:hover .faction-media img { transform: scale(1.08); }
+        .faction-media::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(12,8,18,1), rgba(12,8,18,0.1) 70%);
+        }
+        .faction-tag {
+            position: absolute;
+            top: 14px; left: 14px;
+            z-index: 2;
+            background: rgba(7,4,12,0.8);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            color: #d8b4fe;
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 5px 11px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+        }
+        .faction-body {
+            padding: 0 24px 24px;
+            margin-top: -34px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            flex: 1;
+        }
+        .faction-body h4 { margin: 0; font-size: 1.22rem; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+        .faction-body p { margin: 0; color: var(--text-muted); font-size: 0.86rem; }
+        .faction-link {
+            margin-top: auto;
+            padding-top: 14px;
+            color: #d8b4fe;
+            font-size: 0.79rem;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .faction-card:hover .faction-link { color: #fff; }
+
+        /* =========================================================
+            WHITELIST
+            ========================================================= */
+        .whitelist-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 46px;
+            align-items: center;
+            background: linear-gradient(140deg, rgba(24, 16, 36, 0.85), rgba(10, 7, 16, 0.85));
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 24px;
+            padding: 44px;
+            box-shadow: 0 26px 54px rgba(0,0,0,0.6);
+        }
+        .whitelist-media {
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(168, 85, 247, 0.28);
+            height: 340px;
+        }
+        .whitelist-media img { width: 100%; height: 100%; object-fit: cover; }
+        .whitelist-copy { display: flex; flex-direction: column; gap: 16px; }
+        .whitelist-copy img.wl-icon { width: 58px; height: 58px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6)); }
+        .whitelist-copy h3 { margin: 0; font-size: 2rem; font-weight: 800; color: #fff; letter-spacing: -0.8px; }
+        .whitelist-copy p { margin: 0; color: var(--text-muted); font-size: 0.94rem; }
+        .wl-points { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+        .wl-point {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.28);
+            color: #e9d5ff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 8px;
+        }
+        @media(max-width: 900px) {
+            .whitelist-block { grid-template-columns: 1fr; padding: 28px; gap: 30px; }
+            .whitelist-media { height: 230px; }
+        }
+
+        /* =========================================================
+            TIENDA
+            ========================================================= */
+        .store-block {
+            display: grid;
+            grid-template-columns: 0.95fr 1.05fr;
+            gap: 46px;
+            align-items: center;
+        }
+        @media(max-width: 900px) { .store-block { grid-template-columns: 1fr; gap: 30px; } }
+
+        .store-copy h3 { font-size: 2rem; font-weight: 800; color: #fff; margin: 0 0 12px; letter-spacing: -0.8px; }
+        .store-copy h3 span {
+            background: linear-gradient(135deg, #c084fc, #f472b6);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .store-copy p { color: var(--text-muted); font-size: 0.95rem; margin: 0 0 18px; }
+        .store-perks { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+        .store-perks li { display: flex; gap: 11px; align-items: flex-start; color: var(--text-muted); font-size: 0.88rem; }
+        .store-perks i { color: var(--accent-pink); margin-top: 4px; font-size: 0.8rem; }
+        .store-note { font-size: 0.78rem; color: var(--text-dim); margin: 14px 0 0; }
+
+        .mini-carousel-wrapper { display: flex; align-items: center; gap: 16px; width: 100%; }
+        .mini-carousel-container {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(168, 85, 247, 0.28);
+            height: 340px;
+            background: var(--bg-elev);
+            width: 100%;
+            box-shadow: 0 22px 44px rgba(0,0,0,0.6);
+        }
+        .mini-track { display: flex; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); height: 100%; }
+        .mini-slide { min-width: 100%; height: 100%; }
+        .mini-slide img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* =========================================================
+            COMUNIDAD + LIGHTBOX
+            ========================================================= */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+        }
+        @media(max-width: 1024px) { .gallery { grid-template-columns: repeat(3, 1fr); } }
+        @media(max-width: 600px) { .gallery { grid-template-columns: repeat(2, 1fr); } }
+
+        .gallery-item {
+            position: relative;
+            height: 150px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(168, 85, 247, 0.18);
+            cursor: zoom-in;
+            padding: 0;
+            background: var(--bg-elev);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .gallery-item:hover { transform: translateY(-3px); border-color: var(--accent-purple); }
+        .gallery-item:hover img { transform: scale(1.09); }
+        .gallery-item::after {
+            content: '\f00e';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(7,4,12,0.55);
+            color: #fff;
+            font-size: 1.1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .gallery-item:hover::after { opacity: 1; }
+
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 2, 8, 0.92);
+            backdrop-filter: blur(8px);
+            z-index: 1500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        .lightbox.open { display: flex; }
+        .lightbox img {
+            max-width: 92vw;
+            max-height: 86vh;
+            border-radius: 14px;
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.9);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 22px; right: 24px;
+            background: rgba(18, 12, 28, 0.9);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            color: #fff;
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .lightbox-close:hover { background: var(--accent-purple); }
+
+        /* Tarjetas grandes de comunidad */
+        .community-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+        @media(max-width: 900px) { .community-cards { grid-template-columns: 1fr; } }
+
+        .big-card {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            min-height: 230px;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 18px 38px rgba(0,0,0,0.6);
+            transition: transform 0.35s ease, border-color 0.35s ease;
+        }
+        .big-card:hover { transform: translateY(-5px); border-color: var(--accent-purple); }
+        .big-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(7,4,12,0.96) 10%, rgba(7,4,12,0.45) 100%);
+        }
+        .big-card-body {
+            position: relative;
+            z-index: 2;
+            margin-top: auto;
+            padding: 26px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .big-card-body h4 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+        .big-card-body p { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
+        .big-card-body span { margin-top: 8px; color: #d8b4fe; font-size: 0.78rem; font-weight: 800; }
+
+        /* =========================================================
+            FAQ
+            ========================================================= */
+        .faq { max-width: 860px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.07); }
+        .faq-item { border-bottom: 1px solid rgba(255,255,255,0.07); }
+        .faq-q {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.98rem;
+            font-weight: 700;
+            text-align: left;
+            padding: 22px 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+        }
+        .faq-q i { color: var(--accent-purple); font-size: 0.8rem; transition: transform 0.3s ease; flex-shrink: 0; }
+        .faq-item.open .faq-q i { transform: rotate(45deg); }
+        .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .faq-item.open .faq-a { max-height: 320px; }
+        .faq-a p { margin: 0 0 22px; color: var(--text-muted); font-size: 0.9rem; max-width: 74ch; }
+
+
+        /* =========================================================
+            FOOTER
+            ========================================================= */
+        .landing-footer {
+            position: relative;
+            background: url('https://i.imgur.com/IHEed1p.jpeg') no-repeat center center/cover;
+            color: var(--text-muted);
+            padding: 62px 5% 30px;
+            border-top: 1px solid rgba(168, 85, 247, 0.2);
+            width: 100%;
+            margin-top: auto;
+        }
+        .landing-footer::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: rgba(7, 4, 12, 0.93);
+            z-index: 1;
+        }
+        .footer-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1140px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: center;
+        }
+        .footer-brand-col {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 25px;
+            margin-left: -25px;
+        }
+        .footer-brand-logo { height: 175px; object-fit: contain; flex-shrink: 0; }
+        .footer-brand-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; margin: 0; }
+        .footer-social { display: flex; gap: 10px; margin-top: 14px; }
+        .footer-social a {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.09);
+            background: rgba(255,255,255,0.03);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .footer-social a:hover { color: #fff; border-color: var(--accent-purple); background: rgba(168,85,247,0.18); }
+
+        .footer-links-col { display: flex; flex-direction: column; gap: 10px; }
+        .footer-links-col h4 { color: #fff; font-size: 0.9rem; font-weight: 700; margin: 0 0 5px; letter-spacing: 0.5px; }
+        .footer-links-col a { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; transition: color 0.2s ease; }
+        .footer-links-col a:hover { color: var(--accent-purple); }
+
+        .footer-bottom {
+            position: relative;
+            z-index: 2;
+            max-width: 1140px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 25px;
+            font-size: 0.78rem;
+            color: var(--text-dim);
+        }
+        @media(max-width: 768px) {
+            .footer-content { grid-template-columns: 1fr; gap: 30px; }
+            .footer-brand-col { flex-direction: column; align-items: flex-start; gap: 15px; margin-left: 0; }
+            .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+        }
+
+        /* Volver arriba */
+        .to-top {
+            position: fixed;
+            right: 20px; bottom: 20px;
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: rgba(168, 85, 247, 0.16);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            color: #e9d5ff;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 900;
+            transition: all 0.25s ease;
+        }
+        .to-top.show { display: flex; }
+        .to-top:hover { background: var(--accent-purple); color: #fff; }
+
+        /* Aviso de copiado */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(18, 12, 28, 0.96);
+            border: 1px solid rgba(163, 230, 53, 0.4);
+            color: #d9f99d;
+            padding: 12px 22px;
+            border-radius: 11px;
+            font-size: 0.83rem;
+            font-weight: 700;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 1600;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <div class="grid-background"></div>
+    <div class="aurora"></div>
+    <div class="read-bar" id="readBar"></div>
+
+    <!-- =========================================================
+         BARRA DE NAVEGACIÓN
+         ========================================================= -->
+    <header class="landing-navbar" id="navbar">
+        <div class="nav-left-group">
+            <a href="index.html" class="nav-brand">
+                <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo">
+            </a>
+
+            <!-- Botones centrales -->
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html" class="active">INICIO</a>
+                <a href="tienda.html">TIENDA</a>
+
+                <!-- Menú Facciones por Click -->
+                <div class="dropdown-container" id="factionsDropdownContainer">
+                    <button class="dropdown-trigger" id="factionsTrigger">FACCIONES <i class="fa-solid fa-chevron-down" style="font-size: 0.55rem; margin-left: 6px;"></i></button>
+                    <div class="dropdown-menu" id="factionsDropdownMenu">
+                        <a href="/facciones/ems.html"><i class="fa-solid fa-kit-medical"></i> EMS</a>
+                        <a href="/facciones/sasp.html"><i class="fa-solid fa-shield-halved"></i> SASP</a>
+                        <a href="/facciones/crews.html"><i class="fa-solid fa-users"></i> CREWS</a>
+                        <a href="/facciones/ilegales.html"><i class="fa-solid fa-skull"></i> ILEGALES</a>
+                        <a href="/facciones/weazelnews.html"><i class="fa-solid fa-newspaper"></i> WEAZELNEWS</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <div class="nav-right-actions">
+            <a href="tienda.html" class="nav-cart-icon" title="Carrito de Tienda">
+                <i class="fa-solid fa-bag-shopping"></i>
+            </a>
+
+            <!-- Selector de Idioma -->
+            <div class="custom-lang-dropdown" id="langDropdownContainer">
+                <div class="lang-selected" id="langSelectedTrigger">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <img src="https://i.imgur.com/eabCZDo.png" alt="ES" class="lang-flag" id="currentLangFlag">
+                        <span id="currentLangText">Español</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.55rem; color: var(--accent-purple);"></i>
+                </div>
+                <div class="lang-options" id="langOptionsDropdown">
+                    <div class="lang-option" data-lang="es" data-text="Español" data-flag="https://i.imgur.com/eabCZDo.png">
+                        <img src="https://i.imgur.com/eabCZDo.png" alt="ES" class="lang-flag">
+                        <span>Español</span>
+                    </div>
+                    <div class="lang-option" data-lang="en" data-text="English" data-flag="https://i.imgur.com/04qe14v.png">
+                        <img src="https://i.imgur.com/04qe14v.png" alt="EN" class="lang-flag">
+                        <span>English</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menú de Perfil -->
+            <div class="profile-dropdown-container" id="profileDropdownContainer">
+                <div id="userProfileTrigger" class="user-avatar-circle" title="Perfil de usuario">
+                    <div id="avatarContainer" class="default-avatar-silhouette">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+                <div class="profile-dropdown-menu" id="profileDropdownMenu">
+                    <a href="perfil.html"><i class="fa-solid fa-user-gear"></i> Mi perfil</a>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank"><i class="fa-brands fa-discord"></i> Discord</a>
+                    <a href="panel.html"><i class="fa-solid fa-gauge-high"></i> Acceder al panel</a>
+                    <a href="#" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+                </div>
+            </div>
+
+            <button class="nav-burger" id="navBurger" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </header>
+
+    <!-- =========================================================
+         HERO
+         ========================================================= -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-veil"></div>
+
+        <div class="wrap hero-inner">
+            <div>
+                <h1>Tu historia empieza<em>en San Andreas</em></h1>
+                <p class="hero-lead">ClickSense RP es un servidor de FiveM de rol serio: economía real, facciones con estructura propia y ciudadanos que responden de lo que hacen. Nadie te dice qué personaje ser, pero todo lo que hagas tendrá consecuencias.</p>
+
+                <div class="hero-actions">
+                    <a href="login.html" class="btn btn-wl"><i class="fa-solid fa-id-card"></i> Iniciar la whitelist <i class="fa-solid fa-arrow-right-long wl-arrow"></i></a>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank" class="btn btn-outline"><i class="fa-brands fa-discord"></i> Entrar al Discord</a>
+                </div>
+
+                <div class="ip-box">
+                    <div>
+                        <span class="ip-label">CONEXIÓN FIVEM</span>
+                        <span class="ip-value" id="serverIp">connect play.clicksenserp.com</span>
+                    </div>
+                    <button class="btn-copy" id="copyIpBtn"><i class="fa-regular fa-copy"></i> Copiar</button>
+                </div>
+            </div>
+
+            <aside class="hero-panel">
+                <div class="hero-panel-top">
+                    <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense RP">
+                    <div>
+                        <h3>ClickSense RP</h3>
+                        <p>Rol serio · Español · FiveM</p>
+                    </div>
+                </div>
+
+                <div class="hero-stats">
+                    <div><b data-count="5">0</b><span>facciones</span></div>
+                    <div><b data-count="300" data-prefix="+">0</b><span>Personajes creados</span></div>
+                    <div><b data-count="30" data-prefix="+">0</b><span>Locales</span></div>
+                </div>
+
+                <ul class="hero-list">
+                    <li><i class="fa-solid fa-check"></i><span><strong>Whitelist mediante formulario</strong>, fácil y rápido.</span></li>
+                    <li><i class="fa-solid fa-check"></i><span><strong>Facciones dirigidas por jugadores</strong>, con jerarquía y procesos propios.</span></li>
+                    <li><i class="fa-solid fa-check"></i><span><strong>Staff presente</strong> y normativa pública que se aplica igual para todos.</span></li>
+                    <li><i class="fa-solid fa-check"></i><span><strong>Servidor optimizado</strong> y actualizaciones constantes de contenido.</span></li>
+                </ul>
+            </aside>
+        </div>
+
+        <a href="#descubre" class="scroll-cue">DESCUBRE MÁS <i class="fa-solid fa-chevron-down"></i></a>
+    </section>
+
+    <!-- =========================================================
+         PILARES
+         ========================================================= -->
+    <section class="section" id="descubre">
+        <div class="wrap">
+            <div class="sec-head scroll-reveal">
+                <span class="eyebrow">QUÉ NOS HACE DISTINTOS</span>
+                <h2 class="sec-title">Una ciudad que <span>se comporta como una ciudad</span></h2>
+                <p class="sec-sub">No hay misiones ni objetivos marcados. Hay un lugar con reglas, con trabajo, con gente que te recuerda y con decisiones que pesan mañana.</p>
+            </div>
+
+            <div class="pillars scroll-reveal">
+                <article class="pillar">
+                    <div class="pillar-icon"><i class="fa-solid fa-masks-theater"></i></div>
+                    <h4>Rol serio de verdad</h4>
+                    <p>Nada de saltarse el rol para ganar. Cada personaje tiene historia, miedos y motivos, y se le exige coherencia dentro y fuera de una escena.</p>
+                </article>
+                <article class="pillar">
+                    <div class="pillar-icon"><i class="fa-solid fa-city"></i></div>
+                    <h4>Economía viva</h4>
+                    <p>Empleos legales, negocios gestionados por jugadores y un mercado ilegal con riesgo real. El dinero se gana, no aparece.</p>
+                </article>
+                <article class="pillar">
+                    <div class="pillar-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <h4>Normas claras</h4>
+                    <p>La normativa es pública y el equipo administrativo resuelve con criterio. Si algo se sanciona, se explica el por qué.</p>
+                </article>
+                <article class="pillar">
+                    <div class="pillar-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                    <h4>Rendimiento cuidado</h4>
+                    <p>Scripts propios, revisión constante de recursos y sesiones estables para que el rol no se rompa por un tirón de FPS.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         CÓMO EMPEZAR
+         ========================================================= -->
+    <section class="section" style="padding-top: 0;">
+        <div class="wrap">
+            <div class="sec-head scroll-reveal">
+                <span class="eyebrow">EMPEZAR ES RÁPIDO</span>
+                <h2 class="sec-title">De cero a tu primer día en la ciudad</h2>
+                <p class="sec-sub">Cuatro pasos. Si te atascas en alguno, en el Discord hay un canal de soporte donde te responden en minutos.</p>
+            </div>
+
+            <div class="steps-rail scroll-reveal">
+                <article class="step-card">
+                    <span class="step-num"></span>
+                    <h4>Entra al Discord</h4>
+                    <p>Es donde se publican las convocatorias, los avisos de mantenimiento y el soporte técnico.</p>
+                </article>
+                <article class="step-card">
+                    <span class="step-num"></span>
+                    <h4>Lee la normativa</h4>
+                    <p>Diez minutos de lectura que te ahorran un sanción. La whitelist pregunta sobre ella.</p>
+                </article>
+                <article class="step-card">
+                    <span class="step-num"></span>
+                    <h4>Pasa la whitelist</h4>
+                    <p>Formulario, historia de tu personaje y consigue el acceso al servidor.</p>
+                </article>
+                <article class="step-card">
+                    <span class="step-num"></span>
+                    <h4>Conéctate y rolea</h4>
+                    <p>Copia la IP, entra en la ciudad y empieza a construir tu personaje desde el primer minuto.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         GALERÍA / CARRUSEL
+         ========================================================= -->
+    <section class="section" style="padding-top: 0;">
+        <div class="wrap">
+            <div class="sec-head center scroll-reveal">
+                <span class="eyebrow" style="justify-content:center;">LA CIUDAD POR DENTRO</span>
+                <h2 class="sec-title">Momentos reales de <span>ClickSense RP</span></h2>
+                <p class="sec-sub">Capturas de partidas reales: intervenciones, negocios, quedadas y noches que acabaron como nadie esperaba.</p>
+            </div>
+
+            <div class="scroll-reveal">
+                <div class="carousel-wrapper">
+                    <button class="carousel-btn" id="carouselPrev" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="carousel-container" id="carouselContainer">
+                        <div class="carousel-track" id="carouselTrack">
+                            <div class="carousel-slide">
+                                <img src="https://i.imgur.com/qltvmW6.jpeg" alt="Patrulla policial en Los Santos">
+                                <div class="slide-caption">
+                                    <h4>Los cuerpos del orden</h4>
+                                    <p>LSPD y LSSD patrullan la ciudad y el condado con procedimientos, rangos y formación propia.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="https://i.imgur.com/JZSGZA2.jpeg" alt="Servicios médicos de emergencia">
+                                <div class="slide-caption">
+                                    <h4>Emergencias sanitarias</h4>
+                                    <p>El SAED responde a cada aviso: accidentes, tiroteos y rescates en cualquier punto del estado.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="https://i.imgur.com/Z2q2QDP.jpeg" alt="Crews y motor">
+                                <div class="slide-caption">
+                                    <h4>Cultura del motor</h4>
+                                    <p>Crews, talleres y carreras clandestinas que mueven medio barrio cada noche.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="https://i.imgur.com/GOB0X9Q.jpeg" alt="Bandas de la ciudad">
+                                <div class="slide-caption">
+                                    <h4>Bandas y territorio</h4>
+                                    <p>Organizaciones con jerarquía, alianzas frágiles y una calle que nunca perdona un error.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="https://i.imgur.com/5EhZnX0.jpeg" alt="Negocios y comercios">
+                                <div class="slide-caption">
+                                    <h4>Negocios de jugadores</h4>
+                                    <p>Bares, tiendas y talleres gestionados por ciudadanos, con empleados y clientes reales.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="https://i.imgur.com/dY8HmCb.jpeg" alt="Vida en la ciudad">
+                                <div class="slide-caption">
+                                    <h4>Vida cotidiana</h4>
+                                    <p>Entre operativos y titulares también hay cafés, quedadas y conversaciones que no van a ninguna parte.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="carousel-btn" id="carouselNext" aria-label="Siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div class="carousel-indicators" id="carouselIndicators"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         FACCIONES
+         ========================================================= -->
+    <section class="section" style="padding-top: 0;">
+        <div class="wrap">
+            <div class="sec-head scroll-reveal">
+                <span class="eyebrow">FACCIONES ACTIVAS</span>
+                <h2 class="sec-title">Elige tu bando, o <span>crea el tuyo</span></h2>
+                <p class="sec-sub">Cuerpos del orden, servicios de emergencia, prensa y organizaciones ilegales. Todas dirigidas por jugadores, con su propio proceso de entrada.</p>
+            </div>
+
+            <div class="factions-grid scroll-reveal">
+                <a href="/facciones/sasp.html" class="faction-card">
+                    <div class="faction-media">
+                        <span class="faction-tag">FUERZAS DEL ORDEN</span>
+                        <img src="https://i.imgur.com/qltvmW6.jpeg" alt="SASP">
+                    </div>
+                    <div class="faction-body">
+                        <h4>SASP · LSPD y LSSD</h4>
+                        <p>Policía de Los Santos y Sheriff del condado. Oposiciones, academia, divisiones especializadas y ascensos por méritos.</p>
+                        <span class="faction-link">Ver facción <i class="fa-solid fa-arrow-right-long"></i></span>
+                    </div>
+                </a>
+
+                <a href="/facciones/ems.html" class="faction-card">
+                    <div class="faction-media">
+                        <span class="faction-tag">EMERGENCIAS</span>
+                        <img src="https://i.imgur.com/JZSGZA2.jpeg" alt="SAED EMS">
+                    </div>
+                    <div class="faction-body">
+                        <h4>SAED · EMS</h4>
+                        <p>Servicio médico del estado. Asistencia en carretera, urgencias hospitalarias y rescates junto a los cuerpos policiales.</p>
+                        <span class="faction-link">Ver facción <i class="fa-solid fa-arrow-right-long"></i></span>
+                    </div>
+                </a>
+
+                <a href="/facciones/crews.html" class="faction-card">
+                    <div class="faction-media">
+                        <span class="faction-tag">MOTOR</span>
+                        <img src="https://i.imgur.com/Z2q2QDP.jpeg" alt="Crews">
+                    </div>
+                    <div class="faction-body">
+                        <h4>Crews</h4>
+                        <p>Clubes de motor, talleres y carreras. Reputación, apuestas y una rivalidad que se resuelve en el asfalto.</p>
+                        <span class="faction-link">Ver facción <i class="fa-solid fa-arrow-right-long"></i></span>
+                    </div>
+                </a>
+
+                <a href="/facciones/ilegales.html" class="faction-card">
+                    <div class="faction-media">
+                        <span class="faction-tag">ILEGALES</span>
+                        <img src="https://i.imgur.com/GOB0X9Q.jpeg" alt="Bandas">
+                    </div>
+                    <div class="faction-body">
+                        <h4>Bandas</h4>
+                        <p>Territorio, negocio y lealtades. Entrar es fácil; salir con vida y sin antecedentes ya es otra historia.</p>
+                        <span class="faction-link">Ver facción <i class="fa-solid fa-arrow-right-long"></i></span>
+                    </div>
+                </a>
+
+                <a href="/facciones/weazelnews.html" class="faction-card">
+                    <div class="faction-media">
+                        <span class="faction-tag">PRENSA</span>
+                        <img src="https://i.imgur.com/R8kdb0h.png" alt="Weazel News">
+                    </div>
+                    <div class="faction-body">
+                        <h4>Weazel News</h4>
+                        <p>La voz de la ciudad. Entrevistas, directos y titulares capaces de hundir una carrera política en una tarde.</p>
+                        <span class="faction-link">Ver facción <i class="fa-solid fa-arrow-right-long"></i></span>
+                    </div>
+                </a>
+
+                <a href="https://discord.gg/KAZzEyhmxW" target="_blank" class="faction-card">
+                    <div class="faction-media">
+                        <span class="faction-tag">TU PROYECTO</span>
+                        <img src="https://i.imgur.com/bXo4YDw.jpeg" alt="Crear facción">
+                    </div>
+                    <div class="faction-body">
+                        <h4>¿Quieres crear la tuya?</h4>
+                        <p>Presenta tu proyecto al staff: concepto, estructura y miembros. Si aporta a la ciudad, se estudia y se aprueba.</p>
+                        <span class="faction-link">Proponer facción <i class="fa-solid fa-arrow-right-long"></i></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         WHITELIST
+         ========================================================= -->
+    <section class="section" style="padding-top: 0;">
+        <div class="wrap">
+            <div class="whitelist-block scroll-reveal">
+                <div class="whitelist-media">
+                    <img src="https://i.imgur.com/hvrzjQS.png" alt="Whitelist ClickSense RP">
+                </div>
+                <div class="whitelist-copy">
+                    <img src="https://i.imgur.com/dWeufze.png" alt="" class="wl-icon">
+                    <h3>Tu pasado, tu futuro</h3>
+                    <p>En ClickSense cada personaje decide su propio camino: un camarero cuyo hobbie es participar en carreras ilegales, un ciudadano que va a opositar a la policía, un agente que se deja la piel cada día...</p>
+                    <p>Todo tiene sus puntos positivos y negativos: una alianza, una traición o cualquier falta de respeto puede meterte en serios problemas.</p>
+                    <div class="wl-points">
+                        <span class="wl-point">Formulario + entrevista</span>
+                        <span class="wl-point">Sin pago para entrar</span>
+                        <span class="wl-point">Respuesta en menos de 48 horas</span>
+                    </div>
+                    <a href="login.html" class="btn btn-wl" style="width: fit-content; margin-top: 8px;"><i class="fa-solid fa-arrow-right-to-bracket"></i> Iniciar la whitelist <i class="fa-solid fa-arrow-right-long wl-arrow"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         TIENDA
+         ========================================================= -->
+    <section class="section" style="padding-top: 0;">
+        <div class="wrap">
+            <div class="store-block scroll-reveal">
+                <div class="store-copy">
+                    <span class="eyebrow">TIENDA OFICIAL</span>
+                    <h3>Apoya el servidor y <span>personaliza tu personaje</span></h3>
+                    <p>Todo lo que hay en la tienda es estético o de comodidad. Nada de ventajas que rompan el rol de los demás: aquí no se compra poder.</p>
+                    <ul class="store-perks">
+                        <li><i class="fa-solid fa-car-side"></i><span>Vehículos exclusivos y personalizaciones para tu garaje.</span></li>
+                        <li><i class="fa-solid fa-crown"></i><span>Membresías con prioridad de cola y ventajas de comodidad.</span></li>
+                        <li><i class="fa-solid fa-shirt"></i><span>Paquetes de ropa y accesorios para tu personaje.</span></li>
+                        <li><i class="fa-solid fa-store"></i><span>Licencias de negocio para montar tu propio local en la ciudad.</span></li>
+                    </ul>
+                    <a href="tienda.html" class="btn btn-solid"><i class="fa-solid fa-bag-shopping"></i> Ir a la tienda</a>
+                    <p class="store-note">Cada compra ayuda a pagar los servidores y el desarrollo. Consulta los <a href="terminos-donaciones.html" style="color:#d8b4fe;">términos de compra</a>.</p>
+                </div>
+
+                <div>
+                    <div class="mini-carousel-wrapper">
+                        <button class="mini-btn" id="miniPrev" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div class="mini-carousel-container">
+                            <div class="mini-track" id="miniTrack">
+                                <div class="mini-slide"><img src="https://i.imgur.com/Z2q2QDP.jpeg" alt="Tienda 1"></div>
+                                <div class="mini-slide"><img src="https://i.imgur.com/GSqq7c7.jpeg" alt="Tienda 2"></div>
+                                <div class="mini-slide"><img src="https://i.imgur.com/qub102R.png" alt="Tienda 3"></div>
+                            </div>
+                        </div>
+                        <button class="mini-btn" id="miniNext" aria-label="Siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div class="carousel-indicators" id="miniIndicators"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         COMUNIDAD
+         ========================================================= -->
+    <section class="section" style="padding-top: 0;">
+        <div class="wrap">
+            <div class="sec-head center scroll-reveal">
+                <span class="eyebrow" style="justify-content:center;">NUESTRA COMUNIDAD</span>
+                <h2 class="sec-title">Momentos capturados por <span>los ciudadanos</span></h2>
+                <p class="sec-sub">Pulsa cualquier imagen para verla en grande. Si quieres que la tuya salga aquí, compártela en el canal de capturas del Discord.</p>
+            </div>
+
+            <div class="gallery scroll-reveal" id="gallery">
+                <button class="gallery-item"><img src="https://i.imgur.com/dY8HmCb.jpeg" alt="Comunidad 1"></button>
+                <button class="gallery-item"><img src="https://i.imgur.com/8HoQS38.jpeg" alt="Comunidad 2"></button>
+                <button class="gallery-item"><img src="https://i.imgur.com/bXo4YDw.jpeg" alt="Comunidad 3"></button>
+                <button class="gallery-item"><img src="https://i.imgur.com/FmV3Rbg.jpeg" alt="Comunidad 4"></button>
+                <button class="gallery-item"><img src="https://i.imgur.com/GSqq7c7.jpeg" alt="Comunidad 5"></button>
+                <button class="gallery-item"><img src="https://i.imgur.com/Z52cN4u.jpeg" alt="Comunidad 6"></button>
+                <button class="gallery-item"><img src="https://i.imgur.com/qub102R.png" alt="Comunidad 7"></button>
+                <button class="gallery-item"><img src="https://i.imgur.com/JnPJup9.jpeg" alt="Comunidad 8"></button>
+                <button class="gallery-item"><img src="https://i.imgur.com/5EhZnX0.jpeg" alt="Negocios y comercios"></button>
+                <button class="gallery-item"><img src="https://i.imgur.com/GOB0X9Q.jpeg" alt="Ilegales"></button>
+            </div>
+
+            <div class="community-cards scroll-reveal">
+                <a href="normativa.html" class="big-card" style="background-image: url('https://i.imgur.com/JnPJup9.jpeg');">
+                    <div class="big-card-body">
+                        <h4>NORMATIVA</h4>
+                        <p>Las reglas de la ciudad, explicadas sin letra pequeña.</p>
+                        <span>Leer normativa</span>
+                    </div>
+                </a>
+                <a href="equipo.html" class="big-card" style="background-image: url('https://i.imgur.com/Z52cN4u.jpeg');">
+                    <div class="big-card-body">
+                        <h4>STAFF</h4>
+                        <p>Quién está detrás del servidor y a quién acudir con cada cosa.</p>
+                        <span>Conocer al equipo</span>
+                    </div>
+                </a>
+                <a href="https://discord.gg/KAZzEyhmxW" target="_blank" class="big-card" style="background-image: url('https://i.imgur.com/FmV3Rbg.jpeg');">
+                    <div class="big-card-body">
+                        <h4>COMUNIDAD</h4>
+                        <p>Anuncios, soporte, eventos y la gente que da vida a todo esto.</p>
+                        <span>Entrar al Discord</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         FAQ
+         ========================================================= -->
+    <section class="section" style="padding-top: 0;">
+        <div class="wrap">
+            <div class="sec-head center scroll-reveal">
+                <span class="eyebrow" style="justify-content:center;">DUDAS FRECUENTES</span>
+                <h2 class="sec-title">Lo que todo el mundo pregunta antes de entrar</h2>
+            </div>
+
+            <div class="faq scroll-reveal" id="faq">
+                <div class="faq-item">
+                    <button class="faq-q">¿Necesito experiencia previa en rol? <i class="fa-solid fa-plus"></i></button>
+                    <div class="faq-a"><p>No. Muchos entran sin haber roleado nunca. Lo único que pedimos es que leas la normativa, preguntes cuando dudes y te tomes en serio a tu personaje. En el Discord hay una guía para principiantes y gente dispuesta a echarte una mano el primer día.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q">¿Cuánto tarda la whitelist? <i class="fa-solid fa-plus"></i></button>
+                    <div class="faq-a"><p>Normally menos de 48 horas entre que envías el formulario y te dan respuesta. Si hay muchas solicitudes acumuladas puede alargarse un poco; lo avisamos en el canal de anuncios.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q">¿Hay que pagar para jugar? <i class="fa-solid fa-plus"></i></button>
+                    <div class="faq-a"><p>No. El acceso es gratuito y la whitelist también. La tienda existe para sostener los costes del servidor y solo vende cosas estéticas o de comodidad, nunca ventajas que afecten al rol de otros.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q">¿Qué necesito para conectarme? <i class="fa-solid fa-plus"></i></button>
+                    <div class="faq-a"><p>GTA V original instalado, el cliente de FiveM y un micrófono que funcione. Con la whitelist aprobada solo tienes que copiar la IP del servidor y pegarla en FiveM para entrar.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q">¿Puedo entrar directamente en una facción? <i class="fa-solid fa-plus"></i></button>
+                    <div class="faq-a"><p>Cada facción tiene su propio proceso. La policía y el EMS abren oposiciones cada cierto tiempo; las bandas y crews se entra roleando con ellos. Lo que no se puede es aparecer el primer día pidiendo placa o kilo.</p></div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q">¿Qué pasa si alguien rompe el rol? <i class="fa-solid fa-plus"></i></button>
+                    <div class="faq-a"><p>Se reporta con pruebas en el Discord y el staff lo revisa. Las sanciones están tipificadas en la normativa y se aplican igual a cualquiera, tenga el rango que tenga dentro del servidor.</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- =========================================================
+         FOOTER
+         ========================================================= -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <div class="footer-brand-col">
+                <img src="https://i.imgur.com/yUs7B3t.png" alt="ClickSense Logo" class="footer-brand-logo">
+                <div>
+                    <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+                    <div class="footer-social">
+                        <a href="https://discord.gg/KAZzEyhmxW" target="_blank" title="Discord"><i class="fa-brands fa-discord"></i></a>
+                        <a href="#" title="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-links-col">
+                <h4>Información</h4>
+                <a href="normativa.html">Normativa del servidor</a>
+                <a href="#">Política de privacidad</a>
+                <a href="#">Política de cookies</a>
+                <a href="términos.html">Términos y condiciones</a>
+                <a href="terminos-donaciones.html">Términos y condiciones de compra</a>
+                <a href="#">Información VIP</a>
+                <a href="#">Información VIP Comercios</a>
+            </div>
+            <div class="footer-links-col">
+                <h4>Comunidad</h4>
+                <a href="https://discord.gg/KAZzEyhmxW" target="_blank">Discord</a>
+                <a href="#">Twitter / X</a>
+                <a href="equipo.html">Staff</a>
+                <a href="whitelist.html">Whitelist</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+            <span>Developed by Gallegoo</span>
+        </div>
+    </footer>
+
+    <!-- Lightbox de la galería -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <img src="" alt="" id="lightboxImg">
+    </div>
+
+    <button class="to-top" id="toTop" aria-label="Volver arriba"><i class="fa-solid fa-arrow-up"></i></button>
+    <div class="toast" id="toast">IP copiada al portapapeles</div>
+
+    <script>
+        window.history.scrollRestoration = 'manual';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            /* ---------- Perfil y sesión de Discord ---------- */
+            const storedUser = localStorage.getItem('discord_user');
+            const avatarContainer = document.getElementById('avatarContainer');
+            const profileTrigger = document.getElementById('userProfileTrigger');
+            const profileMenu = document.getElementById('profileDropdownMenu');
+            const logoutBtn = document.getElementById('logoutBtn');
+            let isLoggedIn = false;
+
+            if (storedUser) {
+                try {
+                    const discordUser = JSON.parse(storedUser);
+                    if (discordUser.avatarUrl) {
+                        avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar Discord" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                        isLoggedIn = true;
+                    }
+                } catch (e) {
+                    console.error('Error al cargar sesión de Discord', e);
+                }
+            }
+
+            /* ---------- Navbar: fondo al hacer scroll + menú móvil ---------- */
+            const navbar = document.getElementById('navbar');
+            const navLinks = document.getElementById('navLinks');
+            const navBurger = document.getElementById('navBurger');
+
+            navBurger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navLinks.classList.toggle('open');
+            });
+
+            /* ---------- Scroll reveal (una sola vez por elemento) ---------- */
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12 });
+
+            document.querySelectorAll('.scroll-reveal').forEach(el => revealObserver.observe(el));
+
+            /* ---------- Contadores del hero ---------- */
+            const counters = document.querySelectorAll('.hero-stats b');
+            const counterObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const el = entry.target;
+                    const destino = parseInt(el.dataset.count, 10);
+                    const sufijo = el.dataset.suffix || '';
+                    const prefijo = el.dataset.prefix || '';
+                    let actual = 0;
+                    const paso = Math.max(1, Math.round(destino / 28));
+                    const timer = setInterval(() => {
+                        actual += paso;
+                        if (actual >= destino) { actual = destino; clearInterval(timer); }
+                        el.textContent = prefijo + actual + sufijo;
+                    }, 35);
+                    counterObserver.unobserve(el);
+                });
+            }, { threshold: 0.5 });
+            counters.forEach(c => counterObserver.observe(c));
+
+            /* ---------- Copiar IP ---------- */
+            const toast = document.getElementById('toast');
+            function mostrarToast(texto) {
+                toast.textContent = texto;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2200);
+            }
+
+            function copiarIp(btn) {
+                const ip = document.getElementById('serverIp').textContent.trim();
+                navigator.clipboard.writeText(ip).then(() => {
+                    mostrarToast('IP copiada al portapapeles');
+                    if (btn) {
+                        const original = btn.innerHTML;
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copiada';
+                        btn.classList.add('done');
+                        setTimeout(() => { btn.innerHTML = original; btn.classList.remove('done'); }, 2200);
+                    }
+                }).catch(() => mostrarToast('No se pudo copiar: ' + ip));
+            }
+
+            document.getElementById('copyIpBtn').addEventListener('click', function () { copiarIp(this); });
+
+            /* ---------- Carrusel principal ---------- */
+            const track = document.getElementById('carouselTrack');
+            const slides = Array.from(track.children);
+            const nextBtn = document.getElementById('carouselNext');
+            const prevBtn = document.getElementById('carouselPrev');
+            const indicatorsContainer = document.getElementById('carouselIndicators');
+            let currentIndex = 0;
+
+            slides.forEach((slide, idx) => {
+                const dot = document.createElement('button');
+                dot.classList.add('indicator-dot');
+                dot.setAttribute('aria-label', 'Ir a la imagen ' + (idx + 1));
+                if (idx === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => { currentIndex = idx; updateCarousel(); });
+                indicatorsContainer.appendChild(dot);
+            });
+            const dots = Array.from(indicatorsContainer.children);
+
+            function updateCarousel() {
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                dots.forEach((dot, idx) => dot.classList.toggle('active', idx === currentIndex));
+            }
+
+            nextBtn.addEventListener('click', () => { currentIndex = (currentIndex + 1) % slides.length; updateCarousel(); });
+            prevBtn.addEventListener('click', () => { currentIndex = (currentIndex - 1 + slides.length) % slides.length; updateCarousel(); });
+
+            let autoCarousel = setInterval(() => {
+                currentIndex = (currentIndex + 1) % slides.length;
+                updateCarousel();
+            }, 5500);
+
+            const carouselContainer = document.getElementById('carouselContainer');
+            carouselContainer.addEventListener('mouseenter', () => clearInterval(autoCarousel));
+            carouselContainer.addEventListener('mouseleave', () => {
+                autoCarousel = setInterval(() => {
+                    currentIndex = (currentIndex + 1) % slides.length;
+                    updateCarousel();
+                }, 5500);
+            });
+
+            /* Deslizar con el dedo en móvil */
+            let touchStartX = 0;
+            carouselContainer.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            carouselContainer.addEventListener('touchend', e => {
+                const dif = e.changedTouches[0].screenX - touchStartX;
+                if (Math.abs(dif) < 45) return;
+                currentIndex = dif < 0
+                    ? (currentIndex + 1) % slides.length
+                    : (currentIndex - 1 + slides.length) % slides.length;
+                updateCarousel();
+            }, { passive: true });
+
+            /* ---------- Mini carrusel de la tienda ---------- */
+            const miniTrack = document.getElementById('miniTrack');
+            const miniSlides = Array.from(miniTrack.children);
+            const miniNext = document.getElementById('miniNext');
+            const miniPrev = document.getElementById('miniPrev');
+            const miniIndicatorsContainer = document.getElementById('miniIndicators');
+            let miniIndex = 0;
+
+            miniSlides.forEach((slide, idx) => {
+                const dot = document.createElement('button');
+                dot.classList.add('indicator-dot');
+                dot.setAttribute('aria-label', 'Ir a la imagen ' + (idx + 1));
+                if (idx === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => { miniIndex = idx; updateMiniCarousel(); });
+                miniIndicatorsContainer.appendChild(dot);
+            });
+            const miniDots = Array.from(miniIndicatorsContainer.children);
+
+            function updateMiniCarousel() {
+                miniTrack.style.transform = `translateX(-${miniIndex * 100}%)`;
+                miniDots.forEach((dot, idx) => dot.classList.toggle('active', idx === miniIndex));
+            }
+
+            miniNext.addEventListener('click', () => { miniIndex = (miniIndex + 1) % miniSlides.length; updateMiniCarousel(); });
+            miniPrev.addEventListener('click', () => { miniIndex = (miniIndex - 1 + miniSlides.length) % miniSlides.length; updateMiniCarousel(); });
+
+            setInterval(() => { miniIndex = (miniIndex + 1) % miniSlides.length; updateMiniCarousel(); }, 4500);
+
+            /* ---------- Galería con lightbox ---------- */
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+
+            document.querySelectorAll('.gallery-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const img = item.querySelector('img');
+                    lightboxImg.src = img.src;
+                    lightboxImg.alt = img.alt;
+                    lightbox.classList.add('open');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            function cerrarLightbox() {
+                lightbox.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+            document.getElementById('lightboxClose').addEventListener('click', cerrarLightbox);
+            lightbox.addEventListener('click', e => { if (e.target === lightbox) cerrarLightbox(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarLightbox(); });
+
+            /* ---------- FAQ ---------- */
+            document.querySelectorAll('.faq-q').forEach(boton => {
+                boton.addEventListener('click', () => {
+                    const item = boton.parentElement;
+                    const abierto = item.classList.contains('open');
+                    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                    if (!abierto) item.classList.add('open');
+                });
+            });
+
+            /* ---------- Menús desplegables de la navbar ---------- */
+            const factionsTrigger = document.getElementById('factionsTrigger');
+            const factionsMenu = document.getElementById('factionsDropdownMenu');
+            const langTrigger = document.getElementById('langSelectedTrigger');
+            const langOptions = document.getElementById('langOptionsDropdown');
+            const currentLangFlag = document.getElementById('currentLangFlag');
+            const currentLangText = document.getElementById('currentLangText');
+
+            document.addEventListener('click', () => {
+                if (profileMenu) profileMenu.classList.remove('show');
+                if (factionsMenu) factionsMenu.classList.remove('show');
+                if (langOptions) langOptions.classList.remove('show');
+                if (window.innerWidth > 980) navLinks.classList.remove('open');
+            });
+
+            navLinks.addEventListener('click', e => e.stopPropagation());
+
+            factionsTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (profileMenu) profileMenu.classList.remove('show');
+                if (langOptions) langOptions.classList.remove('show');
+                factionsMenu.classList.toggle('show');
+            });
+
+            profileTrigger.addEventListener('click', (e) => {
+                if (!isLoggedIn) {
+                    window.location.href = 'login.html';
+                } else {
+                    e.stopPropagation();
+                    if (factionsMenu) factionsMenu.classList.remove('show');
+                    if (langOptions) langOptions.classList.remove('show');
+                    profileMenu.classList.toggle('show');
+                }
+            });
+
+            langTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (profileMenu) profileMenu.classList.remove('show');
+                if (factionsMenu) factionsMenu.classList.remove('show');
+                langOptions.classList.toggle('show');
+            });
+
+            document.querySelectorAll('.lang-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    currentLangFlag.src = option.getAttribute('data-flag');
+                    currentLangText.textContent = option.getAttribute('data-text');
+                    langOptions.classList.remove('show');
+                });
+            });
+
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('discord_user');
+                    window.location.reload();
+                });
+            }
+
+            /* ---------- Scroll: barra de progreso, navbar y volver arriba ---------- */
+            const readBar = document.getElementById('readBar');
+            const toTop = document.getElementById('toTop');
+
+            window.addEventListener('scroll', () => {
+                const alto = document.documentElement.scrollHeight - window.innerHeight;
+                readBar.style.width = (alto > 0 ? (window.scrollY / alto) * 100 : 0) + '%';
+                navbar.classList.toggle('scrolled', window.scrollY > 40);
+                toTop.classList.toggle('show', window.scrollY > 700);
+            });
+
+            toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        });
+    </script>
+</body>
+</html>

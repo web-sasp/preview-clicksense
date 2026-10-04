@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración | ClickSense RP</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/src/assets/admin.css">
+
+    <!-- Estilos específicos para la inmersión 3D del Acceso Denegado y el panel -->
+    <style>
+        :root {
+            --tk-bg-card: var(--bg-card, #130d1c);
+            --tk-border: var(--border-color, rgba(239, 68, 68, 0.2));
+            --tk-muted: var(--text-muted, #9ca3af);
+            --tk-accent: var(--accent-red, #ef4444);
+            --adm-green: #10b981;
+            --adm-purple: #a855f7;
+            --adm-pink: #f472b6;
+            --adm-font-title: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Foco visible al navegar con teclado */
+        :where(a, button, select, [tabindex]):focus-visible {
+            outline: 2px solid var(--adm-pink);
+            outline-offset: 3px;
+        }
+
+        /* ======================================================== */
+        /* MÁXIMA ANIMACIÓN 3D E INMERSIÓN - ACCESO DENEGADO        */
+        /* ======================================================== */
+
+        @keyframes entry3DExplosion {
+            0% { opacity: 0; transform: scale(0.7) translateZ(-300px) rotateX(35deg); }
+            100% { opacity: 1; transform: scale(1) translateZ(0px) rotateX(0deg); }
+        }
+
+        @keyframes neonCycle3D {
+            0% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(239, 68, 68, 0.25), inset 0 0 25px rgba(239, 68, 68, 0.15); }
+            33% { border-color: rgba(168, 85, 247, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(168, 85, 247, 0.3), inset 0 0 25px rgba(168, 85, 247, 0.15); }
+            66% { border-color: rgba(236, 72, 153, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(236, 72, 153, 0.3), inset 0 0 25px rgba(236, 72, 153, 0.15); }
+            100% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(239, 68, 68, 0.25), inset 0 0 25px rgba(239, 68, 68, 0.15); }
+        }
+
+        @keyframes liquidShimmer3D {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes radarSpin3D {
+            0% { transform: rotate(0deg) rotateX(10deg); }
+            100% { transform: rotate(360deg) rotateX(10deg); }
+        }
+
+        @keyframes pulseCore3D {
+            0%, 100% { transform: scale(1) translateZ(40px); filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.7)); }
+            50% { transform: scale(1.1) translateZ(60px); filter: drop-shadow(0 0 40px rgba(239, 68, 68, 1)); }
+        }
+
+        @keyframes bgFloatingOrb1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(80px, -60px) scale(1.3); }
+        }
+
+        @keyframes bgFloatingOrb2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-90px, 70px) scale(1.4); }
+        }
+
+        /* Pantalla completa. Se muestra con display:flex desde el script.
+           Con "margin: auto" en la tarjeta queda centrada y, si la ventana es baja,
+           se puede desplazar sin que se corte la parte de arriba. */
+        .denied-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+            padding: 24px;
+            box-sizing: border-box;
+            background: radial-gradient(circle at 50% 25%, #160a2b 0%, #040207 92%);
+            font-family: var(--adm-font-title);
+            overflow-x: hidden;
+            overflow-y: auto;
+            perspective: 1600px;
+        }
+
+        /* Orbes lumínicos de fondo */
+        .denied-orb {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .denied-orb-1 {
+            top: 10vh; left: 15vw; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.09) 0%, transparent 70%);
+            animation: bgFloatingOrb1 9s infinite ease-in-out;
+        }
+        .denied-orb-2 {
+            bottom: 10vh; right: 15vw; width: 450px; height: 450px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.09) 0%, transparent 70%);
+            animation: bgFloatingOrb2 11s infinite ease-in-out;
+        }
+
+        /* Tarjeta principal 3D interactiva (se inclina siguiendo el ratón).
+           La animación de entrada usa "backwards": al terminar suelta el transform
+           y así la inclinación con el ratón puede aplicarse. */
+        .denied-card {
+            position: relative;
+            z-index: 2;
+            margin: auto;
+            width: 100%;
+            max-width: 660px;
+            box-sizing: border-box;
+            padding: 56px 46px 48px;
+            text-align: center;
+            border-radius: 34px;
+            border: 2px solid rgba(239, 68, 68, 0.6);
+            background: linear-gradient(155deg, rgba(24, 15, 40, 0.97) 0%, rgba(8, 5, 14, 0.99) 100%);
+            backdrop-filter: blur(30px);
+            transform-style: preserve-3d;
+            will-change: transform;
+            transition: transform 0.15s cubic-bezier(0.03, 0.98, 0.52, 0.99);
+            animation: entry3DExplosion 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards, neonCycle3D 7s infinite linear;
+        }
+
+        .denied-top-glow {
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(30px);
+            width: 200px;
+            height: 5px;
+            background: linear-gradient(90deg, transparent, #ec4899, #8b5cf6, transparent);
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 0 25px #ec4899;
+        }
+
+        .denied-tag {
+            transform: translateZ(25px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(239, 68, 68, 0.14);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 7px 20px;
+            border-radius: 20px;
+            color: #f87171;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            margin-bottom: 44px;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.2);
+        }
+
+        .denied-emblem {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+            transform: translateZ(50px);
+        }
+        .denied-ring {
+            position: absolute;
+            border-radius: 50%;
+        }
+        .denied-ring-1 {
+            inset: -8px;
+            border: 2px dashed rgba(236, 72, 153, 0.5);
+            animation: radarSpin3D 10s linear infinite;
+        }
+        .denied-ring-2 {
+            inset: -18px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            animation: radarSpin3D 15s linear infinite reverse;
+        }
+        .denied-core {
+            width: 104px;
+            height: 104px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(168, 85, 247, 0.12));
+            color: #f87171;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            border: 1px solid rgba(239, 68, 68, 0.7);
+            animation: pulseCore3D 3s infinite ease-in-out;
+        }
+
+        .denied-title {
+            transform: translateZ(40px);
+            margin: 0 0 14px;
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 15%, #f472b6 45%, #c084fc 75%, #fff 100%);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: liquidShimmer3D 4s linear infinite;
+        }
+
+        .denied-text {
+            transform: translateZ(30px);
+            color: #94a3b8;
+            font-size: 16px;
+            line-height: 1.7;
+            max-width: 550px;
+            margin: 0 auto 34px;
+        }
+        .denied-flag {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.18);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+
+        .denied-options {
+            transform: translateZ(35px);
+            transform-style: preserve-3d;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            text-align: left;
+            margin-bottom: 38px;
+        }
+        .denied-option {
+            --opt: 168, 85, 247;
+            background: rgba(15, 10, 28, 0.9);
+            border: 1px solid rgba(var(--opt), 0.3);
+            border-radius: 18px;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+        }
+        .denied-option.is-blue { --opt: 59, 130, 246; }
+        .denied-option:hover {
+            border-color: rgba(var(--opt), 0.7);
+            background: rgba(22, 16, 44, 0.95);
+            transform: translateZ(10px) translateX(6px);
+        }
+        .denied-option-icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #c084fc;
+            background: rgba(var(--opt), 0.18);
+            border: 1px solid rgba(var(--opt), 0.45);
+            box-shadow: 0 0 20px rgba(var(--opt), 0.25);
+        }
+        .denied-option.is-blue .denied-option-icon { color: #60a5fa; }
+        .denied-option-text {
+            font-size: 14.5px;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+        .denied-option-text > strong:first-child {
+            color: #fff;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .denied-option-text .is-owner { color: var(--adm-pink); }
+
+        .denied-cta {
+            transform: translateZ(60px);
+            background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+            color: #fff;
+            text-decoration: none;
+            padding: 18px 42px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 15px 40px rgba(236, 72, 153, 0.5);
+            transition: transform 0.25s ease, filter 0.25s ease, box-shadow 0.25s ease;
+        }
+        .denied-cta:hover {
+            transform: translateZ(75px) scale(1.04);
+            filter: brightness(1.15);
+            box-shadow: 0 22px 55px rgba(236, 72, 153, 0.7);
+        }
+
+        @media (max-width: 600px) {
+            .denied-screen { padding: 16px; }
+            .denied-card { padding: 42px 22px 34px; border-radius: 26px; }
+            .denied-tag { font-size: 11px; letter-spacing: 1.2px; padding: 7px 14px; margin-bottom: 40px; }
+            .denied-title { font-size: 26px; }
+            .denied-text { font-size: 15px; margin-bottom: 28px; }
+            .denied-option { padding: 16px; gap: 14px; }
+            .denied-cta { padding: 16px 26px; font-size: 15px; }
+        }
+
+        /* ======================================================== */
+        /* CABECERA DEL PANEL                                        */
+        /* ======================================================== */
+
+        .top-btn.adm-back-btn {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color, rgba(239, 68, 68, 0.2));
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+        .top-btn.adm-back-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(239, 68, 68, 0.45);
+            transform: translateX(-2px);
+        }
+
+        .adm-welcome-icon {
+            background: rgba(239, 68, 68, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            flex-shrink: 0;
+            font-size: 24px;
+            color: #ef4444;
+        }
+        .adm-welcome-title {
+            color: #fff;
+            margin: 0 0 4px;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            font-family: var(--adm-font-title);
+        }
+        .adm-welcome-text {
+            margin: 0;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: var(--tk-muted);
+        }
+
+        /* Aviso de acceso concedido: una franja discreta en lugar de una tarjeta grande */
+        .admin-card.adm-access-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid rgba(16, 185, 129, 0.28);
+            border-radius: 14px;
+            padding: 16px 20px;
+        }
+        .adm-access-icon {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--adm-green);
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        .adm-access-card h3 {
+            margin: 0 0 2px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--adm-font-title);
+        }
+        .adm-access-card p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--tk-muted);
+        }
+        .adm-access-card code,
+        .tk-toolbar-title code {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 1px 6px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #e5e7eb;
+        }
+
+        /* ======================================================== */
+        /* TARJETA DE ACCESO A LA GESTIÓN DE NOVEDADES               */
+        /* ======================================================== */
+        .nv-admin-link {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-top: 20px;
+            padding: 22px 25px;
+            background: var(--tk-bg-card);
+            border: 1px solid var(--tk-border);
+            border-radius: 14px;
+            text-decoration: none;
+            color: #fff;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nv-admin-link:hover,
+        .nv-admin-link:focus-visible {
+            transform: translateY(-3px);
+            border-color: rgba(236, 72, 153, 0.6);
+            box-shadow: 0 12px 32px rgba(236, 72, 153, 0.22);
+        }
+
+        .nv-admin-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #f472b6;
+            background: rgba(236, 72, 153, 0.15);
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            flex-shrink: 0;
+        }
+
+        .nv-admin-link h3 { font-size: 16px; margin: 0 0 4px; font-family: var(--adm-font-title); }
+        .nv-admin-link p { font-size: 13px; margin: 0; line-height: 1.5; color: var(--tk-muted); }
+
+        .nv-admin-arrow {
+            margin-left: auto;
+            color: var(--tk-muted);
+            transition: transform 0.25s ease, color 0.25s ease;
+        }
+
+        .nv-admin-link:hover .nv-admin-arrow,
+        .nv-admin-link:focus-visible .nv-admin-arrow {
+            transform: translateX(6px);
+            color: #f472b6;
+        }
+
+        /* Tarjetas de herramientas del panel (Novedades, Tickets...) */
+        .adm-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .adm-tools-grid .nv-admin-link { margin-top: 0; }
+
+        /* Variante en rojo para la tarjeta de Tickets */
+        .nv-admin-link.is-tickets:hover,
+        .nv-admin-link.is-tickets:focus-visible {
+            border-color: rgba(239, 68, 68, 0.6);
+            box-shadow: 0 12px 32px rgba(239, 68, 68, 0.2);
+        }
+        .nv-admin-link.is-tickets .nv-admin-icon {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        .nv-admin-link.is-tickets:hover .nv-admin-arrow,
+        .nv-admin-link.is-tickets:focus-visible .nv-admin-arrow { color: #f87171; }
+
+        /* Cuántos tickets siguen activos, junto al título de la tarjeta */
+        .adm-link-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 9px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #34d399;
+            font-size: 11.5px;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+        .adm-link-badge[hidden] { display: none; }
+
+        @media (max-width: 640px) {
+            .adm-tools-grid { grid-template-columns: 1fr; }
+            .nv-admin-link { padding: 18px; gap: 14px; }
+        }
+
+        /* Quien prefiera menos movimiento: sin animaciones en bucle ni transiciones largas */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-background"></div>
+
+    <!-- CONTENEDOR DE ACCESO DENEGADO CON INMERSIÓN 3D MÁXIMA -->
+    <div id="accessDeniedContainer" class="denied-screen" style="display: none;">
+        
+        <!-- Orbes Lumínicos 3D de Fondo -->
+        <div class="denied-orb denied-orb-1"></div>
+        <div class="denied-orb denied-orb-2"></div>
+
+        <!-- TARJETA PRINCIPAL 3D INTERACTIVA -->
+        <div id="deniedCard3D" class="denied-card">
+
+            <div class="denied-top-glow"></div>
+
+            <div class="denied-tag">
+                <i class="fa-solid fa-triangle-exclamation"></i> Protocolo de Seguridad Activo
+            </div>
+
+            <div class="denied-emblem">
+                <div class="denied-ring denied-ring-1"></div>
+                <div class="denied-ring denied-ring-2"></div>
+                <div class="denied-core">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+            </div>
+
+            <h1 class="denied-title">ACCESO NO AUTORIZADO</h1>
+            
+            <p class="denied-text">
+                Tu perfil actual carece de privilegios o consta como <strong class="denied-flag">INACTIVO</strong> dentro de este sistema de control central.
+            </p>
+
+            <div class="denied-options">
+                <div class="denied-option">
+                    <div class="denied-option-icon">
+                        <i class="fa-solid fa-user-gear"></i>
+                    </div>
+                    <div class="denied-option-text">
+                        <strong>¿Eres miembro del equipo staff?</strong>
+                        Comunícate con el <strong class="is-owner">owner</strong> para que valide y configure tu acceso de manera oficial en el panel.
+                    </div>
+                </div>
+
+                <div class="denied-option is-blue">
+                    <div class="denied-option-icon">
+                        <i class="fa-solid fa-house-laptop"></i>
+                    </div>
+                    <div class="denied-option-text">
+                        <strong>¿Usuario general?</strong>
+                        Por motivos de seguridad, debes regresar de inmediato a la página principal del servidor.
+                    </div>
+                </div>
+            </div>
+
+            <a href="/home.html" class="denied-cta">
+                <i class="fa-solid fa-house"></i> Volver a la página principal
+            </a>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Menú Lateral Completo (Sidebar) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;" onerror="this.style.display='none'">
+                    <span class="server-main-title">ClickSense</span>
+                </div>
+                <button class="sidebar-toggle-icon" id="sidebarToggleBtn" title="Colapsar menú"><i class="fa-solid fa-bars"></i></button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Sección General -->
+                <div class="nav-category">General</div>
+                <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="/admin.html" class="nav-item active"><i class="fa-solid fa-shield-halved"></i> Panel Admin</a>
+                <a href="/admin/novedades.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> Novedades</a>
+                <a href="/admin/tickets.html" class="nav-item"><i class="fa-solid fa-headset"></i> Gestión de tickets</a>
+                <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> Equipo</a>
+                <a href="/calendario.html" class="nav-item"><i class="fa-solid fa-calendar-days"></i> Calendario</a>
+                <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> Comercios</a>
+                <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> Postulaciones ilegales</a>
+
+                <!-- Espacio de trabajo -->
+                <div class="nav-category">Espacio de trabajo</div>
+                <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> Grupos</a>
+                <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> Documentos</a>
+                <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Whitelist</a>
+
+                <!-- Mi Cuenta -->
+                <div class="nav-category">Mi Cuenta</div>
+                <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> Mi Perfil</a>
+                <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> Historias personaje</a>
+                <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+
+                <!-- LSPD -->
+                <div class="nav-category">LSPD</div>
+                <a href="/lspd-academia.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Academia</a>
+
+                <!-- LSSD -->
+                <div class="nav-category">LSSD</div>
+                <a href="/lssd-academia.html" class="nav-item"><i class="fa-solid fa-star-badge"></i> Academia</a>
+
+                <!-- SAHP -->
+                <div class="nav-category">SAHP</div>
+                <a href="/sahp-academia.html" class="nav-item"><i class="fa-solid fa-shield"></i> Academia</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-mini" id="userProfileMini">
+                    <div class="avatar-placeholder" id="userAvatarContainer">
+                        <span id="userAvatarFallback">?</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">Usuario</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@tag</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Botón flotante para abrir el menú cuando está colapsado -->
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <header class="top-action-bar animate-fade-down">
+                <div class="breadcrumb">Administración / Panel de Control</div>
+                <div class="top-buttons">
+                    <a href="/home.html" class="top-btn adm-back-btn"><i class="fa-solid fa-arrow-left"></i> Volver a Home</a>
+                </div>
+            </header>
+
+            <div class="welcome-banner-card animate-fade-up">
+                <div class="welcome-avatar adm-welcome-icon">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div class="welcome-text-content">
+                    <h1 class="adm-welcome-title">Panel de Administración Staff</h1>
+                    <p class="adm-welcome-text">Gestiona los accesos y herramientas de moderación conectados a tu servidor de pruebas.</p>
+                </div>
+            </div>
+
+            <!-- Contenedor dinámico controlado por permisos y scripts -->
+            <div id="adminContentContainer" class="animate-fade-up delay-1">
+                <div class="admin-card adm-access-card">
+                    <div class="adm-access-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div>
+                        <h3>Acceso concedido</h3>
+                        <p>Tu usuario ha sido verificado correctamente contra la base de datos de staff (<code>/api/staff</code>) y consta como Activo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- HERRAMIENTAS DEL PANEL: cada tarjeta lleva a su página de gestión -->
+            <!-- ==================================================== -->
+            <div class="adm-tools-grid">
+                <a href="/admin/novedades.html" class="nv-admin-link animate-fade-up delay-1">
+                    <div class="nv-admin-icon"><i class="fa-solid fa-newspaper"></i></div>
+                    <div>
+                        <h3>Gestionar Novedades</h3>
+                        <p>Crea, edita o elimina las novedades que se muestran en la página de inicio.</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right nv-admin-arrow"></i>
+                </a>
+
+                <!-- Tarjeta: gestión de tickets (public/admin/tickets.html) -->
+                <a href="/admin/tickets.html" class="nv-admin-link is-tickets animate-fade-up delay-1">
+                    <div class="nv-admin-icon"><i class="fa-solid fa-ticket"></i></div>
+                    <div>
+                        <h3>Tickets <span class="adm-link-badge" id="tkSummaryBadge" hidden></span></h3>
+                        <p>Consulta y gestiona los tickets abiertos por los usuarios desde la página de tickets.</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right nv-admin-arrow"></i>
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts de interactividad (Sidebar, sesión de Discord y panel) -->
+    <script>
+        // Inicialización y Validación Principal.
+        // El único criterio de acceso es checkUserPermissions() (definido en
+        // /src/views/permissions.js), que valida contra /api/staff por
+        // discordId y exige status "Activo". Ya no se depende de claves de
+        // localStorage como 'staff_data' que nunca se rellenaban de verdad.
+        document.addEventListener('DOMContentLoaded', async () => {
+            const hasAccess = await checkUserPermissions();
+
+            if (!hasAccess) {
+                // Ocultar la aplicación principal y mostrar el panel denegado 3D
+                const appContainer = document.querySelector('.app-container');
+                if (appContainer) appContainer.style.display = 'none';
+
+                const deniedContainer = document.getElementById('accessDeniedContainer');
+                if (deniedContainer) {
+                    deniedContainer.style.display = 'flex';
+
+                    // Iniciar efecto interactivo de inclinación en la tarjeta.
+                    // Solo con ratón y si el usuario no ha pedido reducir el movimiento.
+                    const deniedCard = document.getElementById('deniedCard3D');
+                    const conRaton = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+                    const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    if (deniedCard && conRaton && !menosMovimiento) {
+                        // Inclinación máxima en grados, para que el texto siga siendo legible
+                        const MAX_TILT = 9;
+                        const limitar = v => Math.max(-MAX_TILT, Math.min(MAX_TILT, v));
+                        document.addEventListener('mousemove', (e) => {
+                            const rect = deniedCard.getBoundingClientRect();
+                            const x = e.clientX - rect.left - rect.width / 2;
+                            const y = e.clientY - rect.top - rect.height / 2;
+                            const rotateX = limitar(-y / 18);
+                            const rotateY = limitar(x / 18);
+                            deniedCard.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                        });
+                        document.documentElement.addEventListener('mouseleave', () => {
+                            deniedCard.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                        });
+                    }
+                }
+                return; // Detener la ejecución del resto del código si se deniega el acceso
+            }
+
+            // Si pasa la validación, cargar interfaz normal
+            loadDiscordSessionData();
+            initSidebar();
+            loadTicketsSummary();
+        });
+
+        // Cargar datos de la sesión de Discord guardada en localStorage
+        async function loadDiscordSessionData() {
+            const storedUser = localStorage.getItem('discord_user');
+            const avatarContainer = document.getElementById('userAvatarContainer');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userHandleDisplay = document.getElementById('userHandleDisplay');
+
+            if (!storedUser) return;
+
+            try {
+                const discordUser = JSON.parse(storedUser);
+                if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+                if (userHandleDisplay) userHandleDisplay.textContent = `@${discordUser.username || "discord"}`;
+                if (avatarContainer && discordUser.avatarUrl) {
+                    avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                }
+            } catch (e) {
+                console.error("Error al cargar la sesión de Discord", e);
+            }
+        }
+
+        // Control del menú lateral (Colapsar y Expandir)
+        function initSidebar() {
+            const toggleBtn = document.getElementById('sidebarToggleBtn');
+            const revealBtn = document.getElementById('sidebarRevealBtn');
+            const sidebar = document.getElementById('sidebar');
+
+            if (toggleBtn && revealBtn && sidebar) {
+                toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+                revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+            }
+        }
+
+        // Resumen para la tarjeta de Tickets: cuántos siguen activos.
+        // La gestión completa está en /admin/tickets.html.
+        async function loadTicketsSummary() {
+            const badge = document.getElementById('tkSummaryBadge');
+            if (!badge) return;
+            try {
+                const response = await fetch('/api/tickets');
+                if (!response.ok) return;
+                const list = await response.json();
+                if (!Array.isArray(list)) return;
+                const activos = list.filter(t => {
+                    const s = String(t.estado || t.status || 'Activo').toLowerCase().trim();
+                    return !(s === 'inactivo' || s === 'cerrado' || s === 'closed');
+                }).length;
+                badge.textContent = `${activos} activo${activos === 1 ? '' : 's'}`;
+                badge.hidden = false;
+            } catch (e) {
+                console.error("Error al cargar el resumen de tickets:", e);
+            }
+        }
+    </script>
+
+    <!-- Scripts del Panel de Control y Permisos Originales -->
+    <script src="/src/views/permissions.js"></script>
+    <script src="/src/components/staff-panel.js"></script>
+</body>
+</html>

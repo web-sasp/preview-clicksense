@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comercios | ClickSenseRP</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/src/assets/perfil.css">
+
+    <style>
+        /* Animaciones globales fluidas */
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.97);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Notificación flotante centrada arriba */
+        .floating-toast-container {
+            position: fixed;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--accent-pink, #db2777);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(219, 39, 119, 0.2);
+            padding: 15px 28px;
+            border-radius: 14px;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .floating-toast-container.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .floating-toast-container i {
+            color: #db2777;
+            font-size: 16px;
+        }
+
+        /* Botón de la campanita de notificaciones */
+        .notif-bell-btn {
+            background: rgba(13, 18, 29, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted, #94a3b8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .notif-bell-btn:hover {
+            background: rgba(25, 32, 48, 0.95);
+            border-color: rgba(219, 39, 119, 0.5);
+            color: #db2777;
+            transform: scale(1.05);
+        }
+
+        .notif-bell-btn.active {
+            background: rgba(219, 39, 119, 0.15);
+            border-color: rgba(219, 39, 119, 0.4);
+            color: #db2777;
+        }
+
+        /* Estilo de tarjeta principal */
+        .comercios-hero-card {
+            position: relative;
+            background: rgba(20, 16, 30, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(219, 39, 119, 0.25);
+            border-radius: 16px;
+            padding: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .comercios-hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, #db2777, #8b5cf6);
+        }
+
+        /* Grid de comercios moderno */
+        .comercios-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 1200px) {
+            .comercios-grid-modern {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .comercios-grid-modern {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comercio-card {
+            background: rgba(20, 16, 30, 0.75);
+            border: 1px solid rgba(219, 39, 119, 0.25);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+        }
+        .comercio-card:hover {
+            border-color: rgba(219, 39, 119, 0.6);
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 16px 35px 5px rgba(219, 39, 119, 0.2);
+        }
+
+        .comercio-info p {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-muted, #94a3b8);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        .search-filter-box {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(219, 39, 119, 0.25);
+            border-radius: 10px;
+            padding: 8px 14px;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        .search-filter-box:focus-within {
+            border-color: #db2777;
+            box-shadow: 0 0 15px rgba(219, 39, 119, 0.45);
+            background: rgba(20, 16, 30, 0.85);
+        }
+
+        .btn-obtener-negocio {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+            margin-top: 10px;
+        }
+        .btn-obtener-negocio:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .filter-dropdown-container {
+            position: relative;
+            user-select: none;
+        }
+        .filter-dropdown-btn {
+            background: rgba(20, 16, 30, 0.9);
+            border: 1px solid rgba(219, 39, 119, 0.25);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+        .filter-dropdown-btn:hover {
+            border-color: var(--accent-pink, #db2777);
+            background: rgba(219, 39, 119, 0.1);
+        }
+        .filter-dropdown-options {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(20, 16, 30, 0.95);
+            border: 1px solid rgba(219, 39, 119, 0.4);
+            border-radius: 12px;
+            margin-top: 6px;
+            display: none;
+            z-index: 50;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 20px rgba(219, 39, 119, 0.15);
+            min-width: 180px;
+            overflow: hidden;
+            padding: 6px;
+            backdrop-filter: blur(12px);
+        }
+        .filter-dropdown-options.open {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            animation: dropdownFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .filter-dropdown-option {
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+        .filter-dropdown-option:hover {
+            background: rgba(219, 39, 119, 0.2);
+            transform: translateX(3px);
+        }
+
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 3, 10, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .custom-modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+        .custom-modal-card-wide {
+            background: rgba(20, 16, 30, 0.95);
+            border: 1px solid rgba(219, 39, 119, 0.4);
+            border-radius: 18px;
+            padding: 28px;
+            max-width: 1000px;
+            width: 100%;
+            box-shadow: 0 25px 65px rgba(0,0,0,0.85);
+            color: #fff;
+            max-height: 90vh;
+            overflow-y: auto;
+            backdrop-filter: blur(12px);
+            transform: scale(0.85) translateY(25px);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            opacity: 0;
+        }
+        .custom-modal-overlay.open .custom-modal-card-wide {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+        .modal-top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(219, 39, 119, 0.3);
+            padding-bottom: 14px;
+        }
+        .modal-business-main-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .modal-close-btn {
+            background: rgba(219, 39, 119, 0.1);
+            border: 1px solid rgba(219, 39, 119, 0.3);
+            color: #f472b6;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        .modal-close-btn:hover {
+            background: rgba(219, 39, 119, 0.25);
+            border-color: var(--accent-pink, #db2777);
+            color: #fff;
+            transform: rotate(90deg) scale(1.1);
+        }
+        .modal-form-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 900px) {
+            .modal-form-grid { grid-template-columns: 1fr; }
+        }
+        .modal-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .modal-input-group label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted, #94a3b8);
+            letter-spacing: 0.5px;
+        }
+        .modal-readonly-field {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(219, 39, 119, 0.25);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            word-break: break-word;
+        }
+
+        /* ===== Botón de Soporte en la barra superior ===== */
+        /* Estilos de reserva: van dentro de :where() (prioridad cero), así que si perfil.css
+           ya da estilo a estas clases mandan los suyos y el botón se ve igual que en Home. */
+        :where(.top-action-bar) { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        :where(.top-buttons) { display: flex; align-items: center; gap: 10px; }
+        :where(.top-btn) {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+        :where(.top-btn.highlight-btn) {
+            background: rgba(168, 85, 247, 0.14);
+            border-color: rgba(168, 85, 247, 0.45);
+            color: #fff;
+        }
+        :where(.top-btn.highlight-btn:hover) {
+            border-color: #a855f7;
+            box-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
+        }
+
+        /* ===== Menú desplegable de Soporte (igual que en Home y Equipo) ===== */
+        .support-dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+        .support-dropdown-menu {
+            position: fixed;
+            width: 250px;
+            background: #13141f;
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            border-radius: 14px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(168, 85, 247, 0.4);
+            display: flex;
+            flex-direction: column;
+            z-index: 2147483647;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 6px 0;
+        }
+        .support-dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .support-menu-section {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .support-menu-section:last-child {
+            border-bottom: none;
+        }
+        .support-menu-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            padding: 6px 16px 4px 16px;
+            letter-spacing: 0.5px;
+        }
+        .support-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            font-size: 13px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+            font-weight: 500;
+        }
+        .support-dropdown-item:hover {
+            background: rgba(168, 85, 247, 0.2);
+            color: #fff;
+        }
+        .support-dropdown-item i {
+            color: #a855f7;
+            width: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-background"></div>
+
+    <!-- Notificación flotante centrada arriba -->
+    <div class="floating-toast-container" id="floatingToast">
+        <i class="fa-solid fa-bell" id="toastIcon"></i>
+        <span id="toastMessage">Mensaje de notificación</span>
+    </div>
+
+    <!-- Modal de Detalles -->
+    <div class="custom-modal-overlay" id="detailModal">
+        <div class="custom-modal-card-wide">
+            <div class="modal-top-header">
+                <span class="modal-business-main-title" id="modalBusinessTitleDisplay">Nombre del negocio</span>
+                <button type="button" class="modal-close-btn" onclick="closeDetailModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="modalBusinessContent"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+
+        <!-- Menú Lateral (Sidebar inyectado por guards.js) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+                    <span class="server-main-title">ClickSense</span>
+                </div>
+                <button class="sidebar-toggle-icon" id="sidebarToggleBtn" title="Colapsar menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- El menú se completa automáticamente mediante guards.js -->
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-mini" id="userProfileMini">
+                    <div class="avatar-placeholder" id="userAvatarContainer">
+                        <span id="userAvatarFallback">?</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">Usuario</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@tag</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Botón flotante para mostrar menú colapsado -->
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <div class="top-action-bar animate-fade-down">
+                <div class="breadcrumb">Comercios y Negocios</div>
+                <div class="top-buttons">
+                    <!-- Botón de Soporte -->
+                    <div class="support-dropdown-container" id="supportDropdownContainer">
+                        <button class="top-btn highlight-btn" id="supportDropdownBtn">
+                            <i class="fa-solid fa-circle-question"></i> Soporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menú desplegable de Soporte (al abrirse se mueve al body para quedar por encima de todo) -->
+            <div class="support-dropdown-menu" id="supportDropdownMenu">
+                <!-- Sección Soporte -->
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Soporte</div>
+                    <a href="/tickets.html" class="support-dropdown-item"><i class="fa-solid fa-ticket"></i> Crear un ticket</a>
+                </div>
+                <!-- Sección Apoyo -->
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Apoyo</div>
+                    <a href="/sugerencias.html" class="support-dropdown-item"><i class="fa-solid fa-lightbulb"></i> Enviar una sugerencia</a>
+                    <a href="/feedback.html" class="support-dropdown-item"><i class="fa-solid fa-comment-dots"></i> Dar tu feedback</a>
+                    <a href="/perfil.html" class="support-dropdown-item"><i class="fa-solid fa-user"></i> Acceder al perfil</a>
+                    <a href="/index.html" class="support-dropdown-item"><i class="fa-solid fa-house-chimney"></i> Acceder al panel principal</a>
+                </div>
+                <!-- Sección Información -->
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Información</div>
+                    <a href="/normativa.html" class="support-dropdown-item"><i class="fa-solid fa-book"></i> Normativa general</a>
+                    <a href="/pol-privacidad.html" class="support-dropdown-item"><i class="fa-solid fa-shield-halved"></i> Política de privacidad</a>
+                    <a href="/terminos.html" class="support-dropdown-item"><i class="fa-solid fa-file-contract"></i> Términos y condiciones</a>
+                </div>
+            </div>
+
+            <div class="profile-dashboard-layout" style="display: block;">
+
+                <!-- Cabecera de la sección -->
+                <div class="comercios-hero-card animate-fade-down delay-1">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--accent-pink, #db2777); letter-spacing: 1px; text-transform: uppercase;">
+                                <i class="fa-solid fa-store"></i> DIRECTORIO CLICKSENSE RP
+                            </span>
+                        </div>
+                        <h1 style="margin: 0 0 4px 0; font-size: 1.8rem; font-weight: 800; color: #fff;">Comercios</h1>
+                        <p style="color: var(--text-muted, #94a3b8); margin: 0; font-size: 0.95rem;">Consulta los negocios oficiales, tiendas autorizadas y estado de licencias en ClickSense RP</p>
+                    </div>
+                </div>
+
+                <!-- Apartado: Negocios activos -->
+                <div class="section-block animate-fade-up delay-2">
+                    <div class="section-header-flex" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <h2 class="section-title" style="font-size: 1.25rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; margin: 0;">
+                            <i class="fa-solid fa-shop" style="color: var(--accent-pink, #db2777);"></i> Negocios activos
+                            <!-- Botón de campanita para notificaciones por Discord DM -->
+                            <button class="notif-bell-btn" id="bellNotifBtn" title="Gestionar notificaciones de comercios" onclick="toggleComerciosNotification()" style="margin-left: 10px;">
+                                <i class="fa-solid fa-bell"></i>
+                            </button>
+                        </h2>
+                        
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <!-- Buscador con efecto de brillo rosado al enfocar -->
+                            <div class="search-filter-box">
+                                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted, #94a3b8);"></i>
+                                <input type="text" id="filterComercios" placeholder="Buscar comercio..." style="background: transparent; border: none; color: #fff; font-size: 13px; outline: none; width: 100%;" oninput="renderComerciosGrid()">
+                            </div>
+
+                            <div class="filter-dropdown-container">
+                                <button type="button" class="filter-dropdown-btn" onclick="toggleStatusDropdown(event)">
+                                    <i class="fa-solid fa-filter" style="color: var(--accent-pink, #db2777);"></i> <span id="currentStatusFilterLabel">Todos los estados</span> <i class="fa-solid fa-chevron-down" style="font-size: 10px;"></i>
+                                </button>
+                                <div class="filter-dropdown-options" id="statusFilterOptions">
+                                    <div class="filter-dropdown-option" onclick="applyStatusFilter('Todos', 'Todos los estados')">
+                                        <i class="fa-solid fa-store" style="color: #f472b6;"></i> Todos los estados
+                                    </div>
+                                    <div class="filter-dropdown-option" onclick="applyStatusFilter('Disponible', '<i class=\'fa-solid fa-circle-check\' style=\'color: #22c55e;\'></i> Disponible')">
+                                        <i class="fa-solid fa-circle-check" style="color: #22c55e;"></i> Disponible
+                                    </div>
+                                    <div class="filter-dropdown-option" onclick="applyStatusFilter('Adquirido', '<i class=\'fa-solid fa-circle-dot\' style=\'color: #3b82f6;\'></i> Adquirido')">
+                                        <i class="fa-solid fa-circle-dot" style="color: #3b82f6;"></i> Adquirido
+                                    </div>
+                                    <div class="filter-dropdown-option" onclick="applyStatusFilter('No disponible', '<i class=\'fa-solid fa-circle-xmark\' style=\'color: #ef4444;\'></i> No disponible')">
+                                        <i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> No disponible
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="comercios-grid-modern" id="comerciosList"></div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        let selectedStatusFilter = 'Todos';
+        let cachedAllComercios = [];
+        let modalActiveImages = [];
+        let modalActiveImgIndex = 0;
+
+        // Lógica de notificaciones por campanita y envío de DM de Discord
+        let isSubscribedToComercios = localStorage.getItem('comercios_comunicados_sub') === 'true';
+
+        function updateBellUI() {
+            const bellBtn = document.getElementById('bellNotifBtn');
+            if (!bellBtn) return;
+            if (isSubscribedToComercios) {
+                bellBtn.classList.add('active');
+                bellBtn.title = "Desvincularte de las notificaciones de comercios";
+            } else {
+                bellBtn.classList.remove('active');
+                bellBtn.title = "Recibir notificaciones de comercios";
+            }
+        }
+
+        let toastTimeout = null;
+
+        function showTopToast(message, isSubscribing) {
+            const toast = document.getElementById('floatingToast');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+            if (!toast || !toastMsg || !toastIcon) return;
+
+            toastMsg.textContent = message;
+            toastIcon.className = isSubscribing ? "fa-solid fa-bell" : "fa-solid fa-bell-slash";
+            
+            toast.classList.add('show');
+            
+            if (toastTimeout) clearTimeout(toastTimeout);
+            
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5500);
+        }
+
+        async function toggleComerciosNotification() {
+            isSubscribedToComercios = !isSubscribedToComercios;
+            localStorage.setItem('comercios_comunicados_sub', isSubscribedToComercios);
+            updateBellUI();
+
+            const storedUser = localStorage.getItem('discord_user');
+            let discordId = null;
+            if (storedUser) {
+                try {
+                    const u = JSON.parse(storedUser);
+                    discordId = u.id || u.discord_id;
+                } catch(e) {}
+            }
+
+            if (isSubscribedToComercios) {
+                showTopToast("Has activado las notificaciones. Se ha enviado un mensaje privado (DM) a tu cuenta de Discord.", true);
+
+                if (discordId) {
+                    try {
+                        await fetch('/api/notificar', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                discord_id: discordId,
+                                tipo: "default",
+                                titulo: "🔔 ClickSense RP - Notificaciones Activas",
+                                descripcion: "Has activado correctamente las notificaciones para **Comercios y Negocios**. Recibirás avisos ante cualquier actualización oficial.",
+                                campos: [
+                                    {
+                                        name: "🔗 Panel de Gestión",
+                                        value: "[Haz clic aquí para volver a Comercios](http://localhost:8000/comercios.html)",
+                                        inline: false
+                                    },
+                                    {
+                                        name: "\u200b",
+                                        value: "*Este es un mensaje automático del sistema de ClickSense RP.*",
+                                        inline: false
+                                    }
+                                ]
+                            })
+                        });
+                    } catch (err) {
+                        console.error("Error al enviar notificación DM por Discord:", err);
+                    }
+                }
+            } else {
+                showTopToast("Te has desvinculado de las notificaciones de comercios.", false);
+            }
+        }
+
+        // Dropdown de filtros
+        function toggleStatusDropdown(e) {
+            e.stopPropagation();
+            // Si el menú de Soporte está abierto, se cierra al abrir el filtro
+            document.getElementById('supportDropdownMenu')?.classList.remove('show');
+            const opts = document.getElementById('statusFilterOptions');
+            opts.classList.toggle('open');
+        }
+
+        window.addEventListener('click', () => {
+            const opts = document.getElementById('statusFilterOptions');
+            if (opts) opts.classList.remove('open');
+        });
+
+        function applyStatusFilter(statusVal, labelHtml) {
+            selectedStatusFilter = statusVal;
+            document.getElementById('currentStatusFilterLabel').innerHTML = labelHtml;
+            document.getElementById('statusFilterOptions').classList.remove('open');
+            renderComerciosGrid();
+        }
+
+        function renderComerciosGrid() {
+            const container = document.getElementById('comerciosList');
+            if (!container) return;
+
+            let allComercios = [];
+            const storedData = localStorage.getItem('registered_businesses_db');
+            if (storedData) {
+                try {
+                    const dynamicItems = JSON.parse(storedData);
+                    dynamicItems.forEach(item => {
+                        let stText = "Disponible";
+                        let stClass = "status-disponible";
+                        if (item.estado === "adquirido") { stText = "Adquirido"; stClass = "status-adquirido"; }
+                        else if (item.estado === "no-disponible") { stText = "No disponible"; stClass = "status-no-disponible"; }
+
+                        let imgUrl = item.imagenesData && item.imagenesData.length > 0 ? item.imagenesData[0] : "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=400&auto=format&fit=crop";
+
+                        allComercios.unshift({
+                            nombre: item.nombre,
+                            tipo: item.tipo,
+                            badgeClass: item.tipo.toLowerCase(),
+                            imagen: imgUrl,
+                            historia: item.historia,
+                            ubicacion: item.ubicacion,
+                            horario: item.horario,
+                            precio: item.precio,
+                            fundado: item.fundado,
+                            etiquetas: item.etiquetas || [],
+                            estado: item.estado,
+                            estadoText: stText,
+                            statusClass: stClass,
+                            imagenesData: item.imagenesData || [imgUrl]
+                        });
+                    });
+                } catch(e) {
+                    console.error("Error al cargar localStorage", e);
+                }
+            }
+
+            cachedAllComercios = allComercios;
+            const searchVal = document.getElementById('filterComercios') ? document.getElementById('filterComercios').value.toLowerCase().trim() : '';
+
+            let filtered = cachedAllComercios.filter(c => {
+                const matchesSearch = c.nombre.toLowerCase().includes(searchVal) || c.historia.toLowerCase().includes(searchVal) || c.tipo.toLowerCase().includes(searchVal);
+                const matchesStatus = (selectedStatusFilter === 'Todos' || c.estadoText.toLowerCase() === selectedStatusFilter.toLowerCase());
+                return matchesSearch && matchesStatus;
+            });
+
+            if (selectedStatusFilter === 'Todos') {
+                filtered.sort((a, b) => {
+                    const aIsDisp = (a.estadoText.toLowerCase() === 'disponible');
+                    const bIsDisp = (b.estadoText.toLowerCase() === 'disponible');
+                    if (aIsDisp && !bIsDisp) return -1;
+                    if (!aIsDisp && bIsDisp) return 1;
+                    return 0;
+                });
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; padding: 50px; text-align: center; background: rgba(20, 16, 30, 0.75); border: 1px dashed rgba(219, 39, 119, 0.3); border-radius: 16px; color: rgba(255,255,255,0.4);">
+                        <i class="fa-solid fa-store-slash" style="font-size: 32px; margin-bottom: 10px; display: block; color: var(--accent-pink, #db2777);"></i>
+                        No se ha encontrado ningún comercio registrado con los filtros seleccionados.
+                    </div>
+                `;
+                return;
+            }
+
+            let html = "";
+            filtered.forEach((c, idx) => {
+                const globalIndex = cachedAllComercios.indexOf(c);
+                const isAvailable = (c.estadoText.toLowerCase() === 'disponible');
+
+                let badgeStatusStyle = 'background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4);';
+                if (c.estadoText === 'Adquirido') badgeStatusStyle = 'background: rgba(59, 130, 246, 0.25); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4);';
+                if (c.estadoText === 'No disponible') badgeStatusStyle = 'background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4);';
+
+                html += `
+                    <div class="comercio-card" onclick="openBusinessModal(${globalIndex})">
+                        <div style="height: 160px; position: relative; background-size: cover; background-position: center; background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url('${c.imagen}'); display: flex; align-items: flex-end; justify-content: space-between; padding: 15px;">
+                            <h3 style="position: relative; z-index: 2; font-size: 18px; font-weight: 800; color: #fff; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">${c.nombre}</h3>
+                            <span style="position: relative; z-index: 2; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; backdrop-filter: blur(4px); ${badgeStatusStyle}">${c.estadoText}</span>
+                        </div>
+                        <div style="padding: 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; justify-content: space-between;">
+                            <div>
+                                <span style="background: rgba(219, 39, 119, 0.15); color: #f472b6; border: 1px solid rgba(219, 39, 119, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 8px;">${c.tipo}</span>
+                                <p>${c.historia}</p>
+                            </div>
+                            <div>
+                                ${isAvailable ? `
+                                    <a href="/tickets.html" class="btn-obtener-negocio" onclick="event.stopPropagation();">
+                                        <i class="fa-solid fa-store"></i> Obtener negocio
+                                    </a>
+                                ` : ''}
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted, #94a3b8); border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; margin-top: 8px;">
+                                    <span><i class="fa-solid fa-location-dot" style="color: var(--accent-pink, #db2777);"></i> ${c.ubicacion}</span>
+                                    <span>Fundado: <strong>${c.fundado}</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function openBusinessModal(index) {
+            const item = cachedAllComercios[index];
+            if (!item) return;
+            document.getElementById('modalBusinessTitleDisplay').textContent = item.nombre;
+            modalActiveImages = item.imagenesData && item.imagenesData.length > 0 ? item.imagenesData : [item.imagen];
+            modalActiveImgIndex = 0;
+            renderModalBody(item);
+            document.getElementById('detailModal').classList.add('open');
+        }
+
+        function renderModalBody(item) {
+            const content = document.getElementById('modalBusinessContent');
+            
+            let statusText = "Disponible";
+            let statusColor = "#22c55e";
+            if (item.estado === 'adquirido' || item.estadoText === 'Adquirido') { statusText = "Adquirido"; statusColor = "#3b82f6"; }
+            else if (item.estado === 'no-disponible' || item.estadoText === 'No disponible') { statusText = "No disponible"; statusColor = "#ef4444"; }
+
+            let imageBoxInner = '';
+            if (modalActiveImages.length > 0) {
+                const currentImg = modalActiveImages[modalActiveImgIndex];
+                const showBtns = modalActiveImages.length > 1;
+                imageBoxInner = `
+                    <div style="position: relative; width: 100%; height: 260px; background: #000; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <img src="${currentImg}" alt="Negocio" style="width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease;">
+                        ${showBtns ? `
+                            <button type="button" onclick="prevModalImg()" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.3); color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-chevron-left" style="font-size: 11px;"></i></button>
+                            <button type="button" onclick="nextModalImg()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.3); color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-chevron-right" style="font-size: 11px;"></i></button>
+                            <div style="position: absolute; bottom: 8px; right: 10px; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #fff;">${modalActiveImgIndex + 1} /${modalActiveImages.length}</div>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                imageBoxInner = `
+                    <div style="width: 100%; height: 260px; background: rgba(0,0,0,0.4); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: rgba(255,255,255,0.4);">
+                        <i class="fa-solid fa-image" style="font-size: 32px;"></i>
+                        <span style="font-size: 12px;">Sin imágenes adjuntas</span>
+                    </div>
+                `;
+            }
+
+            let tagsHtml = item.etiquetas ? item.etiquetas.map(t => `<span style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--text-muted, #94a3b8); word-break: break-word;">${t}</span>`).join('') : '<span style="color: var(--text-muted, #94a3b8); font-size: 12px;">Sin etiquetas</span>';
+
+            let horarioBlock = item.horario && item.horario.toLowerCase() !== 'oculto' && item.horario.trim() !== '' ? `
+                <div class="modal-input-group">
+                    <label>HORARIO</label>
+                    <div class="modal-readonly-field">${item.horario}</div>
+                </div>
+            ` : '';
+
+            let precioBlock = item.precio && item.precio.toLowerCase() !== 'oculto' && item.precio.trim() !== '' ? `
+                <div class="modal-input-group">
+                    <label>RANGO DE PRECIOS</label>
+                    <div class="modal-readonly-field">${item.precio}</div>
+                </div>
+            ` : '';
+
+            content.innerHTML = `
+                <div class="modal-form-grid">
+                    <div>
+                        <div class="modal-input-group" style="border: 1px dashed rgba(219, 39, 119, 0.3); border-radius: 14px; padding: 12px; background: rgba(20, 16, 30, 0.5);">
+                            ${imageBoxInner}
+                        </div>
+                        <div class="modal-input-group" style="margin-top: 14px; border: 1px solid rgba(219, 39, 119, 0.25); border-radius: 12px; padding: 14px; background: rgba(20, 16, 30, 0.9);">
+                            <label style="margin-bottom: 8px; display: block;"><i class="fa-solid fa-book-open" style="color: var(--accent-pink, #db2777); margin-right: 6px;"></i> Historia del comercio</label>
+                            <div style="max-height: 140px; overflow-y: auto; line-height: 1.6; word-break: break-all; white-space: pre-wrap; font-size: 13px; color: var(--text-muted, #94a3b8); padding-right: 4px;">${item.historia}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <div class="modal-input-group">
+                            <label>ESTADO</label>
+                            <div class="modal-readonly-field" style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-circle" style="color: ${statusColor}; font-size: 10px;"></i> <strong>${statusText}</strong>
+                            </div>
+                        </div>
+                        <div class="modal-input-group">
+                            <label>TIPO DE COMERCIO</label>
+                            <div class="modal-readonly-field"><strong>${item.tipo}</strong></div>
+                        </div>
+                        <div class="modal-input-group">
+                            <label>UBICACIÓN</label>
+                            <div class="modal-readonly-field">${item.ubicacion}</div>
+                        </div>
+                        ${horarioBlock}
+                        ${precioBlock}
+                        <div class="modal-input-group">
+                            <label>FUNDADO EN</label>
+                            <div class="modal-readonly-field">${item.fundado}</div>
+                        </div>
+                        <div class="modal-input-group">
+                            <label>ETIQUETAS</label>
+                            <div class="modal-readonly-field" style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+                                ${tagsHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function prevModalImg() {
+            if (modalActiveImages.length <= 1) return;
+            modalActiveImgIndex = (modalActiveImgIndex - 1 + modalActiveImages.length) % modalActiveImages.length;
+            const name = document.getElementById('modalBusinessTitleDisplay').textContent;
+            const item = cachedAllComercios.find(b => b.nombre === name);
+            if (item) renderModalBody(item);
+        }
+
+        function nextModalImg() {
+            if (modalActiveImages.length <= 1) return;
+            modalActiveImgIndex = (modalActiveImgIndex + 1) % modalActiveImages.length;
+            const name = document.getElementById('modalBusinessTitleDisplay').textContent;
+            const item = cachedAllComercios.find(b => b.nombre === name);
+            if (item) renderModalBody(item);
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('open');
+        }
+
+        // Cargar sesión de Discord
+        async function loadDiscordSessionData() {
+            const storedUser = localStorage.getItem('discord_user');
+            const avatarContainer = document.getElementById('userAvatarContainer');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userHandleDisplay = document.getElementById('userHandleDisplay');
+
+            if (!storedUser) return;
+
+            try {
+                const discordUser = JSON.parse(storedUser);
+                if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+                if (userHandleDisplay) userHandleDisplay.textContent = `@${discordUser.username || "discord"}`;
+                if (avatarContainer && discordUser.avatarUrl) {
+                    avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                }
+            } catch (e) {
+                console.error("Error al cargar la sesión", e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDiscordSessionData();
+            updateBellUI();
+            renderComerciosGrid();
+        });
+
+        // Control del menú lateral colapsable
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+        const revealBtn = document.getElementById('sidebarRevealBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        if (toggleBtn && revealBtn && sidebar) {
+            toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+            revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+        }
+
+        // Menú desplegable de Soporte: se coloca justo debajo del botón y se cierra al pulsar fuera
+        const supportBtn = document.getElementById('supportDropdownBtn');
+        const supportMenu = document.getElementById('supportDropdownMenu');
+
+        if (supportBtn && supportMenu) {
+            supportBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = supportMenu.classList.contains('show');
+
+                // Si el filtro de estados está abierto, se cierra al abrir Soporte
+                document.getElementById('statusFilterOptions')?.classList.remove('open');
+
+                if (!isOpen) {
+                    if (supportMenu.parentElement !== document.body) {
+                        document.body.appendChild(supportMenu);
+                    }
+                    const rect = supportBtn.getBoundingClientRect();
+                    supportMenu.style.top = (rect.bottom + 8) + 'px';
+                    supportMenu.style.right = (window.innerWidth - rect.right) + 'px';
+                    supportMenu.classList.add('show');
+                } else {
+                    supportMenu.classList.remove('show');
+                }
+            });
+
+            window.addEventListener('click', () => {
+                supportMenu.classList.remove('show');
+            });
+
+            window.addEventListener('resize', () => {
+                supportMenu.classList.remove('show');
+            });
+        }
+    </script>
+
+    <script src="/guards.js"></script>
+</body>
+</html>

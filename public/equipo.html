@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipo | ClickSense RP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lexend:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/src/assets/home.css">
+    <link rel="stylesheet" href="/src/assets/perfil.css">
+
+    <style>
+        html { background-color: #12101c; }
+body { color: #fff; margin: 0; padding: 0; overflow-x: clip; }
+
+/* Fondo: cuadrícula + resplandor morado suave */
+.grid-background {
+    position: fixed !important; inset: 0 !important; z-index: 0 !important; pointer-events: none;
+    background-color: #12101c;
+    background-image:
+        radial-gradient(900px 500px at 85% -10%, rgba(168, 85, 247, 0.18), transparent 70%),
+        radial-gradient(700px 450px at 0% 100%, rgba(236, 72, 153, 0.10), transparent 70%),
+        linear-gradient(to right, rgba(168, 85, 247, 0.07) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(168, 85, 247, 0.07) 1px, transparent 1px);
+    background-size: auto, auto, 40px 40px, 40px 40px;
+}
+.app-container { position: relative; z-index: 1; }
+
+/* Menú lateral: sin animación de entrada, el resto igual que en home */
+aside.sidebar, .sidebar { animation: none !important; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.35); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.6); }
+
+        .team-category-section { margin-bottom: 2.5rem; }
+        .category-title {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Lexend', sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: 1px;
+            margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            color: #ffffff !important; text-transform: uppercase;
+        }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; }
+
+        .staff-card {
+            background: rgba(20, 24, 33, 0.7); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px; padding: 1.75rem 1rem 1.25rem 1rem; text-align: center;
+            backdrop-filter: blur(10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); cursor: pointer;
+        }
+        .staff-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .staff-card:hover { transform: translateY(-5px); border-color: rgba(168,85,247,.4); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); background: rgba(25, 30, 42, 0.85); }
+        .staff-card:hover::before { opacity: 1; }
+        .staff-avatar-wrapper { position: relative; width: 80px; height: 80px; margin: 0 auto 1rem auto; }
+        .staff-avatar-wrapper img {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); transition: border-color 0.3s ease;
+        }
+        .staff-card:hover .staff-avatar-wrapper img { border-color: rgba(168, 85, 247, 0.6); }
+        .staff-name { font-size: 1.1rem; font-weight: 800; color: #ffffff; margin-bottom: 1rem; letter-spacing: 0.5px; text-transform: uppercase; }
+        .staff-social-links {
+            display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px;
+            margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.06); position: relative; z-index: 2;
+        }
+        .staff-social-link {
+            width: 32px; height: 32px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #94a3b8; font-size: 13px; transition: all 0.25s ease; text-decoration: none;
+        }
+        .staff-social-link:hover { background: rgba(255, 255, 255, 0.12); color: #ffffff; border-color: rgba(255, 255, 255, 0.25); transform: translateY(-2px); }
+        .no-staff {
+            text-align: center; padding: 3rem; color: #94a3b8; font-style: italic;
+            background: rgba(20, 24, 33, 0.4); border-radius: 12px; border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .equipo-hero-card {
+            position: relative !important;
+            background: linear-gradient(90deg, rgba(28, 16, 38, 0.85) 0%, rgba(15, 12, 22, 0.95) 100%) !important;
+            backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(139, 92, 246, 0.2) !important; border-radius: 16px !important;
+            padding: 28px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
+            margin-bottom: 24px !important; overflow: hidden !important;
+        }
+        .equipo-hero-card::before {
+            content: '' !important; position: absolute !important; top: 0 !important; left: 0 !important;
+            width: 5px !important; height: 100% !important; background: linear-gradient(to bottom, #ec4899, #8b5cf6) !important;
+        }
+
+        .support-dropdown-container { position: relative; display: inline-block; }
+        .support-dropdown-menu {
+            position: fixed; width: 250px; background: #13141f; border: 1px solid rgba(168, 85, 247, 0.5);
+            border-radius: 14px; box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(168, 85, 247, 0.4);
+            display: flex; flex-direction: column; z-index: 2147483647; overflow: hidden; opacity: 0;
+            transform: translateY(-10px) scale(0.95); pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); padding: 6px 0;
+        }
+        .support-dropdown-menu.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        .support-menu-section { padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+        .support-menu-section:last-child { border-bottom: none; }
+        .support-menu-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; padding: 6px 16px 4px 16px; letter-spacing: 0.5px; }
+        .support-dropdown-item {
+            display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: #cbd5e1;
+            text-decoration: none; transition: background 0.2s, color 0.2s; font-weight: 500;
+        }
+        .support-dropdown-item:hover { background: rgba(168, 85, 247, 0.2); color: #fff; }
+        .support-dropdown-item i { color: #a855f7; width: 16px; text-align: center; }
+
+        /* ===== Página de perfil ===== */
+        .breadcrumb a { color: #94a3b8; text-decoration: none; cursor: pointer; }
+        .breadcrumb a:hover { color: #fff; }
+        .breadcrumb .bc-sep { margin: 0 8px; opacity: .5; }
+
+        .pv { max-width: 1100px; margin: 0 auto; animation: pvIn .5s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes pvIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+        .pv-banner {
+    position: relative; height: 210px; border-radius: 18px; overflow: hidden;
+    background:
+        url('https://i.imgur.com/KNIw6K5.png') center / cover no-repeat,
+        linear-gradient(135deg, #5865f2, #a855f7 55%, #ec4899);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+        .pv-banner::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 20%, rgba(255,255,255,.18), transparent 55%); }
+        .pv-banner-title {
+            position: relative; z-index: 2; font-family: 'Lexend', sans-serif; font-size: 44px; font-weight: 700;
+            color: #fff; text-transform: uppercase; letter-spacing: 3px; text-align: center; padding: 0 20px;
+            text-shadow: 0 4px 18px rgba(0,0,0,.6);
+        }
+        .pv-back {
+            position: absolute; top: 14px; left: 14px; z-index: 3;
+            background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.18); color: #fff;
+            padding: 8px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 8px; transition: background .2s, transform .2s;
+        }
+        .pv-back:hover { background: rgba(0,0,0,.7); transform: translateX(-2px); }
+
+        .pv-grid { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; margin-top: 28px; align-items: start; }
+        @media (max-width: 900px) { .pv-grid { grid-template-columns: 1fr; } .pv-banner-title { font-size: 28px; } }
+
+        .pv-avatar { width: 160px; height: 160px; border-radius: 18px; object-fit: cover; border: 1px solid rgba(255,255,255,.12); box-shadow: 0 8px 26px rgba(0,0,0,.45); background: #13141f; display: block; }
+        .pv-name { margin: 18px 0 4px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .pv-id { margin: 0; color: #94a3b8; font-size: 14px; word-break: break-all; }
+        .pv-copy {
+            background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: #cbd5e1;
+            width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all .2s;
+        }
+        .pv-copy:hover { background: rgba(168,85,247,.25); border-color: #a855f7; color: #fff; }
+        .pv-label { margin: 24px 0 10px; font-size: 11.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #94a3b8; }
+        .pv-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+        .pv-pill {
+            display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px;
+            background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); font-size: 12.5px; font-weight: 600;
+        }
+        .pv-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .pv-info { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+        .pv-info li { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #e2e8f0; }
+        .pv-info li i { width: 16px; text-align: center; color: #94a3b8; }
+
+        .pv-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 560px) { .pv-stats { grid-template-columns: 1fr; } }
+        .pv-stat {
+            display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: 18px;
+            background: rgba(20,24,33,.7); border: 1px solid rgba(255,255,255,.08);
+        }
+        .pv-stat-ico { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .pv-stat small { display: block; color: #94a3b8; font-size: 13px; }
+        .pv-stat strong { display: block; font-size: 24px; font-weight: 800; margin-top: 2px; }
+
+        .pv-sections { margin-top: 18px; display: flex; flex-direction: column; }
+        .pv-sec { border-bottom: 1px solid rgba(255,255,255,.05); }
+        .pv-sec-head {
+            width: 100%; display: flex; align-items: center; gap: 12px; background: transparent; border: none;
+            color: #fff; padding: 18px 4px; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 16px; font-weight: 700; text-align: left;
+        }
+        .pv-sec-head > i:first-child { color: #94a3b8; width: 18px; text-align: center; }
+        .pv-sec-head span { flex: 1; }
+        .pv-chev { color: #94a3b8; transition: transform .35s cubic-bezier(.16,1,.3,1); }
+        .pv-sec.open .pv-chev { transform: rotate(180deg); }
+        .pv-sec-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s cubic-bezier(.16,1,.3,1); }
+        .pv-sec.open .pv-sec-body { grid-template-rows: 1fr; }
+        .pv-sec-inner { overflow: hidden; min-height: 0; }
+        .pv-sec-pad { padding: 0 4px 18px; }
+
+        .pv-empty { text-align: center; padding: 26px 16px; border: 1px dashed rgba(255,255,255,.14); border-radius: 14px; color: #94a3b8; font-size: 13.5px; }
+        .pv-empty b { display: block; color: #fff; margin-bottom: 6px; font-size: 14px; }
+        .pv-socials { display: flex; flex-wrap: wrap; gap: 10px; }
+        .pv-social {
+            display: inline-flex; align-items: center; gap: 9px; padding: 9px 16px; border-radius: 12px; text-decoration: none;
+            background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); color: #e2e8f0; font-size: 13.5px; font-weight: 600;
+            transition: transform .2s, border-color .2s, background .2s;
+        }
+        .pv-social:hover { transform: translateY(-2px); border-color: #a855f7; background: rgba(168,85,247,.1); }
+        .pv-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .pv-photo { display: block; aspect-ratio: 3 / 2; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); background: #13141f; }
+        .pv-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+        .pv-photo:hover img { transform: scale(1.07); }
+        .pv-sug { padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); margin-bottom: 10px; }
+        .pv-sug-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; word-break: break-word; }
+        .pv-sug-meta { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: #94a3b8; }
+        .pv-sug-meta .up { color: #34d399; margin-right: 10px; }
+        .pv-sug-meta .down { color: #f87171; }
+        .pv-more { text-align: center; font-size: 12.5px; color: #94a3b8; margin-top: 4px; }
+
+        /* Carga / privado / error: mensaje centrado */
+        .pv-center {
+            min-height: 62vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; gap: 14px; padding: 30px 20px; animation: pvIn .5s cubic-bezier(.16,1,.3,1) both;
+        }
+        .pv-center i.spin { font-size: 28px; color: #a855f7; }
+        .pv-lock {
+            width: 92px; height: 92px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 34px; color: #f87171; background: radial-gradient(circle, rgba(239,68,68,.22), rgba(239,68,68,.05));
+            border: 1px solid rgba(239,68,68,.35); box-shadow: 0 0 44px rgba(239,68,68,.2); animation: pvPulse 2.6s ease-in-out infinite;
+        }
+        .pv-lock.warn { color: #fbbf24; background: radial-gradient(circle, rgba(251,191,36,.2), rgba(251,191,36,.04)); border-color: rgba(251,191,36,.35); box-shadow: 0 0 44px rgba(251,191,36,.18); }
+        @keyframes pvPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+        .pv-center h3 { margin: 0; font-family: 'Lexend', sans-serif; font-size: 22px; }
+        .pv-center p { margin: 0; max-width: 360px; font-size: 14px; line-height: 1.6; color: #94a3b8; }
+        .pv-btn {
+            margin-top: 6px; background: transparent; border: 1px solid rgba(168,85,247,.55); color: #c084fc;
+            padding: 10px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s;
+        }
+        .pv-btn:hover { background: rgba(168,85,247,.15); color: #fff; box-shadow: 0 0 16px rgba(168,85,247,.35); }
+
+        .custom-toast-notification {
+            position: fixed; top: 25px; left: 50%; transform: translateX(-50%) translateY(-30px);
+            background: rgba(18, 16, 26, 0.95); border: 1px solid rgba(139, 92, 246, 0.6);
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.4); border-radius: 40px; padding: 12px 24px; color: #ffffff;
+            font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px;
+            z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(10px);
+        }
+        .custom-toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .toast-icon-wrapper {
+            width: 22px; height: 22px; background: #23a55a; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; color: #12101a; font-size: 11px; flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-background"></div>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+                    <span class="server-main-title">ClickSense</span>
+                </div>
+                <button class="sidebar-toggle-icon" id="sidebarToggleBtn" title="Colapsar menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-category">General</div>
+                <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> <span>Home</span></a>
+                <a href="/equipo.html" class="nav-item active"><i class="fa-solid fa-users"></i> <span>Equipo</span></a>
+                <a href="/calendario.html" class="nav-item"><i class="fa-solid fa-calendar-days"></i> <span>Calendario</span></a>
+                <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> <span>Comercios</span></a>
+                <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> <span>Postulaciones ilegales</span></a>
+
+                <div class="nav-category">Espacio de trabajo</div>
+                <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> <span>Grupos</span></a>
+                <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> <span>Documentos</span></a>
+                <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> <span>Whitelist</span></a>
+
+                <div class="nav-category">Mi Cuenta</div>
+                <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> <span>Mi Perfil</span></a>
+                <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> <span>Historias personaje</span></a>
+                <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> <span>Tickets</span></a>
+
+                <div class="nav-category">SASP</div>
+                <a href="/lspd-academia.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> <span>Academia LSPD</span></a>
+                <a href="/lssd-academia.html" class="nav-item"><i class="fa-solid fa-star-badge"></i> <span>Academia LSSD</span></a>
+                <a href="/defcon.html" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i> <span>Defcon</span></a>
+                <a href="/codigo-penal.html" class="nav-item"><i class="fa-solid fa-scale-balanced"></i> <span>Código penal</span></a>
+                <a href="/organigrama.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> <span>Organigrama</span></a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-mini" id="userProfileMini">
+                    <div class="avatar-placeholder" id="userAvatarContainer">
+                        <span id="userAvatarFallback">?</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">Usuario</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@tag</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <main class="main-content">
+            <header class="top-action-bar animate-fade-down">
+                <div class="breadcrumb" id="breadcrumbBar">Equipo</div>
+                <div class="top-buttons">
+                    <div class="support-dropdown-container" id="supportDropdownContainer">
+                        <button class="top-btn highlight-btn" id="supportDropdownBtn">
+                            <i class="fa-solid fa-circle-question"></i> Soporte
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="support-dropdown-menu" id="supportDropdownMenu">
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Soporte</div>
+                    <a href="/tickets.html" class="support-dropdown-item"><i class="fa-solid fa-ticket"></i> Crear un ticket</a>
+                </div>
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Apoyo</div>
+                    <a href="/sugerencias.html" class="support-dropdown-item"><i class="fa-solid fa-lightbulb"></i> Enviar una sugerencia</a>
+                    <a href="/feedback.html" class="support-dropdown-item"><i class="fa-solid fa-comment-dots"></i> Dar tu feedback</a>
+                    <a href="/perfil.html" class="support-dropdown-item"><i class="fa-solid fa-user"></i> Acceder al perfil</a>
+                    <a href="/index.html" class="support-dropdown-item"><i class="fa-solid fa-house-chimney"></i> Acceder al panel principal</a>
+                </div>
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Información</div>
+                    <a href="/normativa.html" class="support-dropdown-item"><i class="fa-solid fa-book"></i> Normativa general</a>
+                    <a href="/pol-privacidad.html" class="support-dropdown-item"><i class="fa-solid fa-shield-halved"></i> Política de privacidad</a>
+                    <a href="/terminos.html" class="support-dropdown-item"><i class="fa-solid fa-file-contract"></i> Términos y condiciones</a>
+                </div>
+            </div>
+
+            <!-- Listado del equipo -->
+            <div id="teamView">
+                <div class="equipo-hero-card animate-fade-up">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <span style="font-size: 0.75rem; font-weight: 700; color: #db2777; letter-spacing: 1px; text-transform: uppercase;">
+                            <i class="fa-solid fa-users"></i> EQUIPO CLICKSENSE RP
+                        </span>
+                    </div>
+                    <h1 style="margin: 0 0 4px 0; font-size: 1.8rem; font-weight: 800; color: #fff;">Equipo administrativo</h1>
+                    <p style="color: #94a3b8; margin: 0; font-size: 0.95rem;">Conoce a los miembros encargados de moderar y gestionar ClickSense RP</p>
+                </div>
+
+                <section class="section-block animate-fade-up delay-1">
+                    <div id="teamContainer"></div>
+                </section>
+            </div>
+
+            <!-- Página de perfil de un miembro -->
+            <div id="profileView" style="display: none;"></div>
+        </main>
+    </div>
+
+    <div id="topToastNotification" class="custom-toast-notification">
+        <div class="toast-icon-wrapper"><i class="fa-solid fa-check"></i></div>
+        <span id="toastMessageText">Información copiada con éxito al portapapeles</span>
+    </div>
+
+    <script>
+    async function handleDiscordCallback() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        if (code) {
+            try {
+                const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        client_id: '1541119489758859315',
+                        client_secret: 'JkByq1rJFvOeRRo3i6Jk0PDmEw2GeZVJ',
+                        grant_type: 'authorization_code',
+                        code: code,
+                        redirect_uri: 'http://localhost:3000/equipo.html',
+                    }),
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                });
+                const tokenData = await tokenResponse.json();
+
+                if (tokenData.access_token) {
+                    const userResponse = await fetch('https://discord.com/api/users/@me', {
+                        headers: { authorization: `Bearer ${tokenData.access_token}` }
+                    });
+                    const userData = await userResponse.json();
+
+                    const avatarUrl = userData.avatar 
+                        ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`
+                        : `https://cdn.discordapp.com/embed/avatars/${parseInt(userData.discriminator || 0) % 5}.png`;
+
+                    const discordUser = {
+                        id: userData.id,
+                        username: userData.username,
+                        displayName: userData.global_name || userData.username,
+                        discriminator: userData.discriminator || "0",
+                        avatarUrl: avatarUrl
+                    };
+
+                    localStorage.setItem('discord_user', JSON.stringify(discordUser));
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            } catch (error) {
+                console.error("Error al autenticar con la API de Discord:", error);
+            }
+        }
+    }
+
+    async function loadDiscordSessionData() {
+        await handleDiscordCallback();
+
+        const storedUser = localStorage.getItem('discord_user');
+        const avatarContainer = document.getElementById('userAvatarContainer');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userHandleDisplay = document.getElementById('userHandleDisplay');
+
+        if (!storedUser) {
+            if (userNameDisplay) userNameDisplay.textContent = "Usuario";
+            if (userHandleDisplay) userHandleDisplay.textContent = "@invitado";
+            return;
+        }
+
+        try {
+            const discordUser = JSON.parse(storedUser);
+            if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+            if (userHandleDisplay) userHandleDisplay.textContent = `@${discordUser.username || "discord"}`;
+            if (avatarContainer && discordUser.avatarUrl) {
+                avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            }
+        } catch (e) {
+            console.error("Error al cargar sesión en sidebar:", e);
+        }
+    }
+
+    function getDiscordCreationDate(discordId) {
+        if (!discordId || !/^\d+$/.test(discordId)) return "Desconocida";
+        try {
+            const DISCORD_EPOCH = 1420070400000n;
+            const snowflake = BigInt(discordId);
+            const timestamp = Number((snowflake >> 22n) + DISCORD_EPOCH);
+            return new Date(timestamp).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        } catch (e) {
+            return "Desconocida";
+        }
+    }
+
+    function copyToClipboard(textToCopy) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            showTopToast("Información copiada con éxito al portapapeles");
+        }).catch(err => console.error('Error al copiar al portapapeles: ', err));
+    }
+
+    function showTopToast(message) {
+        const toast = document.getElementById('topToastNotification');
+        const textSpan = document.getElementById('toastMessageText');
+        if (!toast || !textSpan) return;
+        textSpan.textContent = message;
+        toast.classList.add('show');
+        if (window._toastTimeout) clearTimeout(window._toastTimeout);
+        window._toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function getRankWeight(categoria, rango) {
+        if (!rango) return 99;
+        const r = String(rango).toLowerCase().trim();
+
+        if (categoria === "Administración" || categoria.toLowerCase().includes("moderación")) {
+            if (r.includes('game master') || r.includes('gm')) return 1;
+            if (r.includes('administrador') || r.includes('admin')) return 2;
+            if (r.includes('moderador') || r.includes('mod')) return 3;
+            if (r.includes('soporte')) return 4;
+            return 5;
+        } else if (categoria === "Dirección" || categoria.toLowerCase().includes("fundador")) {
+            if (r.includes('fundador') || r.includes('owner')) return 1;
+            if (r.includes('director')) return 2;
+            return 3;
+        } else if (categoria === "Desarrollo" || categoria.toLowerCase().includes("tecnologia")) {
+            if (r.includes('lead') || r.includes('head')) return 1;
+            if (r.includes('desarrollador') || r.includes('dev')) return 2;
+            return 3;
+        }
+        return 99;
+    }
+
+    // ===== Utilidades =====
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    const PF_BASE = {
+        instagram: { label: 'Instagram', base: 'https://instagram.com/', icon: 'fa-brands fa-instagram', color: '#e1306c' },
+        youtube:   { label: 'YouTube',   base: 'https://youtube.com/@',  icon: 'fa-brands fa-youtube',   color: '#ff0000' },
+        twitch:    { label: 'Twitch',    base: 'https://twitch.tv/',     icon: 'fa-brands fa-twitch',    color: '#9146ff' },
+        kick:      { label: 'Kick',      base: 'https://kick.com/',      icon: 'fa-solid fa-k',          color: '#53fc18' }
+    };
+
+    function safeSocialUrl(key, val) {
+        val = String(val || '').trim();
+        if (!val || !PF_BASE[key]) return '';
+        if (/^https?:\/\//i.test(val)) return val;
+        if (/^[a-z][a-z0-9+.-]*:/i.test(val)) return '';
+        const user = val.replace(/^@/, '').replace(/[^\w.\-]/g, '');
+        return user ? PF_BASE[key].base + user : '';
+    }
+
+    async function fetchJson(url) {
+        try {
+            const r = await fetch(url, { cache: 'no-store', credentials: 'same-origin' });
+            if (!r.ok) return { ok: false, status: r.status };
+            return { ok: true, data: await r.json() };
+        } catch (e) {
+            return { ok: false, status: 0 };
+        }
+    }
+
+    // ===== Datos del equipo =====
+    // El equipo sale de /api/staff, la misma base de datos donde guarda el panel
+    // "Gestión de Staff". Ya no se lee el localStorage ('staff_data'), que era de
+    // donde venían los staffs de ejemplo.
+    let globalStaffList = [];
+    let perfilesPublicos = {};
+    let staffCargado = false;
+    let staffError = false;
+    let ultimoStaffJson = '';
+
+    const esPerfilPropio = s => String((s && s.id) || '').startsWith('self-');
+
+    function aplicarStaff(lista) {
+        const limpia = (Array.isArray(lista) ? lista : []).filter(s => s && typeof s === 'object');
+        const json = JSON.stringify(limpia);
+        const sinCambios = staffCargado && json === ultimoStaffJson;
+
+        // Se conserva el perfil propio abierto por URL (?perfil=...) aunque no sea staff
+        const propios = globalStaffList.filter(esPerfilPropio)
+            .filter(p => !limpia.some(s => String(s.discordId || '').trim() === String(p.discordId)));
+
+        globalStaffList = limpia.concat(propios);
+        ultimoStaffJson = json;
+        staffCargado = true;
+        staffError = false;
+        if (!sinCambios) renderPublicTeam();
+    }
+
+    async function cargarStaff() {
+        const res = await fetchJson('/api/staff');
+        if (res.ok && Array.isArray(res.data)) {
+            aplicarStaff(res.data);
+        } else if (!staffCargado) {
+            staffError = true;
+            renderPublicTeam();
+        }
+    }
+
+    // Actualización en directo: cuando el panel de staff guarda (registrar, modificar,
+    // inactivar) avisa por este canal y el listado se repinta sin recargar la página.
+    try {
+        const adminSyncChannel = new BroadcastChannel('click_sense_admin_sync');
+        adminSyncChannel.onmessage = (event) => {
+            if (event.data && event.data.type === 'STAFF_DATA_UPDATED') aplicarStaff(event.data.payload);
+        };
+    } catch (e) { /* navegador sin BroadcastChannel: se actualiza al volver a la pestaña */ }
+
+    async function cargarPerfilesPublicos() {
+        const res = await fetchJson('/api/perfiles-publicos');
+        if (res.ok && res.data && typeof res.data === 'object' && !Array.isArray(res.data)) {
+            perfilesPublicos = res.data;
+            renderPublicTeam();
+        }
+    }
+
+    function avatarDe(member, loggedUser) {
+        const dId = String(member.discordId || "").trim();
+        let url = 'https://cdn.discordapp.com/embed/avatars/0.png';
+        if (loggedUser && loggedUser.id && dId && String(loggedUser.id) === dId && loggedUser.avatarUrl) {
+            url = loggedUser.avatarUrl;
+        } else if (dId && /^\d+$/.test(dId)) {
+            try { url = `https://cdn.discordapp.com/embed/avatars/${Number((BigInt(dId) >> 22n) % 6n)}.png`; } catch (err) {}
+        }
+        return url;
+    }
+
+    function renderPublicTeam() {
+        const container = document.getElementById('teamContainer');
+        if (!container) return;
+
+        if (!staffCargado) {
+            container.innerHTML = staffError
+                ? `<div class="no-staff">No se ha podido cargar el equipo. Vuelve a intentarlo en unos segundos.</div>`
+                : `<div class="no-staff"><i class="fa-solid fa-circle-notch fa-spin"></i> Cargando equipo...</div>`;
+            return;
+        }
+
+        const lista = globalStaffList.filter(s => !esPerfilPropio(s));
+
+        if (lista.length === 0) {
+            container.innerHTML = `<div class="no-staff">No hay miembros del staff registrados actualmente.</div>`;
+            return;
+        }
+
+        let loggedUser = null;
+        try { loggedUser = JSON.parse(localStorage.getItem('discord_user') || 'null'); } catch (e) {}
+
+        const categories = {
+            "Dirección": { displayTitle: "DIRECCIÓN", members: [] },
+            "Desarrollo": { displayTitle: "DESARROLLO", members: [] },
+            "Administración": { displayTitle: "ADMINISTRACIÓN", members: [] }
+        };
+
+        lista.forEach(s => {
+            const status = s.status ? String(s.status).toLowerCase().trim() : 'activo';
+            if (status === 'inactivo' || status === 'inactive' || status === '0' || status === 'false') return;
+
+            let categoria = String(s.categoria || "Administración");
+            if (categoria === "Dirección y Fundadores") categoria = "Dirección";
+            if (categoria === "Desarrollo & Tecnologia") categoria = "Desarrollo";
+            if (categoria === "Moderación y Soporte") categoria = "Administración";
+
+            if (!categories[categoria]) categories[categoria] = { displayTitle: categoria.toUpperCase(), members: [] };
+            categories[categoria].members.push(s);
+        });
+
+        let htmlContent = '';
+        let totalRendered = 0;
+
+        for (const [catName, catData] of Object.entries(categories)) {
+            if (catData.members.length === 0) continue;
+
+            catData.members.sort((a, b) => {
+                const wA = getRankWeight(catName, a.rango), wB = getRankWeight(catName, b.rango);
+                if (wA !== wB) return wA - wB;
+                return String(a.usuario || '').localeCompare(String(b.usuario || ''));
+            });
+            totalRendered += catData.members.length;
+
+            htmlContent += `<div class="team-category-section"><div class="category-title">${esc(catData.displayTitle)}</div><div class="team-grid">`;
+
+            catData.members.forEach(member => {
+                const nombreUsuario = member.usuario || 'Sin nombre';
+                const dId = String(member.discordId || "").trim();
+                const finalAvatarUrl = avatarDe(member, loggedUser);
+
+                const socials = [
+                    { key: 'instagram', hideKey: 'hideInstagram', icon: 'fa-brands fa-instagram', title: 'Instagram' },
+                    { key: 'youtube', hideKey: 'hideYoutube', icon: 'fa-brands fa-youtube', title: 'YouTube' },
+                    { key: 'kick', hideKey: 'hideKick', icon: 'fa-solid fa-video', title: 'Kick' },
+                    { key: 'twitch', hideKey: 'hideTwitch', icon: 'fa-brands fa-twitch', title: 'Twitch' }
+                ];
+                const pubEntry = dId ? perfilesPublicos[dId] : null;
+                const pub = pubEntry ? (pubEntry.redes || {}) : {};
+
+                let linksContent = '';
+                socials.forEach(soc => {
+                    if (member[soc.hideKey]) return;
+                    let url = safeSocialUrl(soc.key, member[soc.key]);
+                    if (!url && pub[soc.key]) url = safeSocialUrl(soc.key, pub[soc.key]);
+                    if (url) linksContent += `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer" class="staff-social-link" title="${soc.title}" onclick="event.stopPropagation()"><i class="${soc.icon}"></i></a>`;
+                });
+                const socialLinksHtml = linksContent ? `<div class="staff-social-links">${linksContent}</div>` : '';
+
+                htmlContent += `
+                    <div class="staff-card" data-id="${esc(member.id)}" data-avatar="${esc(finalAvatarUrl)}">
+                        <div class="staff-avatar-wrapper">
+                            <img src="${esc(finalAvatarUrl)}" alt="${esc(nombreUsuario)}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png';">
+                        </div>
+                        <div class="staff-name">${esc(nombreUsuario)}</div>
+                        ${socialLinksHtml}
+                    </div>`;
+            });
+            htmlContent += `</div></div>`;
+        }
+
+        container.innerHTML = totalRendered === 0
+            ? `<div class="no-staff">No hay miembros del staff registrados actualmente.</div>`
+            : htmlContent;
+    }
+
+    document.getElementById('teamContainer').addEventListener('click', (e) => {
+        const card = e.target.closest('.staff-card');
+        if (card) openProfile(card.dataset.id, card.dataset.avatar, true);
+    });
+
+    // ===== Página de perfil =====
+    let profileToken = 0;
+
+    function setBreadcrumb(nombre) {
+        const bc = document.getElementById('breadcrumbBar');
+        bc.innerHTML = nombre
+            ? `<a onclick="closeProfile(true)">Equipo</a><span class="bc-sep">›</span><span style="color:#fff;">${esc(nombre)}</span>`
+            : 'Equipo';
+    }
+
+    function showProfileShell(html) {
+        document.getElementById('teamView').style.display = 'none';
+        const pv = document.getElementById('profileView');
+        pv.style.display = 'block';
+        pv.innerHTML = html;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const backBtnHtml = `<button class="pv-back" onclick="closeProfile(true)"><i class="fa-solid fa-arrow-left"></i> Volver al equipo</button>`;
+
+    function renderLoading() {
+        showProfileShell(`<div class="pv-center"><i class="fa-solid fa-circle-notch fa-spin spin"></i><span style="color:#94a3b8;">Cargando perfil...</span></div>`);
+    }
+    function renderPrivate() {
+        showProfileShell(`
+            <div class="pv-center">
+                <div class="pv-lock"><i class="fa-solid fa-lock"></i></div>
+                <h3>Este perfil es privado</h3>
+                <p>Este usuario ha decidido no mostrar su información en la web, así que no puedes acceder a su perfil.</p>
+                <button class="pv-btn" onclick="closeProfile(true)">Volver al equipo</button>
+            </div>`);
+    }
+    function renderError(id, av) {
+        showProfileShell(`
+            <div class="pv-center">
+                <div class="pv-lock warn"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <h3>No se puede mostrar el perfil</h3>
+                <p>No hemos podido comprobar la privacidad de este perfil. Por seguridad no se muestra su información.</p>
+                <div style="display:flex;gap:10px;">
+                    <button class="pv-btn" id="pvRetry">Reintentar</button>
+                    <button class="pv-btn" style="border-color:#3f4147;color:#cbd5e1;" onclick="closeProfile(true)">Volver</button>
+                </div>
+            </div>`);
+        document.getElementById('pvRetry').addEventListener('click', () => openProfile(id, av, false));
+    }
+
+    function pvSection(icon, title, body, open) {
+        return `
+            <div class="pv-sec ${open ? 'open' : ''}">
+                <button class="pv-sec-head" onclick="this.parentElement.classList.toggle('open')">
+                    <i class="${icon}"></i><span>${title}</span><i class="fa-solid fa-chevron-down pv-chev"></i>
+                </button>
+                <div class="pv-sec-body"><div class="pv-sec-inner"><div class="pv-sec-pad">${body}</div></div></div>
+            </div>`;
+    }
+
+    function buildInfoHtml(member, webDate) {
+        let esp = '<div class="pv-empty">Sin especialidades.</div>';
+        const raw = String(member.especialidad || 'Ninguna');
+        const list = raw === 'Ninguna' ? [] : raw.split(',').map(e => e.trim()).filter(e => e && e !== 'Ninguna');
+        if (list.length) esp = `<div class="pv-pills">${list.map(e => `<span class="pv-pill"><span class="pv-dot" style="background:#3b82f6;"></span>${esc(e)}</span>`).join('')}</div>`;
+        return `
+            <div class="pv-label" style="margin-top:0;">Especialidad</div>${esp}
+            <div class="pv-label">Registro en la web</div><div style="font-size:14px;">${esc(webDate)}</div>`;
+    }
+
+    // Redes del perfil: mandan las que el usuario puso en su perfil y, si falta alguna,
+    // se usa la que se registró en el panel de staff (salvo que esté marcada como "Ocultar").
+    function redesDe(member, redesPerfil) {
+        const out = {};
+        Object.keys(PF_BASE).forEach(k => {
+            const hideKey = 'hide' + k.charAt(0).toUpperCase() + k.slice(1);
+            out[k] = (redesPerfil && redesPerfil[k]) || (!member[hideKey] && member[k]) || '';
+        });
+        return out;
+    }
+
+    function buildRedesHtml(redes) {
+        let html = '';
+        Object.keys(PF_BASE).forEach(k => {
+            const url = safeSocialUrl(k, redes && redes[k]);
+            if (url) html += `<a class="pv-social" href="${esc(url)}" target="_blank" rel="noopener noreferrer"><i class="${PF_BASE[k].icon}" style="color:${PF_BASE[k].color};"></i> ${PF_BASE[k].label}</a>`;
+        });
+        return html ? `<div class="pv-socials">${html}</div>` : `<div class="pv-empty"><b>Sin redes</b>No ha añadido redes sociales.</div>`;
+    }
+
+    function buildFotosHtml(lista) {
+        const urls = (Array.isArray(lista) ? lista : [])
+            .map(f => typeof f === 'string' ? f : (f && (f.url || f.src)))
+            .filter(u => typeof u === 'string' && (/^https?:\/\//i.test(u) || /^\/fotos\/[\w-]+\.(jpg|png|webp)$/i.test(u))).slice(0, 12);
+        if (!urls.length) return `<div class="pv-empty"><b>Sin fotos</b>Aún no ha publicado imágenes.</div>`;
+        return `<div class="pv-photos">${urls.map(u => `<a class="pv-photo" href="${esc(u)}" target="_blank" rel="noopener noreferrer"><img src="${esc(u)}" alt="" loading="lazy"></a>`).join('')}</div>`;
+    }
+
+    function buildSugerenciasHtml(mias) {
+        if (!mias.length) return `<div class="pv-empty"><b>Sin actividad</b>No ha enviado sugerencias.</div>`;
+        const items = mias.slice(0, 6).map(s => {
+            const estado = String(s.status || 'Pendiente'), el = estado.toLowerCase();
+            const color = (el === 'aprobada' || el === 'implementada') ? '#34d399' : (el === 'rechazada' ? '#f87171' : '#fbbf24');
+            return `
+                <div class="pv-sug">
+                    <div class="pv-sug-title">${esc(s.titulo)}</div>
+                    <div class="pv-sug-meta">
+                        <span style="color:${color};font-weight:700;"><i class="fa-solid fa-circle" style="font-size:7px;"></i> ${esc(estado)}</span>
+                        <span><span class="up"><i class="fa-solid fa-thumbs-up"></i> ${Number(s.upvotes) || 0}</span><span class="down"><i class="fa-solid fa-thumbs-down"></i> ${Number(s.downvotes) || 0}</span></span>
+                    </div>
+                </div>`;
+        }).join('');
+        return items + (mias.length > 6 ? `<div class="pv-more">+${mias.length - 6} sugerencias más</div>` : '');
+    }
+
+    async function openProfile(staffId, passedAvatar, pushState) {
+        const member = globalStaffList.find(s => String(s.id) === String(staffId));
+        if (!member) return;
+
+        const myToken = ++profileToken;
+        const avatar = passedAvatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+        const dId = String(member.discordId || '').trim();
+
+        if (pushState) { try { history.pushState({ perfil: dId || staffId }, '', '?perfil=' + encodeURIComponent(dId || staffId)); } catch (e) {} }
+        setBreadcrumb(member.usuario);
+        renderLoading();
+
+        let ajustes = { redes: {}, publico: true, mostrar: {} };
+        let sugerencias = [], fotos = [];
+
+        if (dId) {
+            const res = await fetchJson('/api/perfil-settings?userId=' + encodeURIComponent(dId));
+            if (myToken !== profileToken) return;
+
+            // 404 = el staff está registrado en el panel pero todavía no ha configurado su
+            // perfil en la web: no hay nada privado que proteger, se usan los ajustes por defecto.
+            const sinAjustes = !res.ok && res.status === 404;
+            if (!sinAjustes) {
+                if (!res.ok || !res.data || typeof res.data !== 'object') { renderError(staffId, avatar); return; }   // no comprobado: no se muestra nada
+                if (res.data.publico === false) { renderPrivate(); return; }
+                ajustes = res.data;
+            }
+
+            const m = ajustes.mostrar || {};
+            const [sug, fot] = await Promise.all([
+                m.sugerencias === false ? Promise.resolve({ ok: false }) : fetchJson('/api/sugerencias'),
+                m.fotos === false ? Promise.resolve({ ok: false }) : fetchJson('/api/fotografias?userId=' + encodeURIComponent(dId))
+            ]);
+            if (myToken !== profileToken) return;
+            if (sug.ok && Array.isArray(sug.data)) sugerencias = sug.data;
+            if (fot.ok) fotos = fot.data;
+        }
+
+        const mostrar = ajustes.mostrar || {};
+        const showRedes = mostrar.redes !== false, showFotos = mostrar.fotos !== false, showSug = mostrar.sugerencias !== false;
+
+        const mias = sugerencias
+            .filter(s => s && String(s.discordId || s.discord_id || '').trim() === dId)
+            .sort((a, b) => new Date(b.fechaRegistro || 0) - new Date(a.fechaRegistro || 0));
+        const votos = mias.reduce((t, s) => t + (Number(s.upvotes) || 0), 0);
+
+        let webDate = 'No registrada';
+        if (member.fechaRegistro) webDate = new Date(member.fechaRegistro).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const discordDate = getDiscordCreationDate(dId);
+        const rango = (member.rango || 'STAFF');
+        const nameForCopy = JSON.stringify(String(member.usuario || '')).replace(/"/g, '&quot;');
+
+        const stat = (ico, color, bg, label, val) => `
+            <div class="pv-stat"><div class="pv-stat-ico" style="background:${bg};color:${color};"><i class="${ico}"></i></div>
+            <div><small>${label}</small><strong>${val}</strong></div></div>`;
+
+        const secciones = [
+            pvSection('fa-solid fa-circle-info', 'Información', buildInfoHtml(member, webDate), true),
+            showRedes ? pvSection('fa-solid fa-share-nodes', 'Redes sociales', buildRedesHtml(redesDe(member, ajustes.redes)), false) : '',
+            showSug ? pvSection('fa-solid fa-wave-square', 'Actividad', buildSugerenciasHtml(mias), false) : '',
+            showFotos ? pvSection('fa-regular fa-images', 'Fotografías', buildFotosHtml(fotos), true) : ''
+        ].join('');
+
+        showProfileShell(`
+            <div class="pv">
+                <div class="pv-banner">${backBtnHtml}</div>
+
+                <div class="pv-grid">
+                    <div>
+                        <img class="pv-avatar" src="${esc(avatar)}" alt="${esc(member.usuario)}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png';">
+                        <h1 class="pv-name">${esc(member.usuario)}
+                            <button class="pv-copy" onclick="copyToClipboard(${nameForCopy})" title="Copiar nombre"><i class="fa-solid fa-copy"></i></button>
+                        </h1>
+                        ${dId ? `<p class="pv-id">ID de Discord · ${esc(dId)}</p>` : ''}
+
+                        <div class="pv-label">Roles</div>
+                        <div class="pv-pills">
+                            <span class="pv-pill"><span class="pv-dot" style="background:#f59e0b;"></span>${esc(member.rango || 'Staff')}</span>
+                            <span class="pv-pill"><span class="pv-dot" style="background:#3b82f6;"></span>${esc(member.categoria || 'General')}</span>
+                        </div>
+
+                        <div class="pv-label">Info</div>
+                        <ul class="pv-info">
+                            <li><i class="fa-regular fa-calendar"></i> Registrado en la web el ${esc(webDate)}</li>
+                            <li><i class="fa-brands fa-discord"></i> Discord desde el ${esc(discordDate)}</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <div class="pv-stats">
+                            ${stat('fa-regular fa-lightbulb', '#a855f7', 'rgba(168,85,247,.15)', 'Sugerencias', showSug ? mias.length : 'Oculto')}
+                            ${stat('fa-regular fa-thumbs-up', '#34d399', 'rgba(16,185,129,.15)', 'Votos recibidos', showSug ? votos : 'Oculto')}
+                        </div>
+                        <div class="pv-sections">${secciones}</div>
+                    </div>
+                </div>
+            </div>`);
+    }
+
+    function closeProfile(updateUrl) {
+        profileToken++;
+        document.getElementById('profileView').style.display = 'none';
+        document.getElementById('profileView').innerHTML = '';
+        document.getElementById('teamView').style.display = 'block';
+        setBreadcrumb('');
+        if (updateUrl) { try { history.pushState({}, '', window.location.pathname); } catch (e) {} }
+    }
+
+    function abrirDesdeUrl() {
+        const id = new URLSearchParams(window.location.search).get('perfil');
+        if (!id) return;
+        let logged = null;
+        try { logged = JSON.parse(localStorage.getItem('discord_user') || 'null'); } catch (e) {}
+
+        let m = globalStaffList.find(s => String(s.discordId || '').trim() === id || String(s.id) === id);
+        if (!m && logged && String(logged.id) === id) {
+            m = {
+                id: 'self-' + id, discordId: id,
+                usuario: logged.displayName || logged.username || 'Usuario',
+                rango: 'Miembro', categoria: 'Comunidad', especialidad: 'Ninguna', fechaRegistro: null
+            };
+            globalStaffList.push(m);
+        }
+        if (m) openProfile(m.id, avatarDe(m, logged), false);
+    }
+
+    window.addEventListener('popstate', () => {
+        if (new URLSearchParams(window.location.search).get('perfil')) abrirDesdeUrl();
+        else closeProfile(false);
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.getElementById('profileView').style.display !== 'none') closeProfile(true); });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        renderPublicTeam();                 // muestra "Cargando equipo..."
+        await loadDiscordSessionData();
+        await cargarStaff();                // staff real desde /api/staff
+        abrirDesdeUrl();
+        cargarPerfilesPublicos();
+
+        // Si cambia la sesión de Discord en otra pestaña, se repintan los avatares
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'discord_user') renderPublicTeam();
+        });
+
+        // Al volver a la pestaña se vuelve a pedir el staff (cambios hechos desde otro dispositivo)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') cargarStaff();
+        });
+    });
+
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const revealBtn = document.getElementById('sidebarRevealBtn');
+    const sidebar = document.getElementById('sidebar');
+
+    if (toggleBtn && revealBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+        revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+    }
+
+    const supportBtn = document.getElementById('supportDropdownBtn');
+    const supportMenu = document.getElementById('supportDropdownMenu');
+
+    if (supportBtn && supportMenu) {
+        supportBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = supportMenu.classList.contains('show');
+            if (!isOpen) {
+                if (supportMenu.parentElement !== document.body) document.body.appendChild(supportMenu);
+                const rect = supportBtn.getBoundingClientRect();
+                supportMenu.style.top = (rect.bottom + 8) + 'px';
+                supportMenu.style.right = (window.innerWidth - rect.right) + 'px';
+                supportMenu.classList.add('show');
+            } else {
+                supportMenu.classList.remove('show');
+            }
+        });
+        window.addEventListener('click', () => supportMenu.classList.remove('show'));
+        window.addEventListener('resize', () => supportMenu.classList.remove('show'));
+    }
+    </script>
+
+    <script src="/guards.js"></script>
+</body>
+</html>

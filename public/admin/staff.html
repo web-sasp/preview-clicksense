@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión de Staff | ClickSense RP</title>
+<!-- Google Fonts & FontAwesome -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --bg-main: #0c0812;
+    --bg-sidebar: #08050a;
+    --bg-card: #130d1e;
+    --bg-card-hover: #191226;
+    --border-color: rgba(239, 68, 68, 0.2);
+    --text-primary: #f3f4f6;
+    --text-muted: #9ca3af;
+    --accent-red: #ef4444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Scrollbar moderno, elegante y estilizado */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(12, 8, 18, 0.9);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(239, 68, 68, 0.35);
+    border-radius: 10px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    transition: background 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(239, 68, 68, 0.7);
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-8px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes slideDownRoof {
+    0% { opacity: 0; transform: translate(-50%, -30px); }
+    100% { opacity: 1; transform: translate(-50%, 0); }
+}
+@keyframes slideUpRoof {
+    0% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -30px); }
+}
+.animate-fade-down { animation: fadeInDown 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+.animate-fade-up { opacity: 0; animation: fadeInUp 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+.delay-1 { animation-delay: 0.1s; }
+.grid-background {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: linear-gradient(to right, rgba(239, 68, 68, 0.03) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(239, 68, 68, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px; z-index: 0; pointer-events: none;
+}
+.app-container { display: flex; min-height: 100vh; position: relative; z-index: 10; }
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    position: sticky; top: 0;
+    height: 100vh;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    overflow: hidden;
+    flex-shrink: 0;
+    z-index: 20;
+}
+.sidebar.collapsed { transform: translateX(-100%); width: 0; border-right: none; }
+.sidebar-reveal-trigger {
+    position: fixed; left: 0; top: 50%;
+    transform: translateY(-50%) translateX(-100%);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.8) 0%, rgba(244, 114, 182, 0.8) 100%);
+    color: #fff; border: none; border-top-right-radius: 8px; border-bottom-right-radius: 8px;
+    width: 24px; height: 50px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 15; transition: 0.3s; opacity: 0; pointer-events: none;
+}
+.sidebar.collapsed + .sidebar-reveal-trigger { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
+.sidebar-brand { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--border-color); width: 260px; }
+.server-main-title { font-size: 16px; font-weight: 800; color: #fff; }
+.sidebar-toggle-icon { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; }
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 15px 12px; display: flex; flex-direction: column; gap: 2px; width: 260px; }
+.nav-category { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; padding: 12px 10px 6px; }
+.nav-item { display: flex; align-items: center; gap: 12px; text-decoration: none; padding: 9px 12px; color: #9ca3af; font-size: 13.5px; border-radius: 8px; transition: 0.25s; }
+.nav-item i { width: 16px; text-align: center; }
+.nav-item:hover { background: rgba(255, 255, 255, 0.03); color: #fff; }
+.nav-item.active { background: rgba(239, 68, 68, 0.15); color: #fff; font-weight: 600; border: 1px solid rgba(239, 68, 68, 0.3); }
+.sidebar-footer { padding: 12px; border-top: 1px solid var(--border-color); background: rgba(5, 3, 8, 0.6); width: 260px; }
+.user-profile-mini { display: flex; align-items: center; gap: 10px; padding: 6px; }
+.avatar-placeholder { width: 32px; height: 32px; background: var(--accent-red); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; overflow: hidden; flex-shrink: 0; }
+.username { font-size: 13px; font-weight: 600; color: #fff; display: block; }
+.user-handle { font-size: 11px; color: var(--text-muted); display: block; }
+
+/* Main Content */
+.main-content { flex: 1; padding: 25px; width: calc(100% - 260px); transition: width 0.4s; }
+.sidebar.collapsed ~ .main-content { width: 100%; }
+
+.top-action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+.breadcrumb { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+.welcome-banner-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 22px 28px; display: flex; align-items: center; gap: 20px; margin-bottom: 25px; }
+.welcome-avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(239, 68, 68, 0.4); flex-shrink: 0; background: rgba(239, 68, 68, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent-red); font-size: 24px; }
+.welcome-text-content h1 { color: #fff; margin-bottom: 4px; font-size: 20px; font-weight: 700; }
+.welcome-text-content p { font-size: 13.5px; color: var(--text-muted); }
+.action-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 25px; }
+.ref-style-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease; cursor: pointer; }
+.ref-style-card:hover { border-color: rgba(239, 68, 68, 0.6); transform: translateY(-4px); box-shadow: 0 10px 25px 5px rgba(239, 68, 68, 0.15); }
+.ref-card-banner { height: 140px; position: relative; background-size: cover; background-position: center; display: flex; align-items: flex-end; padding: 15px; }
+.ref-card-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(19, 13, 28, 0.95) 0%, rgba(19, 13, 28, 0.2) 100%); }
+.ref-card-banner h3 { position: relative; z-index: 2; font-size: 20px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+.ref-card-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; justify-content: space-between; }
+.ref-card-body p { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+.content-section { display: none; }
+.content-section.active { display: block; }
+.admin-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 25px; margin-bottom: 25px; }
+.table-header-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; flex-wrap: wrap; }
+.toolbar-title-area h3 { font-size: 16px; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.toolbar-title-area p { color: var(--text-muted); font-size: 13.5px; }
+.toolbar-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.search-box-wrapper { position: relative; display: flex; align-items: center; }
+.search-box-wrapper i { position: absolute; left: 12px; color: var(--text-muted); font-size: 13px; }
+.search-input { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 9px 14px 9px 36px; color: #fff; font-size: 13px; outline: none; width: 240px; transition: 0.25s; }
+.search-input:focus { border-color: var(--accent-red); background: rgba(239, 68, 68, 0.03); }
+.filter-dropdown-container { position: relative; display: inline-block; }
+.filter-main-btn { background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%); border: 1px solid rgba(239, 68, 68, 0.4); color: #fff; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.25s; }
+.filter-main-btn:hover { border-color: var(--accent-red); background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(139, 92, 246, 0.25) 100%); }
+.filter-dropdown-menu { position: absolute; right: 0; top: calc(100% + 6px); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; width: 200px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); display: none; z-index: 50; overflow: hidden; padding: 6px; }
+.filter-dropdown-menu.active { display: block; animation: fadeInDown 0.2s ease forwards; }
+.filter-option { padding: 10px 12px; font-size: 13px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease; border-radius: 8px; margin-bottom: 2px; }
+.filter-option:last-child { margin-bottom: 0; }
+.filter-option:hover { background: rgba(239, 68, 68, 0.15); color: #fff; transform: translateX(3px); }
+.filter-option i { width: 20px; text-align: center; font-size: 14px; }
+.table-responsive { width: 100%; overflow-x: auto; }
+.org-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px; table-layout: fixed; }
+.org-table th { color: var(--text-muted); font-weight: 600; padding: 12px 15px; border-bottom: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.01); }
+.org-table td { padding: 14px 15px; border-bottom: 1px solid rgba(239, 68, 68, 0.08); color: #fff; }
+.org-table tbody tr:hover { background: var(--bg-card-hover); }
+.org-table th.col-rango, .org-table td.col-rango { width: 25%; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badge-status { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+.badge-status.active { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; }
+.badge-status.revoked { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; }
+.badge-status.warning { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #f59e0b; }
+.action-btns-group { display: flex; align-items: center; gap: 6px; }
+.action-icon-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: #fff; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.25s; display: inline-flex; align-items: center; justify-content: center; }
+.action-icon-btn:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); }
+.delete-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+.delete-btn:hover { background: rgba(239, 68, 68, 0.25); border-color: var(--accent-red); color: #fff; }
+
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.form-group label i, .admin-card h3 i { margin-right: 8px; }
+.form-control { width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13.5px; outline: none; transition: 0.25s; }
+.form-control:focus { border-color: var(--accent-red); background: rgba(239, 68, 68, 0.03); }
+
+.custom-select-wrapper { position: relative; user-select: none; width: 100%; }
+.custom-select-trigger { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; color: #fff; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; }
+.custom-select-trigger:hover { border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.03); }
+.custom-select-wrapper.open .custom-select-trigger { border-color: var(--accent-red); background: rgba(239, 68, 68, 0.05); }
+.custom-options { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); display: none; z-index: 100; overflow: hidden; padding: 6px; max-height: 240px; overflow-y: auto; animation: fadeInDown 0.2s ease forwards; }
+.custom-select-wrapper.open .custom-options { display: block; }
+.custom-option { padding: 11px 14px; font-size: 13.5px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s ease; border-radius: 8px; margin-bottom: 2px; }
+.custom-option:last-child { margin-bottom: 0; }
+.custom-option:hover { background: rgba(239, 68, 68, 0.15); color: #fff; transform: translateX(3px); }
+.custom-option i { font-size: 14px; width: 20px; text-align: center; }
+.custom-option.selected { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fff; }
+
+.form-row-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 18px; }
+.sub-view-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+.back-to-list-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+.back-to-list-btn:hover { color: #fff; }
+
+/* Notificación desde el techo */
+#successNotification {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 14px; padding: 14px 22px; display: flex;
+    align-items: center; gap: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 3000;
+    opacity: 0; pointer-events: none; transition: 0.3s;
+}
+#successNotification.show { opacity: 1; pointer-events: auto; animation: slideDownRoof 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+#successNotification.hide { animation: slideUpRoof 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+.success-icon-badge { width: 28px; height: 28px; background: rgba(16, 185, 129, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 13px; flex-shrink: 0; }
+.success-message-text { font-size: 13.5px; color: #fff; font-weight: 500; }
+.success-tag-pill { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 8px; font-size: 11.5px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Modales */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s; }
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; width: 90%; max-width: 480px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); transform: scale(0.95); transition: 0.3s; max-height: 90vh; overflow-y: auto; }
+.modal-overlay.active .modal-box { transform: scale(1); }
+.modal-icon-warn { width: 50px; height: 50px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-red); font-size: 20px; margin: 0 auto 15px; }
+.modal-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; text-align: center; }
+.modal-desc { font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; text-align: center; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.modal-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; border: 1px solid var(--border-color); }
+.modal-btn-cancel { background: rgba(255,255,255,0.05); color: #fff; }
+.modal-btn-cancel:hover { background: rgba(255,255,255,0.1); }
+.modal-btn-confirm { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+.modal-btn-confirm:hover { background: #dc2626; }
+
+/* Ficha Interactiva */
+.ficha-field-row { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+.ficha-field-info { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.ficha-field-label { font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+.ficha-field-value { font-size: 13.5px; color: #fff; word-break: break-all; }
+.copy-val-btn { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.copy-val-btn:hover { background: var(--accent-red); }
+
+/* Animaciones 3D Acceso Denegado */
+@keyframes entry3DExplosion {
+    0% { opacity: 0; transform: scale(0.7) translateZ(-300px) rotateX(35deg); }
+    100% { opacity: 1; transform: scale(1) translateZ(0px) rotateX(0deg); }
+}
+@keyframes neonCycle3D {
+    0% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(239, 68, 68, 0.25), inset 0 0 25px rgba(239, 68, 68, 0.15); }
+    33% { border-color: rgba(168, 85, 247, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(168, 85, 247, 0.3), inset 0 0 25px rgba(168, 85, 247, 0.15); }
+    66% { border-color: rgba(236, 72, 153, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(236, 72, 153, 0.3), inset 0 0 25px rgba(236, 72, 153, 0.15); }
+    100% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(239, 68, 68, 0.25), inset 0 0 25px rgba(239, 68, 68, 0.15); }
+}
+@keyframes liquidShimmer3D {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+@keyframes radarSpin3D {
+    0% { transform: rotate(0deg) rotateX(10deg); }
+    100% { transform: rotate(360deg) rotateX(10deg); }
+}
+@keyframes pulseCore3D {
+    0%, 100% { transform: scale(1) translateZ(40px); filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.7)); }
+    50% { transform: scale(1.1) translateZ(60px); filter: drop-shadow(0 0 40px rgba(239, 68, 68, 1)); }
+}
+@keyframes bgFloatingOrb1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(80px, -60px) scale(1.3); }
+}
+@keyframes bgFloatingOrb2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-90px, 70px) scale(1.4); }
+}
+</style>
+</head>
+<body>
+<div class="grid-background"></div>
+
+<!-- CONTENEDOR DE ACCESO DENEGADO 3D -->
+<div id="accessDeniedContainer" style="display: none; position: fixed; inset: 0; background: radial-gradient(circle at 50% 25%, #160a2b 0%, #040207 92%); z-index: 999999; align-items: center; justify-content: center; padding: 24px; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; perspective: 1600px;">
+    <div style="position: absolute; top: 10vh; left: 15vw; width: 400px; height: 400px; background: radial-gradient(circle, rgba(239, 68, 68, 0.09) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: bgFloatingOrb1 9s infinite ease-in-out;"></div>
+    <div style="position: absolute; bottom: 10vh; right: 15vw; width: 450px; height: 450px; background: radial-gradient(circle, rgba(168, 85, 247, 0.09) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: bgFloatingOrb2 11s infinite ease-in-out;"></div>
+
+    <div id="deniedCard3D" style="background: linear-gradient(155deg, rgba(24, 15, 40, 0.97) 0%, rgba(8, 5, 14, 0.99) 100%); border-radius: 40px; padding: 60px 48px; max-width: 680px; width: 100%; text-align: center; backdrop-filter: blur(30px); position: relative; z-index: 2; transform-style: preserve-3d; will-change: transform; transition: transform 0.15s cubic-bezier(0.03, 0.98, 0.52, 0.99), box-shadow 0.3s ease; animation: entry3DExplosion 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards, neonCycle3D 7s infinite linear;">
+        <div style="position: absolute; inset: 0; border-radius: 40px; pointer-events: none; border: 2px solid rgba(239, 68, 68, 0.6); box-sizing: border-box;"></div>
+        <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%) translateZ(30px); width: 200px; height: 5px; background: linear-gradient(90deg, transparent, #ec4899, #8b5cf6, transparent); border-radius: 0 0 6px 6px; box-shadow: 0 0 25px #ec4899;"></div>
+
+        <div style="transform: translateZ(25px); display: inline-flex; align-items: center; gap: 8px; background: rgba(239, 68, 68, 0.14); border: 1px solid rgba(239, 68, 68, 0.4); padding: 7px 20px; border-radius: 20px; color: #f87171; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.8px; margin-bottom: 28px; box-shadow: 0 0 25px rgba(239, 68, 68, 0.2);">
+            <i class="fa-solid fa-triangle-exclamation"></i> Protocolo de Seguridad Activo
+        </div>
+
+        <div style="position: relative; width: 110px; height: 110px; margin: 0 auto 28px auto; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; transform: translateZ(50px);">
+            <div style="position: absolute; inset: -8px; border-radius: 50%; border: 2px dashed rgba(236, 72, 153, 0.5); animation: radarSpin3D 10s linear infinite;"></div>
+            <div style="position: absolute; inset: -18px; border-radius: 50%; border: 1px solid rgba(168, 85, 247, 0.3); animation: radarSpin3D 15s linear infinite reverse;"></div>
+            <div style="width: 104px; height: 104px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(168, 85, 247, 0.12)); color: #f87171; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 44px; border: 1px solid rgba(239, 68, 68, 0.7); animation: pulseCore3D 3s infinite ease-in-out;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+        </div>
+
+        <h1 style="transform: translateZ(40px); font-size: 36px; font-weight: 800; margin-bottom: 14px; letter-spacing: -0.5px; background: linear-gradient(135deg, #fff 15%, #f472b6 45%, #c084fc 75%, #fff 100%); background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: liquidShimmer3D 4s linear infinite;">ACCESO NO AUTORIZADO</h1>
+        
+        <p style="transform: translateZ(30px); color: #94a3b8; font-size: 16px; line-height: 1.7; margin-bottom: 34px; max-width: 550px; margin-left: auto; margin-right: auto;">
+            Tu perfil actual carece de privilegios o consta como <strong style="color: #f87171; background: rgba(239, 68, 68, 0.18); padding: 2px 8px; border-radius: 6px; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.35);">INACTIVO</strong> en la base de datos central.
+        </p>
+
+        <a href="/home.html" style="transform: translateZ(60px); background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%); color: #fff; text-decoration: none; padding: 18px 42px; border-radius: 16px; font-weight: 700; font-size: 16px; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 15px 40px rgba(236, 72, 153, 0.5); transition: all 0.25s ease;">
+            <i class="fa-solid fa-house"></i> Volver a la página principal
+        </a>
+    </div>
+</div>
+
+<!-- Notificación desde el techo -->
+<div id="successNotification">
+    <div class="success-icon-badge" id="successIconBadge">
+        <i class="fa-solid fa-check" id="successIconElement"></i>
+    </div>
+    <div class="success-message-text" id="successNotificationText">Acción realizada con éxito...</div>
+    <div class="success-tag-pill" id="successNotificationTag">ACTIVO</div>
+</div>
+
+<!-- Modal de confirmación para pasar a Inactivo -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box" style="max-width: 420px; text-align: center;">
+        <div class="modal-icon-warn">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="modal-title">¿Cambiar a Inactivo?</div>
+        <div class="modal-desc" id="deleteModalDesc">Esta acción cambiará el estado del miembro a inactivo, quitándole los permisos de staff en la base de datos.</div>
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancelar</button>
+            <button class="modal-btn modal-btn-confirm" id="confirmDeleteBtn">Sí, inactivar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver Ficha de Staff -->
+<div class="modal-overlay" id="fichaModal">
+    <div class="modal-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 18px; color: #fff; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-user-shield" style="color: var(--accent-red);"></i> Ficha del Staff
+            </h3>
+            <button onclick="closeFichaModal()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="fichaContentContainer"></div>
+        <div style="margin-top: 15px; text-align: right;">
+            <button class="modal-btn modal-btn-cancel" onclick="closeFichaModal()" style="width: 100%;">Cerrar Detalles</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Modificar Staff -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 18px; color: #fff; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-pen-to-square" style="color: var(--accent-red);"></i> Modificar Staff
+            </h3>
+            <button onclick="closeEditModal()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form id="editForm" onsubmit="handleSaveEdit(event)">
+            <input type="hidden" id="editRowId">
+            <div class="form-row-dual">
+                <div class="form-group">
+                    <label><i class="fa-brands fa-discord"></i> Usuario de Discord</label>
+                    <input type="text" id="editUsuarioInput" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-id-card"></i> ID de Discord</label>
+                    <input type="text" id="editDiscordIdInput" class="form-control" oninput="this.value=this.value.replace(/[^0-9]/g,'')" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fa-solid fa-layer-group"></i> Categoria</label>
+                <div class="custom-select-wrapper" id="editCategoriaCustomSelect">
+                    <input type="hidden" id="editCategoriaInput" value="Moderación y Soporte" required>
+                    <div class="custom-select-trigger" onclick="toggleCustomSelect('editCategoriaCustomSelect')">
+                        <span id="editCategoriaTriggerText"><i class="fa-solid fa-headset" style="color: #10b981; margin-right: 8px;"></i> Moderación y Soporte</span>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: var(--text-muted);"></i>
+                    </div>
+                    <div class="custom-options">
+                        <div class="custom-option" onclick="selectCustomOption('editCategoriaCustomSelect', 'Dirección y Fundadores', 'Dirección y Fundadores', '<i class=\'fa-solid fa-crown\' style=\'color: #f59e0b; margin-right: 8px;\'></i>')">
+                            <i class="fa-solid fa-crown" style="color: #f59e0b;"></i> Dirección y Fundadores
+                        </div>
+                        <div class="custom-option" onclick="selectCustomOption('editCategoriaCustomSelect', 'Desarrollo & Tecnologia', 'Desarrollo & Tecnologia', '<i class=\'fa-solid fa-code\' style=\'color: #3b82f6; margin-right: 8px;\'></i>')">
+                            <i class="fa-solid fa-code" style="color: #3b82f6;"></i> Desarrollo & Tecnologia
+                        </div>
+                        <div class="custom-option" onclick="selectCustomOption('editCategoriaCustomSelect', 'Moderación y Soporte', 'Moderación y Soporte', '<i class=\'fa-solid fa-headset\' style=\'color: #10b981; margin-right: 8px;\'></i>')">
+                            <i class="fa-solid fa-headset" style="color: #10b981;"></i> Moderación y Soporte
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row-dual">
+                <div class="form-group">
+                    <label><i class="fa-solid fa-shield"></i> Rango</label>
+                    <div class="custom-select-wrapper" id="editRangoCustomSelect">
+                        <input type="hidden" id="editRangoInput" value="Moderador" required>
+                        <div class="custom-select-trigger" onclick="toggleCustomSelect('editRangoCustomSelect')">
+                            <span id="editRangoTriggerText"><i class="fa-solid fa-shield" style="color: #3b82f6; margin-right: 8px;"></i> Moderador</span>
+                            <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: var(--text-muted);"></i>
+                        </div>
+                        <div class="custom-options">
+                            <div class="custom-option" onclick="selectCustomOption('editRangoCustomSelect', 'Owner', 'Owner', '<i class=\'fa-solid fa-chess-king\' style=\'color: #f59e0b; margin-right: 8px;\'></i>')"><i class="fa-solid fa-chess-king" style="color: #f59e0b;"></i> Owner</div>
+                            <div class="custom-option" onclick="selectCustomOption('editRangoCustomSelect', 'Desarrollador', 'Desarrollador', '<i class=\'fa-solid fa-laptop-code\' style=\'color: #3b82f6; margin-right: 8px;\'></i>')"><i class="fa-solid fa-laptop-code" style="color: #3b82f6;"></i> Desarrollador</div>
+                            <div class="custom-option" onclick="selectCustomOption('editRangoCustomSelect', 'Game Master', 'Game Master', '<i class=\'fa-solid fa-gamepad\' style=\'color: #a855f7; margin-right: 8px;\'></i>')"><i class="fa-solid fa-gamepad" style="color: #a855f7;"></i> Game Master</div>
+                            <div class="custom-option" onclick="selectCustomOption('editRangoCustomSelect', 'Administrador', 'Administrador', '<i class=\'fa-solid fa-shield-halved\' style=\'color: #ef4444; margin-right: 8px;\'></i>')"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> Administrador</div>
+                            <div class="custom-option" onclick="selectCustomOption('editRangoCustomSelect', 'Moderador', 'Moderador', '<i class=\'fa-solid fa-shield\' style=\'color: #3b82f6; margin-right: 8px;\'></i>')"><i class="fa-solid fa-shield" style="color: #3b82f6;"></i> Moderador</div>
+                            <div class="custom-option" onclick="selectCustomOption('editRangoCustomSelect', 'Soporte', 'Soporte', '<i class=\'fa-solid fa-life-ring\' style=\'color: #10b981; margin-right: 8px;\'></i>')"><i class="fa-solid fa-life-ring" style="color: #10b981;"></i> Soporte</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-folder-open"></i> Estado</label>
+                    <div class="custom-select-wrapper" id="editEstadoCustomSelect">
+                        <input type="hidden" id="editEstadoInput" value="Activo" required>
+                        <div class="custom-select-trigger" onclick="toggleCustomSelect('editEstadoCustomSelect')">
+                            <span id="editEstadoTriggerText"><i class="fa-solid fa-circle-check" style="color: #10b981; margin-right: 8px;"></i> Activo</span>
+                            <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: var(--text-muted);"></i>
+                        </div>
+                        <div class="custom-options">
+                            <div class="custom-option" onclick="selectCustomOption('editEstadoCustomSelect', 'Activo', 'Activo', '<i class=\'fa-solid fa-circle-check\' style=\'color: #10b981; margin-right: 8px;\'></i>')">
+                                <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Activo
+                            </div>
+                            <div class="custom-option" onclick="selectCustomOption('editEstadoCustomSelect', 'Inactivo', 'Inactivo', '<i class=\'fa-solid fa-circle-xmark\' style=\'color: #ef4444; margin-right: 8px;\'></i>')">
+                                <i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Inactivo
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fa-solid fa-star"></i> Especialidades (Selección Múltiple)</label>
+                <div class="custom-select-wrapper" id="editEspecialidadCustomSelect">
+                    <input type="hidden" id="editEspecialidadInput" value="Ninguna">
+                    <div class="custom-select-trigger" onclick="toggleCustomSelect('editEspecialidadCustomSelect')">
+                        <span id="editEspecialidadTriggerText"><i class="fa-solid fa-ban" style="color: #9ca3af; margin-right: 8px;"></i> Ninguna</span>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: var(--text-muted);"></i>
+                    </div>
+                    <div class="custom-options" id="editEspecialidadOptionsList">
+                        <div class="custom-option" onclick="toggleMultiOption('editEspecialidadCustomSelect', 'Ninguna')"><i class="fa-solid fa-ban" style="color: #9ca3af;"></i> Ninguna</div>
+                        <div class="custom-option" onclick="toggleMultiOption('editEspecialidadCustomSelect', 'Encargado de CK\'s')"><i class="fa-solid fa-skull" style="color: #ef4444;"></i> Encargado de CK's</div>
+                        <div class="custom-option" onclick="toggleMultiOption('editEspecialidadCustomSelect', 'Encargado de Whitelist\'s')"><i class="fa-solid fa-id-badge" style="color: #3b82f6;"></i> Encargado de Whitelist's</div>
+                        <div class="custom-option" onclick="toggleMultiOption('editEspecialidadCustomSelect', 'Encargado de locales')"><i class="fa-solid fa-store" style="color: #10b981;"></i> Encargado de locales</div>
+                        <div class="custom-option" onclick="toggleMultiOption('editEspecialidadCustomSelect', 'Encargado de la facción legal')"><i class="fa-solid fa-scale-balanced" style="color: #f59e0b;"></i> Encargado de la facción legal</div>
+                        <div class="custom-option" onclick="toggleMultiOption('editEspecialidadCustomSelect', 'Encargado de la facción ilegal')"><i class="fa-solid fa-user-secret" style="color: #ef4444;"></i> Encargado de la facción ilegal</div>
+                        <div class="custom-option" onclick="toggleMultiOption('editEspecialidadCustomSelect', 'Encargado de creadores de contenido')"><i class="fa-solid fa-video" style="color: #ec4899;"></i> Encargado de creadores de contenido</div>
+                        <div class="custom-option" onclick="toggleMultiOption('editEspecialidadCustomSelect', 'Encargado de playmaker\'s')"><i class="fa-solid fa-bolt" style="color: #a855f7;"></i> Encargado de playmaker's</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row-dual">
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="margin-bottom: 0;"><i class="fa-brands fa-instagram" style="color: #e1306c;"></i> Instagram URL</label>
+                        <label style="font-size: 11px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="editInstagramHide"> Ocultar
+                        </label>
+                    </div>
+                    <input type="url" id="editInstagramInput" class="form-control" placeholder="https://instagram.com/...">
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="margin-bottom: 0;"><i class="fa-brands fa-youtube" style="color: #ff0000;"></i> YouTube URL</label>
+                        <label style="font-size: 11px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="editYoutubeHide"> Ocultar
+                        </label>
+                    </div>
+                    <input type="url" id="editYoutubeInput" class="form-control" placeholder="https://youtube.com/...">
+                </div>
+            </div>
+            <div class="form-row-dual">
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="margin-bottom: 0;"><i class="fa-solid fa-video" style="color: #53fc18;"></i> Kick URL</label>
+                        <label style="font-size: 11px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="editKickHide"> Ocultar
+                        </label>
+                    </div>
+                    <input type="url" id="editKickInput" class="form-control" placeholder="https://kick.com/...">
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="margin-bottom: 0;"><i class="fa-brands fa-twitch" style="color: #9146ff;"></i> Twitch URL</label>
+                        <label style="font-size: 11px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                            <input type="checkbox" id="editTwitchHide"> Ocultar
+                        </label>
+                    </div>
+                    <input type="url" id="editTwitchInput" class="form-control" placeholder="https://twitch.tv/...">
+                </div>
+            </div>
+
+            <button type="submit" class="modal-btn modal-btn-confirm" style="width: 100%; margin-top: 10px; padding: 12px;">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="app-container">
+    <!-- Menú Lateral Completo -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;" onerror="this.style.display='none'">
+                <span class="server-main-title">ClickSense</span>
+            </div>
+            <button class="sidebar-toggle-icon" id="sidebarToggleBtn"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-category">General</div>
+            <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/admin.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Panel Admin</a>
+            <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> Equipo</a>
+            <a href="/admin/calendario.html" class="nav-item active"><i class="fa-solid fa-calendar-days"></i> Calendario</a>
+            <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> Comercios</a>
+            <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> Postulaciones ilegales</a>
+
+            <div class="nav-category">Espacio de trabajo</div>
+            <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> Grupos</a>
+            <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> Documentos</a>
+            <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Whitelist</a>
+
+            <div class="nav-category">Mi Cuenta</div>
+            <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> Mi Perfil</a>
+            <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> Historias personaje</a>
+            <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+
+            <div class="nav-category">LSPD</div>
+            <a href="/lspd-academia.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Academia</a>
+
+            <div class="nav-category">LSSD</div>
+            <a href="/lssd-academia.html" class="nav-item"><i class="fa-solid fa-star-badge"></i> Academia</a>
+
+            <div class="nav-category">SAHP</div>
+            <a href="/sahp-academia.html" class="nav-item"><i class="fa-solid fa-shield"></i> Academia</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile-mini" id="userProfileMini">
+                <div class="avatar-placeholder" id="userAvatarContainer">
+                    <span id="userAvatarFallback">?</span>
+                </div>
+                <div class="user-info">
+                    <span class="username" id="userNameDisplay">Usuario</span>
+                    <span class="user-handle" id="userHandleDisplay">@tag</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <header class="top-action-bar animate-fade-down">
+            <div class="breadcrumb" id="breadcrumbTitle">Panel de Staff</div>
+        </header>
+
+        <div class="welcome-banner-card animate-fade-up">
+            <div class="welcome-avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <div class="welcome-text-content">
+                <h1 id="bannerTitle">Gestión y Registro de Staff</h1>
+                <p id="bannerDesc">Administra los miembros del equipo, audita sus rangos o registra nuevos colaboradores en el sistema.</p>
+            </div>
+        </div>
+
+        <div class="action-cards-grid animate-fade-up delay-1" id="dashboardCardsGrid">
+            <div class="ref-style-card" onclick="switchTab('list')">
+                <div class="ref-card-banner" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80');">
+                    <h3>Gestionar STAFFs</h3>
+                </div>
+                <div class="ref-card-body">
+                    <p>Consulta el listado completo de miembros del staff, modifica sus rangos o gestiona sus estados actuales.</p>
+                </div>
+            </div>
+            <div class="ref-style-card" onclick="switchTab('create')">
+                <div class="ref-card-banner" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80');">
+                    <h3>Registrar STAFFs</h3>
+                </div>
+                <div class="ref-card-body">
+                    <p>Da de alta a un nuevo integrante en el equipo de staff especificando su usuario de Discord y rango asignado.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 1: GESTIONAR STAFFS (LISTADO) -->
+        <div id="sectionList" class="content-section animate-fade-up">
+            <div class="sub-view-header" style="margin-bottom: 15px;">
+                <button class="back-to-list-btn" onclick="returnToDashboard()">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al menú principal
+                </button>
+            </div>
+            <div class="admin-card">
+                <div class="table-header-toolbar">
+                    <div class="toolbar-title-area">
+                        <h3><i class="fa-solid fa-users-gear" style="color: var(--accent-red);"></i> Listado de Staff Registrados</h3>
+                        <p>Panel de consulta y auditoria del equipo de trabajo.</p>
+                    </div>
+                    <div class="toolbar-controls">
+                        <div class="search-box-wrapper">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="tableSearchInput" class="search-input" placeholder="Buscar por usuario, ID..." oninput="renderTableData()">
+                        </div>
+                        <div class="filter-dropdown-container">
+                            <button class="filter-main-btn" onclick="toggleFilterMenu()">
+                                <i class="fa-solid fa-filter" style="color: var(--accent-red);"></i> Filtro <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
+                            </button>
+                            <div class="filter-dropdown-menu" id="filterDropdownMenu">
+                                <div class="filter-option" onclick="applyStatusFilter('Todos')">
+                                    <i class="fa-solid fa-list" style="color: #a855f7;"></i> Todos
+                                </div>
+                                <div class="filter-option" onclick="applyStatusFilter('Activo')">
+                                    <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Activo
+                                </div>
+                                <div class="filter-option" onclick="applyStatusFilter('Inactivo')">
+                                    <i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> Inactivo
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="org-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuario</th>
+                                <th class="col-rango">Rango</th>
+                                <th>Fecha Registro</th>
+                                <th>Estado</th>
+                                <th style="text-align: right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staffTableBody">
+                            <!-- Se renderiza dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: REGISTRAR STAFFS -->
+        <div id="sectionCreate" class="content-section animate-fade-up">
+            <div class="sub-view-header" style="margin-bottom: 15px;">
+                <button class="back-to-list-btn" onclick="returnToDashboard()">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al menú principal
+                </button>
+            </div>
+            <div class="admin-card">
+                <h3><i class="fa-solid fa-user-plus" style="color: var(--accent-red);"></i> Registrar nuevo staff</h3>
+                <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 13.5px;">Rellena todos los campos requeridos para dar de alta a un miembro en el equipo de staff y permitirle el acceso al calendario.</p>
+                <form onsubmit="handleCreateStaff(event)">
+                    <div class="form-row-dual">
+                        <div class="form-group">
+                            <label><i class="fa-brands fa-discord"></i> Usuario de Discord</label>
+                            <input type="text" id="staffUsuarioInput" class="form-control" placeholder="Ej. AlexGamer" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-id-card"></i> ID de Discord</label>
+                            <input type="text" id="staffDiscordIdInput" class="form-control" placeholder="Ej. 384920192837465920" oninput="this.value=this.value.replace(/[^0-9]/g,'')" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-layer-group"></i> Categoria</label>
+                        <div class="custom-select-wrapper" id="createCategoriaCustomSelect">
+                            <input type="hidden" id="staffCategoriaInput" value="Moderación y Soporte" required>
+                            <div class="custom-select-trigger" onclick="toggleCustomSelect('createCategoriaCustomSelect')">
+                                <span id="createCategoriaTriggerText"><i class="fa-solid fa-headset" style="color: #10b981; margin-right: 8px;"></i> Moderación y Soporte</span>
+                                <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: var(--text-muted);"></i>
+                            </div>
+                            <div class="custom-options">
+                                <div class="custom-option" onclick="selectCustomOption('createCategoriaCustomSelect', 'Dirección y Fundadores', 'Dirección y Fundadores', '<i class=\'fa-solid fa-crown\' style=\'color: #f59e0b; margin-right: 8px;\'></i>')">
+                                    <i class="fa-solid fa-crown" style="color: #f59e0b;"></i> Dirección y Fundadores
+                                </div>
+                                <div class="custom-option" onclick="selectCustomOption('createCategoriaCustomSelect', 'Desarrollo & Tecnologia', 'Desarrollo & Tecnologia', '<i class=\'fa-solid fa-code\' style=\'color: #3b82f6; margin-right: 8px;\'></i>')">
+                                    <i class="fa-solid fa-code" style="color: #3b82f6;"></i> Desarrollo & Tecnologia
+                                </div>
+                                <div class="custom-option" onclick="selectCustomOption('createCategoriaCustomSelect', 'Moderación y Soporte', 'Moderación y Soporte', '<i class=\'fa-solid fa-headset\' style=\'color: #10b981; margin-right: 8px;\'></i>')">
+                                    <i class="fa-solid fa-headset" style="color: #10b981;"></i> Moderación y Soporte
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row-dual">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-shield"></i> Rango</label>
+                            <div class="custom-select-wrapper" id="createRangoCustomSelect">
+                                <input type="hidden" id="staffRangoInput" value="Moderador" required>
+                                <div class="custom-select-trigger" onclick="toggleCustomSelect('createRangoCustomSelect')">
+                                    <span id="createRangoTriggerText"><i class="fa-solid fa-shield" style="color: #3b82f6; margin-right: 8px;"></i> Moderador</span>
+                                    <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: var(--text-muted);"></i>
+                                </div>
+                                <div class="custom-options">
+                                    <div class="custom-option" onclick="selectCustomOption('createRangoCustomSelect', 'Owner', 'Owner', '<i class=\'fa-solid fa-chess-king\' style=\'color: #f59e0b; margin-right: 8px;\'></i>')"><i class="fa-solid fa-chess-king" style="color: #f59e0b;"></i> Owner</div>
+                                    <div class="custom-option" onclick="selectCustomOption('createRangoCustomSelect', 'Desarrollador', 'Desarrollador', '<i class=\'fa-solid fa-laptop-code\' style=\'color: #3b82f6; margin-right: 8px;\'></i>')"><i class="fa-solid fa-laptop-code" style="color: #3b82f6;"></i> Desarrollador</div>
+                                    <div class="custom-option" onclick="selectCustomOption('createRangoCustomSelect', 'Game Master', 'Game Master', '<i class=\'fa-solid fa-gamepad\' style=\'color: #a855f7; margin-right: 8px;\'></i>')"><i class="fa-solid fa-gamepad" style="color: #a855f7;"></i> Game Master</div>
+                                    <div class="custom-option" onclick="selectCustomOption('createRangoCustomSelect', 'Administrador', 'Administrador', '<i class=\'fa-solid fa-shield-halved\' style=\'color: #ef4444; margin-right: 8px;\'></i>')"><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> Administrador</div>
+                                    <div class="custom-option" onclick="selectCustomOption('createRangoCustomSelect', 'Moderador', 'Moderador', '<i class=\'fa-solid fa-shield\' style=\'color: #3b82f6; margin-right: 8px;\'></i>')"><i class="fa-solid fa-shield" style="color: #3b82f6;"></i> Moderador</div>
+                                    <div class="custom-option" onclick="selectCustomOption('createRangoCustomSelect', 'Soporte', 'Soporte', '<i class=\'fa-solid fa-life-ring\' style=\'color: #10b981; margin-right: 8px;\'></i>')"><i class="fa-solid fa-life-ring" style="color: #10b981;"></i> Soporte</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-star"></i> Especialidades (Selección Múltiple)</label>
+                            <div class="custom-select-wrapper" id="createEspecialidadCustomSelect">
+                                <input type="hidden" id="staffEspecialidadInput" value="Ninguna">
+                                <div class="custom-select-trigger" onclick="toggleCustomSelect('createEspecialidadCustomSelect')">
+                                    <span id="createEspecialidadTriggerText"><i class="fa-solid fa-ban" style="color: #9ca3af; margin-right: 8px;"></i> Ninguna</span>
+                                    <i class="fa-solid fa-chevron-down" style="font-size: 11px; color: var(--text-muted);"></i>
+                                </div>
+                                <div class="custom-options" id="createEspecialidadOptionsList">
+                                    <div class="custom-option" onclick="toggleMultiOption('createEspecialidadCustomSelect', 'Ninguna')"><i class="fa-solid fa-ban" style="color: #9ca3af;"></i> Ninguna</div>
+                                    <div class="custom-option" onclick="toggleMultiOption('createEspecialidadCustomSelect', 'Encargado de CK\'s')"><i class="fa-solid fa-skull" style="color: #ef4444;"></i> Encargado de CK's</div>
+                                    <div class="custom-option" onclick="toggleMultiOption('createEspecialidadCustomSelect', 'Encargado de Whitelist\'s')"><i class="fa-solid fa-id-badge" style="color: #3b82f6;"></i> Encargado de Whitelist's</div>
+                                    <div class="custom-option" onclick="toggleMultiOption('createEspecialidadCustomSelect', 'Encargado de locales')"><i class="fa-solid fa-store" style="color: #10b981;"></i> Encargado de locales</div>
+                                    <div class="custom-option" onclick="toggleMultiOption('createEspecialidadCustomSelect', 'Encargado de la facción legal')"><i class="fa-solid fa-scale-balanced" style="color: #f59e0b;"></i> Encargado de la facción legal</div>
+                                    <div class="custom-option" onclick="toggleMultiOption('createEspecialidadCustomSelect', 'Encargado de la facción ilegal')"><i class="fa-solid fa-user-secret" style="color: #ef4444;"></i> Encargado de la facción ilegal</div>
+                                    <div class="custom-option" onclick="toggleMultiOption('createEspecialidadCustomSelect', 'Encargado de creadores de contenido')"><i class="fa-solid fa-video" style="color: #ec4899;"></i> Encargado de creadores de contenido</div>
+                                    <div class="custom-option" onclick="toggleMultiOption('createEspecialidadCustomSelect', 'Encargado de playmaker\'s')"><i class="fa-solid fa-bolt" style="color: #a855f7;"></i> Encargado de playmaker's</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row-dual">
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="margin-bottom: 0;"><i class="fa-brands fa-instagram" style="color: #e1306c;"></i> Instagram URL</label>
+                                <label style="font-size: 11px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                    <input type="checkbox" id="staffInstagramHide"> Ocultar
+                                </label>
+                            </div>
+                            <input type="url" id="staffInstagramInput" class="form-control" placeholder="https://instagram.com/...">
+                        </div>
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="margin-bottom: 0;"><i class="fa-brands fa-youtube" style="color: #ff0000;"></i> YouTube URL</label>
+                                <label style="font-size: 11px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                    <input type="checkbox" id="staffYoutubeHide"> Ocultar
+                                </label>
+                            </div>
+                            <input type="url" id="staffYoutubeInput" class="form-control" placeholder="https://youtube.com/...">
+                        </div>
+                    </div>
+                    <div class="form-row-dual">
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="margin-bottom: 0;"><i class="fa-solid fa-video" style="color: #53fc18;"></i> Kick URL</label>
+                                <label style="font-size: 11px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                    <input type="checkbox" id="staffKickHide"> Ocultar
+                                </label>
+                            </div>
+                            <input type="url" id="staffKickInput" class="form-control" placeholder="https://kick.com/...">
+                        </div>
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="margin-bottom: 0;"><i class="fa-brands fa-twitch" style="color: #9146ff;"></i> Twitch URL</label>
+                                <label style="font-size: 11px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                                    <input type="checkbox" id="staffTwitchHide"> Ocultar
+                                </label>
+                            </div>
+                            <input type="url" id="staffTwitchInput" class="form-control" placeholder="https://twitch.tv/...">
+                        </div>
+                    </div>
+
+                    <button type="submit" style="width: 100%; justify-content: center; padding: 12px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); margin-top: 15px; cursor: pointer; color: #fff; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-check"></i> REGISTRAR STAFF EN EL SISTEMA
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Scripts con validación global para la ID maestra y cualquier rol Owner activo -->
+<script>
+let staffList = [];
+let multiSelections = {
+    'createEspecialidadCustomSelect': ['Ninguna'],
+    'editEspecialidadCustomSelect': ['Ninguna']
+};
+
+const MASTER_ADMIN_ID = "732650490588037160";
+
+// Canal de comunicación en tiempo real para todos los archivos dentro de public/admin
+const adminSyncChannel = new BroadcastChannel('click_sense_admin_sync');
+adminSyncChannel.onmessage = (event) => {
+    if (event.data && event.data.type === 'STAFF_DATA_UPDATED') {
+        staffList = event.data.payload || [];
+        if (typeof renderTableData === 'function') {
+            renderTableData();
+        }
+    }
+};
+
+async function checkStaffAccess() {
+    const storedUser = localStorage.getItem('discord_user');
+    if (!storedUser) return false;
+
+    let discordUser;
+    try {
+        discordUser = JSON.parse(storedUser);
+    } catch (e) {
+        return false;
+    }
+
+    const currentUserId = String(discordUser.id || '');
+
+    // 1. Acceso absoluto e incondicional para la ID maestra
+    if (currentUserId === MASTER_ADMIN_ID) {
+        return true;
+    }
+
+    try {
+        const response = await fetch('/api/staff', { cache: 'no-store', credentials: 'same-origin' });
+        if (response.ok) {
+            const data = await response.json();
+            if (Array.isArray(data)) {
+                return data.some(s => {
+                    const sName = (s.name || s.username || s.discord || s.user || s.usuario || '').toLowerCase();
+                    const sId = String(s.id || s.discordId || '');
+                    const uName = (discordUser.username || '').toLowerCase();
+                    const uDisplay = (discordUser.displayName || '').toLowerCase();
+                    const uId = String(discordUser.id || '');
+
+                    const isActive = (s.status || 'Activo') === 'Activo';
+                    const isOwner = (s.rango || '').toLowerCase() === 'owner';
+
+                    // 2. Acceso incondicional para cualquier usuario registrado con rol Owner y estado Activo
+                    if (isActive && isOwner && (sId === uId || (sName && (sName.includes(uName) || sName.includes(uDisplay))))) {
+                        return true;
+                    }
+
+                    return isActive && ((sName && (sName.includes(uName) || sName.includes(uDisplay))) || (sId && sId === uId));
+                });
+            }
+        }
+    } catch (err) {
+        console.error("Error al verificar los permisos del staff desde la base de datos", err);
+    }
+    return false;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const hasAccess = await checkStaffAccess();
+    
+    if (!hasAccess) {
+        const appContainer = document.querySelector('.app-container');
+        if (appContainer) appContainer.style.display = 'none';
+        const deniedContainer = document.getElementById('accessDeniedContainer');
+        if (deniedContainer) {
+            deniedContainer.style.display = 'flex';
+            
+            const deniedCard = document.getElementById('deniedCard3D');
+            if (deniedCard) {
+                document.addEventListener('mousemove', (e) => {
+                    const rect = deniedCard.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    const rotateX = (-y / 18);
+                    const rotateY = (x / 18);
+                    deniedCard.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                document.addEventListener('mouseleave', () => {
+                    deniedCard.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
+            }
+        }
+        return;
+    }
+
+    loadDiscordSessionData();
+    initSidebar();
+    await loadStaffFromStorage();
+    initGlobalClickHandlers();
+    updateMultiUI('createEspecialidadCustomSelect');
+    updateMultiUI('editEspecialidadCustomSelect');
+});
+
+async function loadStaffFromStorage() {
+    try {
+        const response = await fetch('/api/staff', { cache: 'no-store', credentials: 'same-origin' });
+        if (response.ok) {
+            const data = await response.json();
+            staffList = Array.isArray(data) ? data : [];
+        } else {
+            staffList = [];
+        }
+    } catch (e) {
+        console.error("Error al cargar el staff desde /api/staff:", e);
+        staffList = [];
+    }
+    renderTableData();
+}
+
+// Guarda la lista en el servidor. Devuelve true si se ha guardado de verdad.
+// Si falla, avisa con el motivo y recupera la lista real del servidor
+// (así la tabla nunca enseña cambios que no se han guardado).
+async function saveStaffToStorage() {
+    let motivo = '';
+    try {
+        const response = await fetch('/api/staff', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(staffList)
+        });
+
+        if (response.ok) {
+            // Transmitir datos actualizados a las demás páginas abiertas (equipo.html, public/admin...)
+            adminSyncChannel.postMessage({
+                type: 'STAFF_DATA_UPDATED',
+                payload: staffList
+            });
+            return true;
+        }
+
+        if (response.status === 401) motivo = 'No hay sesión iniciada en el servidor. Vuelve a iniciar sesión con Discord.';
+        else if (response.status === 403) motivo = 'Tu cuenta no tiene permisos para gestionar el staff.';
+        else if (response.status === 404 || response.status === 405) motivo = 'El servidor no tiene la ruta /api/staff (actualiza main.py y reinícialo).';
+        else motivo = `El servidor ha respondido con un error (${response.status}).`;
+    } catch (e) {
+        motivo = 'No se ha podido conectar con el servidor.';
+        console.error("Error al sincronizar con la base de datos:", e);
+    }
+
+    console.error("No se ha guardado el staff:", motivo);
+    await loadStaffFromStorage();
+    showTopNotification(`<strong>No se ha guardado.</strong> ${motivo}`, 'ERROR', true);
+    return false;
+}
+
+function loadDiscordSessionData() {
+    const storedUser = localStorage.getItem('discord_user');
+    const avatarContainer = document.getElementById('userAvatarContainer');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const userHandleDisplay = document.getElementById('userHandleDisplay');
+    if (!storedUser) return;
+    try {
+        const discordUser = JSON.parse(storedUser);
+        if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+        if (userHandleDisplay) userHandleDisplay.textContent = "@" + (discordUser.username || "discord");
+        if (avatarContainer && discordUser.avatarUrl) {
+            avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    } catch (e) {
+        console.error("Error al cargar la sesión de Discord", e);
+    }
+}
+
+function initSidebar(){
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const revealBtn = document.getElementById('sidebarRevealBtn');
+    const sidebar = document.getElementById('sidebar');
+    if (toggleBtn && revealBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+        revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+    }
+}
+
+function toggleCustomSelect(wrapperId) {
+    const wrapper = document.getElementById(wrapperId);
+    document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+        if (w.id !== wrapperId) w.classList.remove('open');
+    });
+    wrapper.classList.toggle('open');
+}
+
+function selectCustomOption(wrapperId, value, text, iconHtml) {
+    const wrapper = document.getElementById(wrapperId);
+    const hiddenInput = wrapper.querySelector('input[type="hidden"]');
+    const triggerText = wrapper.querySelector('.custom-select-trigger span');
+    hiddenInput.value = value;
+    triggerText.innerHTML = `${iconHtml} ${text}`;
+    wrapper.classList.remove('open');
+}
+
+function toggleMultiOption(wrapperId, optionValue) {
+    let list = multiSelections[wrapperId] || [];
+    
+    if (optionValue === 'Ninguna') {
+        list = ['Ninguna'];
+    } else {
+        list = list.filter(item => item !== 'Ninguna');
+        
+        if (list.includes(optionValue)) {
+            list = list.filter(item => item !== optionValue);
+            if (list.length === 0) list = ['Ninguna'];
+        } else {
+            list.push(optionValue);
+        }
+    }
+    
+    multiSelections[wrapperId] = list;
+    updateMultiUI(wrapperId);
+}
+
+function updateMultiUI(wrapperId) {
+    const wrapper = document.getElementById(wrapperId);
+    if (!wrapper) return;
+    const list = multiSelections[wrapperId] || ['Ninguna'];
+    const hiddenInput = wrapper.querySelector('input[type="hidden"]');
+    const triggerText = wrapper.querySelector('.custom-select-trigger span');
+    
+    hiddenInput.value = list.join(', ');
+    
+    if (list.length === 1 && list[0] === 'Ninguna') {
+        triggerText.innerHTML = `<i class="fa-solid fa-ban" style="color: #9ca3af; margin-right: 8px;"></i> Ninguna`;
+    } else {
+        triggerText.innerHTML = `<i class="fa-solid fa-star" style="color: #f59e0b; margin-right: 8px;"></i> ${list.join(', ')}`;
+    }
+    
+    const options = wrapper.querySelectorAll('.custom-option');
+    options.forEach(opt => {
+        const textContent = opt.textContent.trim();
+        if (list.includes(textContent)) {
+            opt.classList.add('selected');
+        } else {
+            opt.classList.remove('selected');
+        }
+    });
+}
+
+function initGlobalClickHandlers() {
+    window.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select-wrapper')) {
+            document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+        }
+        if (!e.target.closest('.filter-dropdown-container')) {
+            const menu = document.getElementById('filterDropdownMenu');
+            if (menu) menu.classList.remove('active');
+        }
+    });
+}
+
+function switchTab(tabName) {
+    const dashboardCardsGrid = document.getElementById('dashboardCardsGrid');
+    const sectionList = document.getElementById('sectionList');
+    const sectionCreate = document.getElementById('sectionCreate');
+    const breadcrumbTitle = document.getElementById('breadcrumbTitle');
+    const bannerTitle = document.getElementById('bannerTitle');
+    const bannerDesc = document.getElementById('bannerDesc');
+    
+    dashboardCardsGrid.style.display = 'none';
+    sectionList.classList.remove('active');
+    sectionCreate.classList.remove('active');
+    
+    if (tabName === 'list') {
+        sectionList.classList.add('active');
+        breadcrumbTitle.textContent = 'Gestión de Staff';
+        bannerTitle.textContent = 'Gestionar STAFFs';
+        bannerDesc.textContent = 'Consulta los miembros del staff registrados, audita sus rangos o gestiona sus estados.';
+    } else if (tabName === 'create') {
+        sectionCreate.classList.add('active');
+        breadcrumbTitle.textContent = 'Gestión de Staff';
+        bannerTitle.textContent = 'Registrar STAFFs';
+        bannerDesc.textContent = 'Completa todos los campos obligatorios del formulario para dar de alta a un nuevo colaborador.';
+    }
+}
+
+function returnToDashboard() {
+    const dashboardCardsGrid = document.getElementById('dashboardCardsGrid');
+    const sectionList = document.getElementById('sectionList');
+    const sectionCreate = document.getElementById('sectionCreate');
+    sectionList.classList.remove('active');
+    sectionCreate.classList.remove('active');
+    dashboardCardsGrid.style.display = 'grid';
+    document.getElementById('breadcrumbTitle').textContent = 'Panel de Staff';
+    document.getElementById('bannerTitle').textContent = 'Gestión y Registro de Staff';
+    document.getElementById('bannerDesc').textContent = 'Administra los miembros del equipo, audita sus rangos o registra nuevos colaboradores en el sistema.';
+}
+
+let currentStatusFilter = 'Todos';
+function toggleFilterMenu() {
+    const menu = document.getElementById('filterDropdownMenu');
+    menu.classList.toggle('active');
+}
+
+function applyStatusFilter(status) {
+    currentStatusFilter = status;
+    document.getElementById('filterDropdownMenu').classList.remove('active');
+    renderTableData();
+}
+
+function renderTableData() {
+    const query = document.getElementById('tableSearchInput').value.toLowerCase();
+    const tbody = document.getElementById('staffTableBody');
+    tbody.innerHTML = '';
+    
+    const filtered = staffList.filter(s => {
+        const matchesSearch = String(s.usuario || '').toLowerCase().includes(query) || 
+                            (s.discordId && String(s.discordId).toLowerCase().includes(query)) || 
+                            String(s.id || '').toLowerCase().includes(query) || 
+                            String(s.rango || '').toLowerCase().includes(query);
+        const matchesFilter = (currentStatusFilter === 'Todos' || s.status === currentStatusFilter);
+        return matchesSearch && matchesFilter;
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">No se encontraron miembros del staff registrados.</td></tr>';
+        return;
+    }
+
+    filtered.forEach(s => {
+        let badgeClass = 'active';
+        if (s.rango === 'Owner' || s.rango === 'Administrador') badgeClass = 'warning';
+        else if (s.rango === 'Desarrollador') badgeClass = 'active';
+
+        let fechaStr = 'N/D';
+        if (s.fechaRegistro) {
+            const fechaObjeto = new Date(s.fechaRegistro);
+            fechaStr = fechaObjeto.toLocaleDateString('es-ES');
+        }
+
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-id', s.id);
+        tr.setAttribute('data-discord-id', s.discordId || '');
+        tr.setAttribute('data-username', s.usuario || '');
+        tr.setAttribute('data-status', s.status);
+
+        tr.innerHTML = `
+            <td><strong>${s.id}</strong></td>
+            <td>
+                <div>${s.usuario}</div>
+                <small style="color: var(--text-muted); font-size: 11px;">ID: ${s.discordId || 'N/A'}</small>
+            </td>
+            <td class="col-rango"><span class="badge-status ${badgeClass}">${s.rango}</span></td>
+            <td style="color: var(--text-muted);">${fechaStr}</td>
+            <td><span class="badge-status ${s.status === 'Activo' ? 'active' : 'revoked'}">${s.status}</span></td>
+            <td style="text-align: right;">
+                <div class="action-btns-group" style="justify-content: flex-end;">
+                    <button class="action-icon-btn" onclick="openFichaModalById('${s.id}')" title="Ver Detalles">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <button class="action-icon-btn" onclick="openEditModalById('${s.id}')" title="Modificar Staff">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="delete-btn" onclick="promptDeleteById('${s.id}', '${s.usuario}', '${s.discordId}')" title="Inactivar Staff">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function openFichaModalById(id) {
+    const s = staffList.find(item => item.id === id);
+    if (!s) return;
+    let fechaFormateada = "No registrada";
+    if (s.fechaRegistro) {
+        const fechaObjeto = new Date(s.fechaRegistro);
+        const opciones = { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+        fechaFormateada = new Intl.DateTimeFormat('es-ES', opciones).format(fechaObjeto) + " (Horario Peninsular)";
+    }
+
+    const formatSocialDisplay = (url, isHidden) => {
+        if (!url) return 'No especificado';
+        if (isHidden) return `${url} <span style="color: var(--accent-red); font-size: 11px; margin-left: 6px;">(Oculto)</span>`;
+        return `${url} <span style="color: #10b981; font-size: 11px; margin-left: 6px;">(Visible)</span>`;
+    };
+
+    const container = document.getElementById('fichaContentContainer');
+    container.innerHTML = `
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-solid fa-hashtag"></i> ID de Staff</span>
+                <span class="ficha-field-value">${s.id}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.id}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-brands fa-discord"></i> Usuario de Discord</span>
+                <span class="ficha-field-value">${s.usuario}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.usuario}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-solid fa-id-card"></i> ID de Discord</span>
+                <span class="ficha-field-value">${s.discordId || 'N/A'}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.discordId || 'N/A'}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-solid fa-layer-group"></i> Categoria</span>
+                <span class="ficha-field-value">${s.categoria || 'N/A'}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.categoria || 'N/A'}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-solid fa-shield"></i> Rango Actual</span>
+                <span class="ficha-field-value">${s.rango}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.rango}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-solid fa-star"></i> Especialidades</span>
+                <span class="ficha-field-value">${s.especialidad || 'Ninguna'}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.especialidad || 'Ninguna'}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-brands fa-instagram" style="color: #e1306c;"></i> Instagram URL</span>
+                <span class="ficha-field-value">${formatSocialDisplay(s.instagram, s.hideInstagram)}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.instagram || ''}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-brands fa-youtube" style="color: #ff0000;"></i> YouTube URL</span>
+                <span class="ficha-field-value">${formatSocialDisplay(s.youtube, s.hideYoutube)}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.youtube || ''}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-solid fa-video" style="color: #53fc18;"></i> Kick URL</span>
+                <span class="ficha-field-value">${formatSocialDisplay(s.kick, s.hideKick)}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.kick || ''}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-brands fa-twitch" style="color: #9146ff;"></i> Twitch URL</span>
+                <span class="ficha-field-value">${formatSocialDisplay(s.twitch, s.hideTwitch)}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.twitch || ''}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-solid fa-folder"></i> Estado Actual</span>
+                <span class="ficha-field-value">${s.status}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${s.status}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+        <div class="ficha-field-row">
+            <div class="ficha-field-info">
+                <span class="ficha-field-label"><i class="fa-solid fa-clock"></i> Fecha de Registro</span>
+                <span class="ficha-field-value">${fechaFormateada}</span>
+            </div>
+            <button class="copy-val-btn" onclick="copyToClipboard('${fechaFormateada}', this)"><i class="fa-regular fa-copy"></i> Copiar</button>
+        </div>
+    `;
+    document.getElementById('fichaModal').classList.add('active');
+}
+
+function closeFichaModal() {
+    document.getElementById('fichaModal').classList.remove('active');
+}
+
+function copyToClipboard(text, btnElement) {
+    if (!text) text = '';
+    navigator.clipboard.writeText(text).then(() => {
+        const originalHTML = btnElement.innerHTML;
+        btnElement.innerHTML = `<i class="fa-solid fa-check"></i> ¡Copiado!`;
+        btnElement.style.background = 'rgba(16, 185, 129, 0.2)';
+        btnElement.style.borderColor = '#10b981';
+        setTimeout(() => {
+            btnElement.innerHTML = originalHTML;
+            btnElement.style.background = '';
+            btnElement.style.borderColor = '';
+        }, 1500);
+    });
+}
+
+function openEditModalById(id) {
+    const s = staffList.find(item => item.id === id);
+    if (!s) return;
+    document.getElementById('editRowId').value = s.id;
+    document.getElementById('editUsuarioInput').value = s.usuario;
+    document.getElementById('editDiscordIdInput').value = s.discordId || '';
+    
+    document.getElementById('editInstagramInput').value = s.instagram || '';
+    document.getElementById('editInstagramHide').checked = !!s.hideInstagram;
+    document.getElementById('editYoutubeInput').value = s.youtube || '';
+    document.getElementById('editYoutubeHide').checked = !!s.hideYoutube;
+    document.getElementById('editKickInput').value = s.kick || '';
+    document.getElementById('editKickHide').checked = !!s.hideKick;
+    document.getElementById('editTwitchInput').value = s.twitch || '';
+    document.getElementById('editTwitchHide').checked = !!s.hideTwitch;
+    
+    const catVal = s.categoria || 'Moderación y Soporte';
+    let catIcon = '<i class="fa-solid fa-headset" style="color: #10b981; margin-right: 8px;"></i>';
+    if (catVal === 'Dirección y Fundadores') catIcon = '<i class="fa-solid fa-crown" style="color: #f59e0b; margin-right: 8px;"></i>';
+    else if (catVal === 'Desarrollo & Tecnologia') catIcon = '<i class="fa-solid fa-code" style="color: #3b82f6; margin-right: 8px;"></i>';
+    selectCustomOption('editCategoriaCustomSelect', catVal, catVal, catIcon);
+
+    const rangoVal = s.rango || 'Moderador';
+    let rangoIcon = '<i class="fa-solid fa-shield" style="color: #3b82f6; margin-right: 8px;"></i>';
+    if (rangoVal === 'Owner') rangoIcon = '<i class="fa-solid fa-chess-king" style="color: #f59e0b; margin-right: 8px;"></i>';
+    else if (rangoVal === 'Desarrollador') rangoIcon = '<i class="fa-solid fa-laptop-code" style="color: #3b82f6; margin-right: 8px;"></i>';
+    else if (rangoVal === 'Game Master') rangoIcon = '<i class="fa-solid fa-gamepad" style="color: #a855f7; margin-right: 8px;"></i>';
+    else if (rangoVal === 'Administrador') rangoIcon = '<i class="fa-solid fa-shield-halved" style="color: #ef4444; margin-right: 8px;"></i>';
+    else if (rangoVal === 'Soporte') rangoIcon = '<i class="fa-solid fa-life-ring" style="color: #10b981; margin-right: 8px;"></i>';
+    selectCustomOption('editRangoCustomSelect', rangoVal, rangoVal, rangoIcon);
+
+    const espSaved = s.especialidad ? s.especialidad.split(', ').map(item => item.trim()) : ['Ninguna'];
+    multiSelections['editEspecialidadCustomSelect'] = espSaved;
+    updateMultiUI('editEspecialidadCustomSelect');
+
+    let estadoIcon = s.status === 'Activo' ? '<i class="fa-solid fa-circle-check" style="color: #10b981; margin-right: 8px;"></i>' : '<i class="fa-solid fa-circle-xmark" style="color: #ef4444; margin-right: 8px;"></i>';
+    selectCustomOption('editEstadoCustomSelect', s.status, s.status, estadoIcon);
+
+    document.getElementById('editModal').classList.add('active');
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+}
+
+async function handleSaveEdit(event) {
+    event.preventDefault();
+    const id = document.getElementById('editRowId').value;
+    const s = staffList.find(item => item.id === id);
+    if (!s) return;
+    s.usuario = document.getElementById('editUsuarioInput').value.trim();
+    s.discordId = document.getElementById('editDiscordIdInput').value.trim();
+    s.categoria = document.getElementById('editCategoriaInput').value;
+    s.rango = document.getElementById('editRangoInput').value;
+    s.especialidad = document.getElementById('editEspecialidadInput').value;
+    
+    s.instagram = document.getElementById('editInstagramInput').value.trim();
+    s.hideInstagram = document.getElementById('editInstagramHide').checked;
+    s.youtube = document.getElementById('editYoutubeInput').value.trim();
+    s.hideYoutube = document.getElementById('editYoutubeHide').checked;
+    s.kick = document.getElementById('editKickInput').value.trim();
+    s.hideKick = document.getElementById('editKickHide').checked;
+    s.twitch = document.getElementById('editTwitchInput').value.trim();
+    s.hideTwitch = document.getElementById('editTwitchHide').checked;
+
+    s.status = document.getElementById('editEstadoInput').value;
+
+    const guardado = await saveStaffToStorage();
+    if (!guardado) return;   // el aviso de error ya se ha mostrado y la tabla vuelve a lo que hay en el servidor
+
+    renderTableData();
+    closeEditModal();
+    showTopNotification(`Se han guardado los cambios con éxito en el staff ID: <strong>${id}</strong>`, 'MODIFICADO');
+}
+
+let idToDelete = null;
+function promptDeleteById(id, usuario, discordId) {
+    idToDelete = id;
+    document.getElementById('deleteModalDesc').innerHTML = `¿Estás seguro de que quieres cambiar al estado inactivo al staff <strong>${usuario} (ID: ${discordId || 'N/A'})</strong>? Al quedar inactivo, perderá sus permisos de staff.`;
+    document.getElementById('deleteModal').classList.add('active');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('active');
+    idToDelete = null;
+}
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    if (!idToDelete) return;
+    const id = idToDelete;
+    const s = staffList.find(item => item.id === id);
+    if (s) {
+        s.status = 'Inactivo';
+    }
+    const guardado = await saveStaffToStorage();
+    closeDeleteModal();
+    if (!guardado) return;
+
+    renderTableData();
+    showTopNotification(`El staff <strong>${id}</strong> ahora se encuentra <strong>Inactivo</strong> y se le han revocado sus permisos de acceso.`, 'INACTIVO');
+});
+
+// ID de staff aleatorio que no esté ya usado por otro miembro
+function generarIdStaff() {
+    let id;
+    do {
+        id = '#ST-' + Math.floor(100 + Math.random() * 900);
+    } while (staffList.some(s => s.id === id));
+    return id;
+}
+
+async function handleCreateStaff(event) {
+    event.preventDefault();
+    const form = event.target;
+    const usuario = document.getElementById('staffUsuarioInput').value.trim();
+    const discordId = document.getElementById('staffDiscordIdInput').value.trim();
+    const categoria = document.getElementById('staffCategoriaInput').value;
+    const rango = document.getElementById('staffRangoInput').value;
+    const especialidad = document.getElementById('staffEspecialidadInput').value;
+    
+    const instagram = document.getElementById('staffInstagramInput').value.trim();
+    const hideInstagram = document.getElementById('staffInstagramHide').checked;
+    const youtube = document.getElementById('staffYoutubeInput').value.trim();
+    const hideYoutube = document.getElementById('staffYoutubeHide').checked;
+    const kick = document.getElementById('staffKickInput').value.trim();
+    const hideKick = document.getElementById('staffKickHide').checked;
+    const twitch = document.getElementById('staffTwitchInput').value.trim();
+    const hideTwitch = document.getElementById('staffTwitchHide').checked;
+
+    const randomId = generarIdStaff();
+    const nuevoStaff = {
+        id: randomId,
+        usuario: usuario,
+        discordId: discordId,
+        categoria: categoria,
+        rango: rango,
+        especialidad: especialidad,
+        instagram: instagram,
+        hideInstagram: hideInstagram,
+        youtube: youtube,
+        hideYoutube: hideYoutube,
+        kick: kick,
+        hideKick: hideKick,
+        twitch: twitch,
+        hideTwitch: hideTwitch,
+        status: 'Activo',
+        fechaRegistro: new Date().toISOString()
+    };
+    staffList.unshift(nuevoStaff);
+
+    const guardado = await saveStaffToStorage();
+    if (!guardado) return;   // no se borra el formulario: se puede reintentar sin volver a escribirlo todo
+
+    renderTableData();
+    form.reset();
+    selectCustomOption('createCategoriaCustomSelect', 'Moderación y Soporte', 'Moderación y Soporte', '<i class="fa-solid fa-headset" style="color: #10b981; margin-right: 8px;"></i>');
+    selectCustomOption('createRangoCustomSelect', 'Moderador', 'Moderador', '<i class="fa-solid fa-shield" style="color: #3b82f6; margin-right: 8px;"></i>');
+    
+    multiSelections['createEspecialidadCustomSelect'] = ['Ninguna'];
+    updateMultiUI('createEspecialidadCustomSelect');
+
+    showTopNotification(`Se ha registrado con éxito el staff <strong>${randomId}</strong> en la base de datos.`, 'ACTIVO');
+    switchTab('list');
+}
+
+let notificationHideTimer = null;
+let notificationResetTimer = null;
+
+function showTopNotification(htmlMessage, tagText, isError) {
+    const notification = document.getElementById('successNotification');
+    const notificationText = document.getElementById('successNotificationText');
+    const notificationTag = document.getElementById('successNotificationTag');
+    const iconBadge = document.getElementById('successIconBadge');
+    const iconElement = document.getElementById('successIconElement');
+
+    notificationText.innerHTML = htmlMessage;
+    notificationTag.textContent = tagText;
+
+    // Verde con ✓ si ha ido bien, rojo con ✕ si es un error
+    if (iconBadge && iconElement) {
+        iconBadge.style.background = isError ? 'rgba(239, 68, 68, 0.15)' : '';
+        iconBadge.style.color = isError ? '#ef4444' : '';
+        iconElement.className = isError ? 'fa-solid fa-xmark' : 'fa-solid fa-check';
+    }
+    notification.style.borderColor = isError ? 'rgba(239, 68, 68, 0.7)' : '';
+
+    clearTimeout(notificationHideTimer);
+    clearTimeout(notificationResetTimer);
+    notification.className = 'show';
+    notificationHideTimer = setTimeout(() => {
+        notification.className = 'hide';
+        notificationResetTimer = setTimeout(() => {
+            notification.className = '';
+        }, 400);
+    }, isError ? 7000 : 2500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 No Encontrado | ClickSense RP</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lexend:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/src/assets/perfil.css">
+
+    <style>
+        :root {
+            --error-bg: #11131a;
+            --error-border: rgba(255, 255, 255, 0.08);
+            --error-text-muted: #8a99ad;
+            --error-text-main: #f1f5f9;
+        }
+
+        body {
+            background-color: var(--error-bg) !important;
+            color: var(--error-text-main) !important;
+            font-family: 'Inter', sans-serif !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .error-card {
+            background: rgba(20, 24, 33, 0.85);
+            border: 1px solid var(--error-border);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+            animation: cardAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: scale(0.92) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .error-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #ffffff, #64748b);
+        }
+
+        .error-code {
+            font-family: 'Lexend', sans-serif;
+            font-size: 5rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 10px;
+            letter-spacing: -2px;
+            text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .error-title {
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .error-desc {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            color: var(--error-text-muted);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .error-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: 'Lexend', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .error-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .redirect-timer {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: var(--error-text-muted);
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-background"></div>
+
+    <div class="error-card">
+        <div class="error-code">404</div>
+        <div class="error-title">Página no encontrada</div>
+        <p class="error-desc">El enlace al que intentas acceder no existe, ha sido movido o el canal está clasificado fuera de la red principal.</p>
+        
+        <a href="/home.html" class="error-btn">
+            <i class="fa-solid fa-house"></i> Volver al Inicio
+        </a>
+
+        <div class="redirect-timer" id="redirectTimer">
+            Redirigiendo automáticamente en <span id="countdown">7</span> segundos...
+        </div>
+    </div>
+
+    <script>
+        // Cuenta atrás opcional para redirigir automáticamente al inicio tras 7 segundos
+        let timeLeft = 7;
+        const countdownEl = document.getElementById('countdown');
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            if (countdownEl) countdownEl.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                window.location.href = '/home.html';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

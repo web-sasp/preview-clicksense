@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión del calendario | ClickSense RP</title>
+<!-- Google Fonts & FontAwesome -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/src/assets/admin.css">
+<style>
+#toastNotification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid #10b981;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 25px 5px rgba(0,0,0,0.5);
+    z-index: 9999;
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+}
+#toastNotification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+#toastNotification .toast-icon {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+#toastNotification .toast-highlight {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.input-icon-wrapper i {
+    position: absolute;
+    left: 14px;
+    color: var(--text-muted, #94a3b8);
+    font-size: 14px;
+    pointer-events: none;
+}
+.input-icon-wrapper input,
+.input-icon-wrapper textarea,
+.input-icon-wrapper select {
+    width: 100%;
+    padding: 12px 14px 12px 42px;
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-color, #334155);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.input-icon-wrapper input:focus,
+.input-icon-wrapper textarea:focus,
+.input-icon-wrapper select:focus {
+    border-color: #10b981;
+}
+.search-box-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.search-box-header i {
+    position: absolute;
+    left: 12px;
+    color: var(--text-muted, #94a3b8);
+    font-size: 13px;
+}
+.search-box-header input {
+    padding: 8px 12px 8px 36px;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--border-color, #334155);
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    width: 220px;
+    transition: width 0.3s ease, border-color 0.2s;
+}
+.search-box-header input:focus {
+    width: 260px;
+    border-color: #10b981;
+}
+.edit-form-container {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-top 0.3s ease;
+    border-top: 0px solid var(--border-color, #334155);
+    margin-top: 0;
+}
+.edit-form-container.open {
+    max-height: 500px;
+    opacity: 1;
+    border-top: 1px solid var(--border-color, #334155);
+    margin-top: 14px;
+    padding-top: 14px;
+}
+
+/* Estilos de las tarjetas de selección */
+.admin-action-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 210px;
+    padding: 24px;
+}
+.admin-action-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.85) 60%, rgba(15, 23, 42, 0.95) 100%);
+    z-index: 1;
+}
+.admin-action-card > * {
+    position: relative;
+    z-index: 2;
+}
+.admin-action-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+}
+.admin-action-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.admin-action-card p {
+    margin: 0;
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.4;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ======================================================== */
+/* MÁXIMA ANIMACIÓN 3D E INMERSIÓN - ACCESO DENEGADO        */
+/* ======================================================== */
+
+@keyframes entry3DExplosion {
+    0% { opacity: 0; transform: scale(0.7) translateZ(-300px) rotateX(35deg); }
+    100% { opacity: 1; transform: scale(1) translateZ(0px) rotateX(0deg); }
+}
+
+@keyframes neonCycle3D {
+    0% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(239, 68, 68, 0.25), inset 0 0 25px rgba(239, 68, 68, 0.15); }
+    33% { border-color: rgba(168, 85, 247, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(168, 85, 247, 0.3), inset 0 0 25px rgba(168, 85, 247, 0.15); }
+    66% { border-color: rgba(236, 72, 153, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(236, 72, 153, 0.3), inset 0 0 25px rgba(236, 72, 153, 0.15); }
+    100% { border-color: rgba(239, 68, 68, 0.6); box-shadow: 0 30px 100px rgba(0,0,0,0.95), 0 0 50px rgba(239, 68, 68, 0.25), inset 0 0 25px rgba(239, 68, 68, 0.15); }
+}
+
+@keyframes liquidShimmer3D {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes radarSpin3D {
+    0% { transform: rotate(0deg) rotateX(10deg); }
+    100% { transform: rotate(360deg) rotateX(10deg); }
+}
+
+@keyframes pulseCore3D {
+    0%, 100% { transform: scale(1) translateZ(40px); filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.7)); }
+    50% { transform: scale(1.1) translateZ(60px); filter: drop-shadow(0 0 40px rgba(239, 68, 68, 1)); }
+}
+
+@keyframes bgFloatingOrb1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(80px, -60px) scale(1.3); }
+}
+
+@keyframes bgFloatingOrb2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-90px, 70px) scale(1.4); }
+}
+</style>
+</head>
+<body>
+<div class="grid-background"></div>
+
+<!-- CONTENEDOR DE ACCESO DENEGADO CON INMERSIÓN 3D MÁXIMA -->
+<div id="accessDeniedContainer" style="display: none; position: fixed; inset: 0; background: radial-gradient(circle at 50% 25%, #160a2b 0%, #040207 92%); z-index: 999999; align-items: center; justify-content: center; padding: 24px; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; perspective: 1600px;">
+    
+    <!-- Orbes Lumínicos 3D de Fondo -->
+    <div style="position: absolute; top: 10vh; left: 15vw; width: 400px; height: 400px; background: radial-gradient(circle, rgba(239, 68, 68, 0.09) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: bgFloatingOrb1 9s infinite ease-in-out;"></div>
+    <div style="position: absolute; bottom: 10vh; right: 15vw; width: 450px; height: 450px; background: radial-gradient(circle, rgba(168, 85, 247, 0.09) 0%, transparent 70%); border-radius: 50%; pointer-events: none; animation: bgFloatingOrb2 11s infinite ease-in-out;"></div>
+
+    <!-- TARJETA PRINCIPAL 3D INTERACTIVA -->
+    <div id="deniedCard3D" style="background: linear-gradient(155deg, rgba(24, 15, 40, 0.97) 0%, rgba(8, 5, 14, 0.99) 100%); border-radius: 40px; padding: 60px 48px; max-width: 680px; width: 100%; text-align: center; backdrop-filter: blur(30px); position: relative; z-index: 2; transform-style: preserve-3d; will-change: transform; transition: transform 0.15s cubic-bezier(0.03, 0.98, 0.52, 0.99), box-shadow 0.3s ease; animation: entry3DExplosion 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards, neonCycle3D 7s infinite linear;">
+        
+        <div style="position: absolute; inset: 0; border-radius: 40px; pointer-events: none; border: 2px solid rgba(239, 68, 68, 0.6); box-sizing: border-box;"></div>
+        <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%) translateZ(30px); width: 200px; height: 5px; background: linear-gradient(90deg, transparent, #ec4899, #8b5cf6, transparent); border-radius: 0 0 6px 6px; box-shadow: 0 0 25px #ec4899;"></div>
+
+        <div style="transform: translateZ(25px); display: inline-flex; align-items: center; gap: 8px; background: rgba(239, 68, 68, 0.14); border: 1px solid rgba(239, 68, 68, 0.4); padding: 7px 20px; border-radius: 20px; color: #f87171; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.8px; margin-bottom: 28px; box-shadow: 0 0 25px rgba(239, 68, 68, 0.2);">
+            <i class="fa-solid fa-triangle-exclamation"></i> Protocolo de Seguridad Activo
+        </div>
+
+        <div style="position: relative; width: 110px; height: 110px; margin: 0 auto 28px auto; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; transform: translateZ(50px);">
+            <div style="position: absolute; inset: -8px; border-radius: 50%; border: 2px dashed rgba(236, 72, 153, 0.5); animation: radarSpin3D 10s linear infinite;"></div>
+            <div style="position: absolute; inset: -18px; border-radius: 50%; border: 1px solid rgba(168, 85, 247, 0.3); animation: radarSpin3D 15s linear infinite reverse;"></div>
+            
+            <div style="width: 104px; height: 104px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(168, 85, 247, 0.12)); color: #f87171; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 44px; border: 1px solid rgba(239, 68, 68, 0.7); animation: pulseCore3D 3s infinite ease-in-out;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+        </div>
+
+        <h1 style="transform: translateZ(40px); font-size: 36px; font-weight: 800; margin-bottom: 14px; letter-spacing: -0.5px; background: linear-gradient(135deg, #fff 15%, #f472b6 45%, #c084fc 75%, #fff 100%); background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: liquidShimmer3D 4s linear infinite;">ACCESO NO AUTORIZADO</h1>
+        
+        <p style="transform: translateZ(30px); color: #94a3b8; font-size: 16px; line-height: 1.7; margin-bottom: 34px; max-width: 550px; margin-left: auto; margin-right: auto;">
+            Tu perfil actual carece de privilegios y no consta en los registros como <strong style="color: #f87171; background: rgba(239, 68, 68, 0.18); padding: 2px 8px; border-radius: 6px; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.35);">STAFF ACTIVO</strong> dentro de este sistema de control central.
+        </p>
+
+        <div style="transform: translateZ(35px); display: flex; flex-direction: column; gap: 14px; text-align: left; margin-bottom: 38px;">
+            <div style="background: rgba(15, 10, 28, 0.9); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 18px; padding: 18px 22px; display: flex; align-items: center; gap: 16px;">
+                <div style="width: 44px; height: 44px; background: rgba(168, 85, 247, 0.18); color: #c084fc; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; border: 1px solid rgba(168, 85, 247, 0.45);">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <div style="font-size: 14.5px; color: #cbd5e1; line-height: 1.5;">
+                    <strong style="color: #fff; display: block; margin-bottom: 2px;">¿Eres miembro activo del equipo staff?</strong>
+                    Comunícate con el <strong style="color: #f472b6;">owner</strong> para que valide y configure tu estado activo en el panel de staff.
+                </div>
+            </div>
+        </div>
+
+        <a href="/home.html" style="transform: translateZ(60px); background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%); color: #fff; text-decoration: none; padding: 18px 42px; border-radius: 16px; font-weight: 700; font-size: 16px; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 15px 40px rgba(236, 72, 153, 0.5);">
+            <i class="fa-solid fa-house"></i> Volver a la página principal
+        </a>
+    </div>
+</div>
+
+<div id="toastNotification">
+    <div class="toast-icon"><i class="fa-solid fa-check"></i></div>
+    <span id="toastText">Se ha creado con éxito el evento</span>
+</div>
+<div class="app-container">
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+            <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+            <span class="server-main-title">ClickSense</span>
+        </div>
+        <button class="sidebar-toggle-icon" id="sidebarToggleBtn" title="Colapsar menú"><i class="fa-solid fa-bars"></i></button>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <div class="nav-category">General</div>
+        <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> <span>Home</span></a>
+        <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> <span>Equipo</span></a>
+        <a href="/admin/calendario.html" class="nav-item active"><i class="fa-solid fa-calendar-days"></i> <span>Calendario</span></a>
+        <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> <span>Comercios</span></a>
+        <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> <span>Postulaciones ilegales</span></a>
+        
+        <div class="nav-category">Espacio de trabajo</div>
+        <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> <span>Grupos</span></a>
+        <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> <span>Documentos</span></a>
+        <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> <span>Whitelist</span></a>
+        
+        <div class="nav-category">Mi Cuenta</div>
+        <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> <span>Mi Perfil</span></a>
+        <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> <span>Historias personaje</span></a>
+        <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> <span>Tickets</span></a>
+
+        <div class="nav-category">SASP</div>
+        <a href="/lspd-academia.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> <span>Academia LSPD</span></a>
+        <a href="/lssd-academia.html" class="nav-item"><i class="fa-solid fa-star-badge"></i> <span>Academia LSSD</span></a>
+        <a href="/defcon.html" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i> <span>Defcon</span></a>
+        <a href="/codigo-penal.html" class="nav-item"><i class="fa-solid fa-scale-balanced"></i> <span>Código penal</span></a>
+        <a href="/organigrama.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> <span>Organigrama</span></a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-profile-mini" id="userProfileMini">
+            <div class="avatar-placeholder" id="userAvatarContainer"><span id="userAvatarFallback">?</span></div>
+            <div class="user-info">
+                <span class="username" id="userNameDisplay">Usuario</span>
+                <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@tag</span>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+    <i class="fa-solid fa-chevron-right"></i>
+</button>
+
+<main class="main-content">
+<header class="top-action-bar animate-fade-down">
+    <div class="breadcrumb">Gestión del calendario</div>
+    <div class="top-buttons"></div>
+</header>
+<div class="welcome-banner-card animate-fade-up">
+    <div class="welcome-avatar" style="background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-calendar-check" style="font-size: 24px; color: #10b981;"></i>
+    </div>
+    <div class="welcome-text-content">
+        <h1>Gestión y Registro de Eventos</h1>
+        <p>Administra los eventos del calendario, revisa los acontecimientos activos o registra nuevas fechas clave en el sistema. Los eventos nuevos también se publican en «Anuncios y Novedades» de Home.</p>
+    </div>
+</div>
+
+<!-- Tarjetas de opciones principales -->
+<div class="admin-cards-grid animate-fade-up delay-1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 20px;">
+    <div class="admin-action-card" id="cardListEvents" style="background-image: url('https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=600&auto=format&fit=crop');">
+        <div>
+            <h3>GESTIONAR EVENTOS</h3>
+            <p>Consulta el listado completo de eventos del calendario, modifica sus detalles o gestiona sus estados actuales.</p>
+        </div>
+    </div>
+    <div class="admin-action-card" id="cardCreateEvent" style="background-image: url('https://images.unsplash.com/photo-1435575653489-b0873ec996e2?q=80&w=600&auto=format&fit=crop');">
+        <div>
+            <h3>CREAR EVENTO</h3>
+            <p>Da de alta un nuevo acontecimiento en el calendario especificando su título, fecha y categoría asignada.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Sección del formulario de creación -->
+<div id="sectionCreateForm" class="animate-fade-up" style="display: none; margin-top: 25px;">
+    <div class="admin-card" style="padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 18px; color: #fff; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-calendar-plus" style="color: #10b981;"></i> Formulario de Nuevo Evento
+            </h3>
+            <button type="button" id="cancelCreateBtn" class="top-btn" style="background: rgba(255, 255, 255, 0.05); color: var(--text-muted, #94a3b8); border: 1px solid var(--border-color, #334155); padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                <i class="fa-solid fa-arrow-left"></i> Volver
+            </button>
+        </div>
+        <form id="createEventForm" style="display: flex; flex-direction: column; gap: 18px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 13px; font-weight: 500; color: var(--text-muted, #94a3b8);">Título del evento</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-solid fa-heading"></i>
+                    <input type="text" id="eventTitle" placeholder="Ej: Apertura Oficial de Servidor" required>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 13px; font-weight: 500; color: var(--text-muted, #94a3b8);">Fecha y hora</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <input type="datetime-local" id="eventDate" min="2025-01-01T00:00" max="2027-12-31T23:59" required>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 13px; font-weight: 500; color: var(--text-muted, #94a3b8);">Tipo de evento</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-solid fa-tag"></i>
+                    <select id="eventCategory">
+                        <option value="event">Evento General</option>
+                        <option value="police">Policía / LSPD</option>
+                        <option value="illegal">Ilegal / Banda</option>
+                        <option value="notice">Aviso Importante</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 13px; font-weight: 500; color: var(--text-muted, #94a3b8);">Descripción</label>
+                <div class="input-icon-wrapper" style="align-items: flex-start;">
+                    <i class="fa-solid fa-align-left" style="top: 14px;"></i>
+                    <textarea id="eventDesc" rows="3" placeholder="Detalles o temática del acontecimiento..." style="resize: vertical;"></textarea>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 5px;">
+                <button type="submit" class="top-btn" style="background: #10b981; color: #fff; border: none; padding: 11px 22px; border-radius: 9px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-check"></i> Guardar Evento
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Sección del listado de eventos activos -->
+<div id="sectionListEvents" class="animate-fade-up" style="display: none; margin-top: 25px;">
+    <div class="admin-card" style="padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button type="button" id="backToListCardsBtn" class="top-btn" style="background: rgba(255, 255, 255, 0.05); color: var(--text-muted, #94a3b8); border: 1px solid var(--border-color, #334155); padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver
+                </button>
+                <h3 style="margin: 0; font-size: 18px; color: #fff; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-clipboard-list" style="color: #3b82f6;"></i> Lista de Eventos Activos
+                </h3>
+            </div>
+            <div class="search-box-header">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchEventInput" placeholder="Buscar evento...">
+            </div>
+        </div>
+        <div id="eventsListContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
+    </div>
+</div>
+</main>
+</div>
+
+<script src="/src/views/permissions.js"></script>
+
+<script>
+async function checkStaffAccess() {
+    const storedUser = localStorage.getItem('discord_user');
+    if (!storedUser) return false;
+
+    let discordUser;
+    try {
+        discordUser = JSON.parse(storedUser);
+    } catch (e) {
+        return false;
+    }
+
+    const currentUserId = String(discordUser.id || '').trim();
+    const currentUsername = String(discordUser.username || '').toLowerCase().trim();
+    const currentDisplayName = String(discordUser.displayName || '').toLowerCase().trim();
+
+    if (!currentUserId && !currentUsername) return false;
+
+    const staffKeys = ['staff_data', 'staff_list', 'staff_members', 'click_sense_staff'];
+    for (const key of staffKeys) {
+        const data = localStorage.getItem(key);
+        if (data) {
+            try {
+                const staffListParsed = JSON.parse(data);
+                if (Array.isArray(staffListParsed)) {
+                    const isRegisteredActive = staffListParsed.some(s => {
+                        const sName = (s.name || s.username || s.discord || s.user || s.usuario || '').toLowerCase();
+                        const sId = String(s.id || s.discordId || s.discord_id || '');
+                        const sStatus = String(s.status || 'Activo').toLowerCase();
+
+                        if (sStatus !== 'activo') return false;
+
+                        const matchId = currentUserId && (sId === currentUserId || sId.includes(currentUserId));
+                        const matchName = currentUsername && (sName.includes(currentUsername) || sName.includes(currentDisplayName));
+
+                        return matchId || matchName;
+                    });
+                    if (isRegisteredActive) return true;
+                }
+            } catch (err) {
+                console.error("Error al analizar los datos de staff en localStorage", err);
+            }
+        }
+    }
+
+    return false;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const isAllowed = await checkUserPermissions();
+    if (!isAllowed) {
+        const appContainer = document.querySelector('.app-container');
+        if (appContainer) appContainer.style.display = 'none';
+        const deniedContainer = document.getElementById('accessDeniedContainer');
+        if (deniedContainer) {
+            deniedContainer.style.display = 'flex';
+            
+            const deniedCard = document.getElementById('deniedCard3D');
+            if (deniedCard) {
+                document.addEventListener('mousemove', (e) => {
+                    const rect = deniedCard.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    const rotateX = (-y / 18);
+                    const rotateY = (x / 18);
+                    deniedCard.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                document.addEventListener('mouseleave', () => {
+                    deniedCard.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
+            }
+        }
+        return;
+    }
+
+    loadDiscordSessionData();
+});
+
+async function loadDiscordSessionData() {
+    const storedUser = localStorage.getItem('discord_user');
+    const avatarContainer = document.getElementById('userAvatarContainer');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const userHandleDisplay = document.getElementById('userHandleDisplay');
+    if (!storedUser) return;
+    try {
+        const discordUser = JSON.parse(storedUser);
+        if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+        if (userHandleDisplay) userHandleDisplay.textContent = `@${discordUser.username || "discord"}`;
+        if (avatarContainer && discordUser.avatarUrl) {
+            avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    } catch (e) {
+        console.error("Error al cargar la sesión de Discord", e);
+    }
+}
+
+function getCurrentAuthor() {
+    try {
+        const u = JSON.parse(localStorage.getItem('discord_user') || '{}');
+        return {
+            autor: u.displayName || u.username || 'Staff ClickSense',
+            avatarAutor: u.avatarUrl || ''
+        };
+    } catch (e) {
+        return { autor: 'Staff ClickSense', avatarAutor: '' };
+    }
+}
+
+const toggleBtn = document.getElementById('sidebarToggleBtn');
+const revealBtn = document.getElementById('sidebarRevealBtn');
+const sidebar = document.getElementById('sidebar');
+if (toggleBtn && revealBtn && sidebar) {
+    toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+    revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+}
+
+const cardCreateEvent = document.getElementById('cardCreateEvent');
+const cardListEvents = document.getElementById('cardListEvents');
+const sectionCreateForm = document.getElementById('sectionCreateForm');
+const sectionListEvents = document.getElementById('sectionListEvents');
+const cancelCreateBtn = document.getElementById('cancelCreateBtn');
+const backToListCardsBtn = document.getElementById('backToListCardsBtn');
+const adminCardsGrid = document.querySelector('.admin-cards-grid');
+
+cardCreateEvent.addEventListener('click', () => {
+    adminCardsGrid.style.display = 'none';
+    sectionCreateForm.style.display = 'block';
+    sectionListEvents.style.display = 'none';
+});
+
+cardListEvents.addEventListener('click', () => {
+    adminCardsGrid.style.display = 'none';
+    sectionListEvents.style.display = 'block';
+    sectionCreateForm.style.display = 'none';
+    renderEventsList();
+});
+
+cancelCreateBtn.addEventListener('click', () => {
+    sectionCreateForm.style.display = 'none';
+    adminCardsGrid.style.display = 'grid';
+});
+
+backToListCardsBtn.addEventListener('click', () => {
+    sectionListEvents.style.display = 'none';
+    adminCardsGrid.style.display = 'grid';
+});
+
+function showToast(message) {
+    const toast = document.getElementById('toastNotification');
+    const toastText = document.getElementById('toastText');
+    toastText.innerHTML = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 4000);
+}
+
+function getStoredEventsObj() {
+    const data = localStorage.getItem('calendar_events');
+    if (!data) return {};
+    try {
+        return JSON.parse(data);
+    } catch(e) {
+        return {};
+    }
+}
+
+function saveStoredEventsObj(obj) {
+    localStorage.setItem('calendar_events', JSON.stringify(obj));
+}
+
+async function notificarNuevoEventoAUsuarios(eventoData) {
+    const isSubscribed = localStorage.getItem('calendar_notifications_active') === 'true';
+    if (!isSubscribed) return;
+
+    let discordId = null;
+    const storedUser = localStorage.getItem('discord_user');
+    if (storedUser) {
+        try {
+            const u = JSON.parse(storedUser);
+            discordId = u.id || u.discord_id;
+        } catch(e) {}
+    }
+
+    if (discordId) {
+        const locationText = eventoData.location || (Array.isArray(eventoData.businesses) ? eventoData.businesses.join(', ') : (eventoData.businesses || 'No especificada'));
+        const fechaHoraText = eventoData.date || '';
+
+        try {
+            await fetch('/api/notificar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    discord_id: discordId,
+                    tipo: "evento",
+                    titulo: "🎉 NUEVO EVENTO PROGRAMADO",
+                    descripcion: `Se ha registrado un nuevo evento en el calendario:\n\n**${eventoData.title}**`,
+                    campos: [
+                        {
+                            name: "📅 Fecha y Hora",
+                            value: `\`\`${fechaHoraText}\`\``,
+                            inline: true
+                        },
+                        {
+                            name: "📍 Ubicación",
+                            value: `\`\`${locationText}\`\``,
+                            inline: true
+                        },
+                        {
+                            name: "📝 Descripción",
+                            value: eventoData.description || "Sin descripción",
+                            inline: false
+                        },
+                        {
+                            name: "🔔 Ver en el calendario",
+                            value: "[Pincha aquí para acceder](http://localhost:8000/calendario.html)",
+                            inline: false
+                        }
+                    ]
+                })
+            });
+        } catch (err) {
+            console.error("Error enviando DM de nuevo evento desde admin:", err);
+        }
+    }
+}
+
+function renderEventsList(filterText = '') {
+    const container = document.getElementById('eventsListContainer');
+    const eventsObj = getStoredEventsObj();
+    let flatList = [];
+
+    for (const dateKey in eventsObj) {
+        if (Array.isArray(eventsObj[dateKey])) {
+            eventsObj[dateKey].forEach(ev => {
+                flatList.push({ ...ev, dateKey });
+            });
+        }
+    }
+
+    if (filterText) {
+        const query = filterText.toLowerCase();
+        flatList = flatList.filter(ev => ev.title.toLowerCase().includes(query) || (ev.description && ev.description.toLowerCase().includes(query)));
+    }
+
+    if (flatList.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted, #94a3b8); font-size: 14px; margin: 0; padding: 10px 0;">No se encontraron eventos activos.</p>';
+        return;
+    }
+
+    container.innerHTML = flatList.map(ev => `
+        <div id="event-row-${ev.id}" style="background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-color, #334155); padding: 16px; border-radius: 10px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4 style="margin: 0 0 6px 0; font-size: 16px; color: #fff;">${ev.title}</h4>
+                    <p style="margin: 0 0 4px 0; font-size: 13px; color: var(--text-muted, #94a3b8);"><i class="fa-regular fa-calendar"></i> ${ev.date}</p>
+                    ${ev.description ? `<p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.7);">${ev.description}</p>` : ''}
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="toggleEditEvent('${ev.id}')" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: none; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Editar evento"><i class="fa-solid fa-pencil"></i></button>
+                    <button onclick="deleteEvent('${ev.id}', '${ev.dateKey}')" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: none; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Eliminar evento"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+            <div id="edit-form-${ev.id}" class="edit-form-container">
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <label style="font-size: 12px; color: var(--text-muted, #94a3b8);">Título</label>
+                        <div class="input-icon-wrapper"><i class="fa-solid fa-heading"></i><input type="text" id="edit-title-${ev.id}" value="${ev.title}"></div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <label style="font-size: 12px; color: var(--text-muted, #94a3b8);">Fecha y hora</label>
+                        <div class="input-icon-wrapper"><i class="fa-solid fa-calendar-days"></i><input type="datetime-local" id="edit-date-${ev.id}" min="2025-01-01T00:00" max="2027-12-31T23:59" value="${ev.date}"></div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <label style="font-size: 12px; color: var(--text-muted, #94a3b8);">Descripción</label>
+                        <div class="input-icon-wrapper" style="align-items: flex-start;"><i class="fa-solid fa-align-left" style="top: 14px;"></i><textarea id="edit-desc-${ev.id}" rows="2" style="resize: vertical;">${ev.description || ''}</textarea></div>
+                    </div>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button onclick="saveEditedEvent('${ev.id}', '${ev.dateKey}')" class="top-btn" style="background: #10b981; color: #fff; border: none; padding: 8px 16px; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 600;"><i class="fa-solid fa-check"></i> Guardar cambios</button>
+                        <button onclick="toggleEditEvent('${ev.id}')" class="top-btn" style="background: rgba(255, 255, 255, 0.05); color: var(--text-muted, #94a3b8); border: 1px solid var(--border-color, #334155); padding: 8px 14px; border-radius: 7px; cursor: pointer; font-size: 13px;">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+window.toggleEditEvent = function(id) {
+    const form = document.getElementById(`edit-form-${id}`);
+    if (form.classList.contains('open')) {
+        form.classList.remove('open');
+    } else {
+        form.classList.add('open');
+    }
+};
+
+window.saveEditedEvent = function(id, oldDateKey) {
+    const newTitle = document.getElementById(`edit-title-${id}`).value.trim();
+    const newDate = document.getElementById(`edit-date-${id}`).value;
+    const newDesc = document.getElementById(`edit-desc-${id}`).value.trim();
+
+    if (!newTitle || !newDate) {
+        alert("El título y la fecha son obligatorios.");
+        return;
+    }
+
+    const newDateKey = newDate.substring(0, 10);
+    let eventsObj = getStoredEventsObj();
+    let targetEvent = null;
+
+    if (eventsObj[oldDateKey]) {
+        eventsObj[oldDateKey] = eventsObj[oldDateKey].filter(ev => {
+            if (ev.id == id) {
+                targetEvent = ev;
+                return false;
+            }
+            return true;
+        });
+        if (eventsObj[oldDateKey].length === 0) delete eventsObj[oldDateKey];
+    }
+
+    if (targetEvent) {
+        targetEvent.title = newTitle;
+        targetEvent.date = newDate;
+        targetEvent.description = newDesc;
+    } else {
+        const a = getCurrentAuthor();
+        targetEvent = { id: id, title: newTitle, date: newDate, description: newDesc, type: 'event', autor: a.autor, avatarAutor: a.avatarAutor, createdAt: new Date().toISOString() };
+    }
+
+    if (!eventsObj[newDateKey]) eventsObj[newDateKey] = [];
+    eventsObj[newDateKey].push(targetEvent);
+
+    saveStoredEventsObj(eventsObj);
+    renderEventsList(document.getElementById('searchEventInput').value);
+    showToast(`Se han guardado los cambios en: <span class="toast-highlight">${newTitle}</span>`);
+};
+
+window.deleteEvent = function(id, dateKey) {
+    let eventsObj = getStoredEventsObj();
+    if (eventsObj[dateKey]) {
+        eventsObj[dateKey] = eventsObj[dateKey].filter(ev => ev.id != id);
+        if (eventsObj[dateKey].length === 0) delete eventsObj[dateKey];
+    }
+    saveStoredEventsObj(eventsObj);
+    renderEventsList(document.getElementById('searchEventInput').value);
+};
+
+document.getElementById('searchEventInput').addEventListener('input', (e) => {
+    renderEventsList(e.target.value);
+});
+
+document.getElementById('createEventForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('eventTitle').value.trim();
+    const date = document.getElementById('eventDate').value;
+    const type = document.getElementById('eventCategory').value;
+    const description = document.getElementById('eventDesc').value.trim();
+
+    if (title && date) {
+        const dateKey = date.substring(0, 10);
+        let eventsObj = getStoredEventsObj();
+
+        if (!eventsObj[dateKey]) {
+            eventsObj[dateKey] = [];
+        }
+
+        const author = getCurrentAuthor();
+
+        const newEvent = {
+            id: Date.now(),
+            title,
+            date,
+            type,
+            description,
+            autor: author.autor,
+            avatarAutor: author.avatarAutor,
+            createdAt: new Date().toISOString()
+        };
+
+        eventsObj[dateKey].push(newEvent);
+        saveStoredEventsObj(eventsObj);
+
+        // Envío de la notificación de Discord con el formato idéntico al calendario
+        if (typeof window.registrarYNotificarNuevoEvento === 'function') {
+            await window.registrarYNotificarNuevoEvento(dateKey, newEvent);
+        } else {
+            await notificarNuevoEventoAUsuarios(newEvent);
+        }
+
+        document.getElementById('createEventForm').reset();
+        sectionCreateForm.style.display = 'none';
+        adminCardsGrid.style.display = 'grid';
+        renderEventsList();
+        showToast(`Se ha creado con éxito el evento <span class="toast-highlight">${title}</span> y se ha publicado en Novedades`);
+    }
+});
+</script>
+</body>
+</html>

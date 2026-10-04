@@ -1,0 +1,966 @@
+/* ==========================================================
+   ESTILOS ESPECÍFICOS: WHITELIST (/src/assets/whitelist.css)
+   ========================================================== */
+
+/* Notificación Flotante Estilo Ticket Exacto (Redondeada y con resplandor morado) */
+.top-notification-banner {
+    position: fixed;
+    top: -90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0f131f;
+    color: #f8fafc;
+    padding: 8px 18px;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(168, 85, 247, 0.4);
+    display: flex;
+    align-items: center;
+    z-index: 2000;
+    transition: top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    max-width: 95vw;
+}
+
+.top-notification-banner.show {
+    top: 24px;
+}
+
+.top-notification-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+.top-notification-icon-wrap {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(168, 85, 247, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a855f7;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+/* Estilo para el mensaje de error de caracteres mínimos */
+.input-error-msg {
+    color: #ef4444;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 4px;
+    display: block;
+}
+
+.whitelist-content-wrapper {
+    padding: 10px 20px;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Tarjeta Estilo Ticket / Panel Horizontal */
+.ticket-style-card {
+    background: #121826;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.ticket-card-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.ticket-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(236, 72, 153, 0.12);
+    border: 1px solid rgba(236, 72, 153, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ec4899;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.ticket-text h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f8fafc;
+    margin: 0 0 4px 0;
+}
+
+.ticket-text p {
+    font-size: 14px;
+    color: var(--text-muted, #94a3b8);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Tarjeta CTA Estilo Panel Profesional */
+.modern-cta-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 16px;
+    padding: 30px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 0 15px rgba(59, 130, 246, 0.05);
+}
+
+.modern-cta-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #3b82f6, #60a5fa);
+}
+
+.cta-left-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.cta-icon-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #60a5fa;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.cta-text h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f8fafc;
+    margin: 0 0 4px 0;
+}
+
+.cta-text p {
+    font-size: 13px;
+    color: var(--text-muted, #94a3b8);
+    margin: 0;
+    line-height: 1.4;
+    max-width: 520px;
+}
+
+.btn-modern-action {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    white-space: nowrap;
+}
+
+.btn-modern-action:hover {
+    background: linear-gradient(135deg, #2563eb 100%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+}
+
+/* ==========================================================
+   GRID DE 3 TARJETAS DE NORMATIVAS
+   ========================================================== */
+.normativas-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.normativa-card {
+    background: #121826;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.normativa-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(236, 72, 153, 0.4);
+    box-shadow: 0 10px 25px rgba(236, 72, 153, 0.15);
+}
+
+.normativa-image {
+    height: 140px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    text-align: center;
+}
+
+.normativa-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.normativa-image h2 {
+    position: relative;
+    color: #ffffff;
+    font-size: 1.3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1.15;
+    margin: 0;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.normativa-content {
+    padding: 16px;
+    background: #121826;
+}
+
+.normativa-content h3 {
+    color: #f8fafc;
+    font-size: 0.95rem;
+    margin: 0 0 4px 0;
+    font-weight: 600;
+}
+
+.normativa-content p {
+    color: #94a3b8;
+    font-size: 0.83rem;
+    margin: 0;
+}
+
+/* ==========================================================
+   ESTILOS DE EXPEDIENTE DE VIAJE (MODAL)
+   ========================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.expediente-card {
+    background: #e9e4d5 !important;
+    border: 2px solid #524738 !important;
+    max-width: 1000px !important;
+    width: 95vw !important;
+    height: 88vh !important;
+    max-height: 920px !important;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    color: #2b261f;
+    transform: scale(0.92) translateY(20px);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+
+.modal-overlay.active .expediente-card {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.expediente-header {
+    background: #dcd4be;
+    border-bottom: 2px solid #bdae93;
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.expediente-badge {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.seal-img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.expediente-titles.center-titles {
+    text-align: center;
+    flex: 1;
+    padding: 0 20px;
+}
+
+.expediente-titles h2 {
+    font-size: 20px;
+    font-weight: 900;
+    color: #262119;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.visa-subtitle {
+    font-size: 10px;
+    font-weight: 700;
+    color: #205048;
+    display: block;
+}
+
+.visa-meta {
+    font-size: 9.5px;
+    color: #736754;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #594c3d;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #000;
+}
+
+.expediente-body {
+    padding: 12px 28px 8px 28px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.expediente-page {
+    display: none;
+}
+
+.expediente-page.active {
+    display: block;
+    animation: fadeInPage 0.3s ease;
+}
+
+@keyframes fadeInPage {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section-banner {
+    background: #1f423d;
+    color: #ffffff;
+    padding: 8px 14px;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.page-grid-p1 {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 14px;
+    align-items: start;
+    margin-bottom: 6px;
+}
+
+.photo-tape-container {
+    position: relative;
+    padding-top: 8px;
+}
+
+.tape-strip {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    width: 70px;
+    height: 18px;
+    background: rgba(212, 197, 160, 0.85);
+    border: 1px dashed #b5a482;
+    z-index: 2;
+}
+
+.character-photo-box {
+    background: #dfd8c5;
+    border: 2px solid #bfae93;
+    height: 195px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+.default-avatar-icon {
+    font-size: 60px;
+    color: #9c917b;
+}
+
+.inputs-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.inline-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.checkbox-group-box {
+    background: #dfd8c5;
+    border: 1px solid #c7b99f;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4a3f32;
+}
+
+.vertical-check-grid {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 12px;
+}
+
+.check-item-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+}
+
+.check-item-col input[type="radio"] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+.sub-card-box {
+    background: #dfd8c5;
+    border: 1px solid #c2b499;
+    padding: 6px 14px;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+.text-center-box {
+    text-align: center;
+}
+
+.block-label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #594c3d;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.centered-tez {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #3b3226;
+}
+
+/* ==========================================================
+   BILLETE DE VUELO AUTÉNTICO (ARRIVAL CARD) - CERO ESPACIOS
+   ========================================================== */
+.flight-ticket-container {
+    background: #173b36;
+    border: 2px solid #0f2824;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 4px;
+    margin-bottom: 0px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.flight-ticket-header-strip {
+    background: #1f423d;
+    padding: 4px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ft-title {
+    color: #f8fafc;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.ft-zone {
+    color: #94a3b8;
+    font-size: 9px;
+    font-weight: 700;
+    font-family: monospace;
+}
+
+.flight-ticket-body {
+    background: #dfd8c5;
+    padding: 6px 14px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    align-items: center;
+}
+
+.ft-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ft-label {
+    font-size: 9px;
+    font-weight: 800;
+    color: #736754;
+    letter-spacing: 0.5px;
+}
+
+.ft-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: #2b261f;
+    text-transform: uppercase;
+}
+
+.ft-valid {
+    color: #1f423d;
+}
+
+.ft-input-origen {
+    background: #f7f4ea !important;
+    border: 1px solid #b8a88a !important;
+    color: #2b261f !important;
+    border-radius: 4px;
+    padding: 3px 6px !important;
+    font-size: 11px !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+.flight-ticket-perforation {
+    background: #dfd8c5;
+    padding: 0 12px 4px 12px;
+}
+
+.perestriation-line {
+    border-top: 1px dashed #b5a482;
+    margin-bottom: 3px;
+}
+
+.perforation-ticks {
+    display: flex;
+    justify-content: space-between;
+}
+
+.perforation-ticks span {
+    width: 1px;
+    height: 5px;
+    background: #b5a482;
+}
+
+/* Formulario página 2 */
+.form-grid-p2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.form-grid-p2 .full-width {
+    grid-column: span 2;
+}
+
+.expediente-card .form-group label {
+    color: #4a3f32;
+    font-size: 11px;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.expediente-card input:not(.ft-input-origen), 
+.expediente-card textarea, 
+.expediente-card select {
+    background: #f7f4ea !important;
+    border: 1px solid #b8a88a !important;
+    color: #2b261f !important;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 13px;
+    width: 100%;
+}
+
+.expediente-card input:focus, 
+.expediente-card textarea:focus {
+    outline: none;
+    border-color: #1f423d !important;
+    box-shadow: 0 0 0 2px rgba(31, 66, 61, 0.2) !important;
+}
+
+.expediente-card textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+/* ==========================================================
+   BOTONES Y PIE DE PÁGINA
+   ========================================================== */
+.expediente-footer {
+    background: #dcd4be !important;
+    border-top: 2px solid #bdae93 !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 28px !important;
+    flex-shrink: 0;
+}
+
+.page-indicators {
+    display: flex;
+    gap: 8px;
+}
+
+.page-indicators .dot {
+    width: 26px;
+    height: 26px;
+    background: #cfc5ad;
+    border: 1px solid #b0a184;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    color: #594c3d;
+}
+
+.page-indicators .dot.active {
+    background: #1f423d;
+    color: #fff;
+    border-color: #152d29;
+}
+
+.footer-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-custom-secondary {
+    background: #d4cbb2;
+    border: 1px solid #b8a88a;
+    color: #4a3f32;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.btn-custom-secondary:hover {
+    background: #c7bc9e;
+    color: #1f2937;
+    transform: translateY(-1px);
+}
+
+.btn-custom-primary {
+    background: linear-gradient(135deg, #1f423d 0%, #152d29 100%);
+    border: 1px solid #0f221e;
+    color: white;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(31, 66, 61, 0.3);
+}
+
+.btn-custom-primary:hover {
+    background: linear-gradient(135deg, #152d29 0%, #0d1e1b 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(31, 66, 61, 0.4);
+}
+
+.btn-submit-final {
+    background: linear-gradient(135deg, #a34832 0%, #85331f 100%) !important;
+    border-color: #6b2616 !important;
+    box-shadow: 0 4px 12px rgba(163, 72, 50, 0.35) !important;
+}
+
+.btn-submit-final:hover {
+    background: linear-gradient(135deg, #85331f 0%, #6b2616 100%) !important;
+    box-shadow: 0 6px 16px rgba(163, 72, 50, 0.5) !important;
+}
+
+/* ==========================================================
+   MODAL DE FIRMA (FOLIO DE PAPEL OFICIAL)
+   ========================================================== */
+.folio-paper-card {
+    background: #fdfcf7 !important;
+    border: 2px solid #d4cebc !important;
+    max-width: 760px !important;
+    width: 92vw !important;
+    min-height: 680px !important;
+    border-radius: 8px !important;
+    padding: 35px 45px !important;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    color: #2b261f !important;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.folio-header {
+    text-align: center;
+    border-bottom: 2px solid #2b261f;
+    padding-bottom: 12px;
+}
+
+.folio-header h3 {
+    font-size: 18px;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: 1.5px;
+    color: #1f2937;
+}
+
+.folio-header span {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+    letter-spacing: 1px;
+}
+
+.folio-body {
+    position: relative;
+    padding: 5px 0;
+    flex: 1;
+}
+
+.folio-badge-stamp {
+    position: absolute;
+    top: -5px;
+    right: 0;
+    border: 2px dashed #991b1b;
+    color: #991b1b;
+    font-size: 11px;
+    font-weight: 900;
+    padding: 4px 10px;
+    transform: rotate(6deg);
+    letter-spacing: 1px;
+    background: rgba(153, 27, 27, 0.05);
+}
+
+.folio-body h4 {
+    font-size: 14px;
+    font-weight: 800;
+    text-align: center;
+    margin: 10px 0 15px 0;
+    color: #1f2937;
+}
+
+.folio-body p {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: #374151;
+    text-align: justify;
+    margin-bottom: 12px;
+}
+
+.folio-signature-section {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px dashed #d1d5db;
+}
+
+.signature-line-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.signature-line-box label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #4b5563;
+    letter-spacing: 0.5px;
+}
+
+.btn-signature-action {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    align-self: flex-start;
+}
+
+.btn-signature-action:hover {
+    background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(30, 58, 138, 0.4);
+}
+
+.signature-preview-container {
+    background: #f3f4f6;
+    border: 1px dashed #9ca3af;
+    border-radius: 6px;
+    padding: 8px 14px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.signature-rendered-text {
+    font-family: 'Caveat', cursive, serif !important;
+    font-size: 30px !important;
+    color: #1e3a8a !important;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.folio-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* ==========================================================
+   RESPONSIVE DESIGN
+   ========================================================== */
+@media (max-width: 1024px) {
+    .normativas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 850px) {
+    .modern-cta-card, .ticket-style-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .btn-modern-action {
+        width: 100%;
+        justify-content: center;
+    }
+    .page-grid-p1 {
+        grid-template-columns: 1fr;
+    }
+    .flight-ticket-body {
+        grid-template-columns: 1fr 1fr;
+    }
+    .expediente-card {
+        height: 90vh !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .normativas-grid { grid-template-columns: 1fr; }
+    .form-grid-p2 { grid-template-columns: 1fr; }
+    .form-grid-p2 .full-width { grid-column: span 1; }
+    .inline-options-grid { grid-template-columns: 1fr; }
+    .flight-ticket-body { grid-template-columns: 1fr; }
+}

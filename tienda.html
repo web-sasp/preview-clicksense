@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tienda Oficial | ClickSense RP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/src/assets/admin.css">
+<link rel="stylesheet" href="/src/assets/perfil.css">
+<style>
+/* Scrollbar moderna */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(14, 10, 20, 0.9);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.3);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(168, 85, 247, 0.6);
+}
+
+/* Animaciones Avanzadas */
+@keyframes pageEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.99);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+@keyframes badgePop {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+}
+
+.main-content {
+    animation: pageEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+:root {
+    --purple-primary: #a855f7;
+    --purple-glow: rgba(168, 85, 247, 0.3);
+    --pink-accent: #ec4899;
+}
+
+/* Banner principal de la tienda */
+.store-banner {
+    background: linear-gradient(135deg, rgba(25, 15, 35, 0.95) 0%, rgba(35, 15, 45, 0.95) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 24px;
+    padding: 36px;
+    margin-bottom: 32px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(168, 85, 247, 0.12);
+    position: relative;
+    overflow: hidden;
+    animation: pageEntrance 0.5s ease-out;
+}
+.store-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(to bottom, #a855f7, #ec4899);
+}
+
+/* Banner de la sección policial con carrusel automático de fondo */
+.police-hero-banner {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    height: 320px;
+    margin-bottom: 32px;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pageEntrance 0.5s ease-out;
+}
+.police-hero-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+    z-index: 1;
+}
+.police-hero-bg.active {
+    opacity: 1;
+}
+.police-hero-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(14, 10, 20, 0.88) 0%, rgba(25, 15, 35, 0.82) 100%);
+    z-index: 2;
+}
+.police-hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Tarjetas del Hub de Entrada */
+.store-hub-grid {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin-top: 35px;
+    margin-bottom: 50px;
+}
+
+.custom-card-item {
+    background: #0c0812;
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 24px;
+    overflow: hidden;
+    width: 430px;
+    max-width: 100%;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.7);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+    box-sizing: border-box;
+    cursor: pointer;
+    animation: pageEntrance 0.5s ease-out;
+}
+.custom-card-img-wrap {
+    width: 100%;
+    height: 270px;
+    position: relative;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.custom-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.4s ease;
+}
+.custom-card-footer {
+    background: #120c1c;
+    padding: 24px;
+    text-align: center;
+    border-top: 1px solid rgba(168, 85, 247, 0.15);
+}
+.custom-card-footer span {
+    color: var(--text-primary);
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+.custom-card-item:hover {
+    border-color: rgba(168, 85, 247, 0.85);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(168, 85, 247, 0.3);
+}
+.custom-card-item:hover .custom-card-img-wrap img {
+    transform: scale(1.05);
+}
+
+/* ESTILO DE TARJETAS DE PAQUETES Y PRODUCTOS */
+.packages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 28px;
+    margin-top: 20px;
+    align-items: stretch;
+}
+
+.package-item-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: pageEntrance 0.5s ease-out;
+    height: 100%;
+}
+
+.package-card {
+    background: linear-gradient(160deg, #140f1d 0%, #0d0914 100%);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    box-sizing: border-box;
+}
+.package-card:hover {
+    border-color: rgba(236, 72, 153, 0.5);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 45px rgba(236, 72, 153, 0.2);
+}
+
+.package-img-box {
+    width: 100%;
+    height: 165px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #0b0711;
+    border: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.package-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.5s ease-in-out, transform 0.4s ease;
+}
+.package-card:hover .package-img-box img {
+    transform: scale(1.06);
+}
+
+.package-card-title-bar {
+    background: #191225;
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.3px;
+}
+
+.package-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+.package-main-price {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+}
+
+.package-features-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.package-feature-item {
+    font-size: 12px;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.package-feature-item i {
+    color: #22c55e;
+    font-size: 13px;
+}
+
+/* Botón de Términos y condiciones donaciones */
+.terms-link-btn {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(147, 51, 234, 0.08) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    color: #d8b4fe;
+    text-align: center;
+    padding: 11px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.terms-link-btn:hover {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(147, 51, 234, 0.18) 100%);
+    border-color: rgba(168, 85, 247, 0.7);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(168, 85, 247, 0.25);
+}
+
+/* Botón de Acción unificado */
+.add-to-cart-btn {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+    color: #fff;
+    border: none;
+    width: 100%;
+    padding: 13px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.add-to-cart-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transition: 0.5s;
+}
+.add-to-cart-btn:hover::before {
+    left: 100%;
+}
+.add-to-cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(236, 72, 153, 0.5);
+}
+.add-to-cart-btn:active {
+    transform: translateY(0);
+}
+
+/* Cajón lateral derecho (Drawer) para el Carrito */
+.cart-drawer-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(5, 3, 10, 0.75); backdrop-filter: blur(8px);
+    z-index: 100000; opacity: 0; visibility: hidden;
+    transition: all 0.35s ease;
+}
+.cart-drawer-overlay.open { opacity: 1; visibility: visible; }
+
+.cart-drawer {
+    position: fixed; top: 0; right: 0; width: 440px; max-width: 100%; height: 100vh;
+    background: linear-gradient(180deg, #181024 0%, #0d0914 100%);
+    border-left: 1px solid rgba(168, 85, 247, 0.4);
+    box-shadow: -25px 0 60px rgba(0,0,0,0.9);
+    z-index: 100001; display: flex; flex-direction: column; padding: 32px;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+}
+.cart-drawer-overlay.open .cart-drawer {
+    transform: translateX(0);
+}
+
+.cart-item-row {
+    background: rgba(22, 14, 32, 0.85);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.cart-item-row:hover {
+    border-color: rgba(168, 85, 247, 0.5);
+}
+
+.cart-delete-btn {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.cart-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.6);
+    transform: scale(1.05);
+}
+
+/* Notificación flotante Toast */
+#toastNotification {
+    position: fixed; top: 25px; left: 50%;
+    transform: translateX(-50%) translateY(-120px);
+    background: linear-gradient(135deg, #1f142e 0%, #140f1d 100%);
+    border: 1px solid rgba(168,85,247,0.5);
+    padding: 16px 22px; border-radius: 16px; color: #fff;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.7), 0 0 20px rgba(168,85,247,0.2);
+    z-index: 200000; display: flex; align-items: center; gap: 14px;
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Modales generales */
+.custom-modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(5, 3, 10, 0.85); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100000; padding: 20px; opacity: 0; visibility: hidden;
+    transition: all 0.3s;
+}
+.custom-modal-overlay.open { opacity: 1; visibility: visible; }
+.modal-card {
+    background: #140f1d;
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    border-radius: 20px; padding: 28px;
+    max-width: 520px; width: 100%;
+    box-shadow: 0 25px 70px rgba(0,0,0,0.9), 0 0 30px rgba(168, 85, 247, 0.15);
+    color: #fff; transform: translateY(20px) scale(0.97);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 85vh; overflow-y: auto;
+}
+.custom-modal-overlay.open .modal-card { transform: translateY(0) scale(1); }
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border-color); padding-bottom: 14px;
+    margin-bottom: 20px;
+}
+.modal-title { font-size: 18px; font-weight: 700; color: #c084fc; display: flex; align-items: center; gap: 10px; }
+.close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; transition: color 0.2s; }
+.close-btn:hover { color: #fff; }
+
+.sidebar-nav .nav-item.active {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(147, 51, 234, 0.18) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);
+}
+
+/* Submenú desplegable en el menú lateral */
+.nav-submenu {
+    max-height: 200px;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    opacity: 1;
+    display: flex; flex-direction: column; gap: 4px;
+    padding-left: 18px;
+    margin-top: 4px;
+}
+.nav-submenu.collapsed-submenu {
+    max-height: 0; opacity: 0; pointer-events: none; margin-top: 0;
+}
+.sub-nav-item {
+    color: var(--text-muted); background: transparent !important; border: none !important; box-shadow: none !important;
+    font-size: 12.5px; padding: 8px 12px; border-radius: 8px; text-decoration: none;
+    display: flex; align-items: center; gap: 8px; transition: all 0.2s ease;
+}
+.sub-nav-item:hover { color: #fff !important; background: rgba(255, 255, 255, 0.04) !important; }
+.sub-nav-item.active {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(147, 51, 234, 0.12) 100%) !important;
+    border: 1px solid rgba(168, 85, 247, 0.35) !important; color: #fff !important;
+}
+.sidebar.collapsed .nav-submenu { display: none !important; }
+
+/* ===== Botón de Soporte en la barra superior ===== */
+/* Estilos de reserva: van dentro de :where() (prioridad cero), así que si perfil.css
+   ya da estilo a estas clases mandan los suyos y el botón se ve igual que en Home. */
+:where(.top-action-bar) { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+:where(.top-buttons) { display: flex; align-items: center; gap: 10px; }
+:where(.top-btn) {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+:where(.top-btn.highlight-btn) {
+    background: rgba(168, 85, 247, 0.14);
+    border-color: rgba(168, 85, 247, 0.45);
+    color: #fff;
+}
+:where(.top-btn.highlight-btn:hover) {
+    border-color: #a855f7;
+    box-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
+}
+
+/* ===== Menú desplegable de Soporte (igual que en Home y Equipo) ===== */
+.support-dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+.support-dropdown-menu {
+    position: fixed;
+    width: 250px;
+    background: #13141f;
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    border-radius: 14px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(168, 85, 247, 0.4);
+    display: flex;
+    flex-direction: column;
+    z-index: 2147483647;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 6px 0;
+}
+.support-dropdown-menu.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+.support-menu-section {
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.support-menu-section:last-child {
+    border-bottom: none;
+}
+.support-menu-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94a3b8;
+    padding: 6px 16px 4px 16px;
+    letter-spacing: 0.5px;
+}
+.support-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    font-size: 13px;
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    font-weight: 500;
+}
+.support-dropdown-item:hover {
+    background: rgba(168, 85, 247, 0.2);
+    color: #fff;
+}
+.support-dropdown-item i {
+    color: #a855f7;
+    width: 16px;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<div class="grid-background"></div>
+
+<!-- Notificación Flotante Estilo Toast -->
+<div id="toastNotification">
+    <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 20px;"></i>
+    <div>
+        <strong style="font-size: 13.5px; display: block; color: #fff;" id="toastTitle">¡Producto añadido!</strong>
+        <span style="font-size: 12px; color: var(--text-muted);" id="toastDesc">Se ha guardado en tu carrito correctamente.</span>
+    </div>
+</div>
+
+<!-- Modal para previsualizar imagen -->
+<div class="custom-modal-overlay" id="imageModal" onclick="closeImageModal()" style="display: flex; align-items: center; justify-content: center;">
+    <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation()">
+        <button onclick="closeImageModal()" style="position: absolute; top: -16px; right: -16px; background: #ec4899; color: #fff; border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 16px; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.6); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"><i class="fa-solid fa-xmark"></i></button>
+        <img id="imgModalSrc" src="" alt="Vista previa" style="max-width: 85vw; max-height: 85vh; object-fit: contain; border-radius: 18px; border: 1px solid rgba(168,85,247,0.4); box-shadow: 0 25px 60px rgba(0,0,0,0.9); background: #000;">
+    </div>
+</div>
+
+<!-- Modal Normativa -->
+<div class="custom-modal-overlay" id="rulesModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title"><i class="fa-solid fa-file-contract" style="color: #a855f7;"></i> Normativa de Donaciones</div>
+            <button class="close-btn" onclick="closeRulesModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div style="font-size: 13px; color: var(--text-muted); line-height: 1.7; display: flex; flex-direction: column; gap: 14px;">
+            <p style="margin: 0; color: #fff;">
+                Bienvenido al apartado oficial de normativas financieras de <strong>ClickSense RP</strong>. Por favor, lea detenidamente los términos antes de realizar cualquier aportación económica:
+            </p>
+            <div style="background: rgba(18, 12, 28, 0.9); padding: 14px; border-radius: 12px; border: 1px solid rgba(168,85,247,0.2);">
+                <strong style="color: #c084fc; display: block; margin-bottom: 6px;"><i class="fa-solid fa-circle-check"></i> 1. Carácter Voluntario</strong>
+                Todas las transacciones en esta tienda se consideran donaciones voluntarias destinadas a cubrir los costes de mantenimiento del servidor, hardware, licencias y desarrollo continuo. No constituyen la compra de un bien físico o propiedad comercial transferible.
+            </div>
+            <div style="background: rgba(18, 12, 28, 0.9); padding: 14px; border-radius: 12px; border: 1px solid rgba(168,85,247,0.2);">
+                <strong style="color: #c084fc; display: block; margin-bottom: 6px;"><i class="fa-solid fa-circle-check"></i> 2. Política de Reembolsos</strong>
+                Al tratarse de una aportación de apoyo al proyecto, los pagos procesados y acreditados en el sistema <strong>no son reembolsables</strong> bajo ninguna circunstancia.
+            </div>
+            <button class="add-to-cart-btn" style="width: 100%; justify-content: center; margin-top: 6px;" onclick="closeRulesModal()">Entendido y de acuerdo</button>
+        </div>
+    </div>
+</div>
+
+<!-- Carrito Drawer -->
+<div class="cart-drawer-overlay" id="cartDrawerOverlay" onclick="closeCartDrawer(event)">
+    <div class="cart-drawer" onclick="event.stopPropagation()">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; margin-bottom: 20px;">
+            <div style="font-size: 18px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-cart-shopping" style="color: #ec4899;"></i> Carrito de compra
+            </div>
+            <button class="close-btn" onclick="closeCartDrawer()" style="font-size: 18px;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div id="cartItemsList" style="display: flex; flex-direction: column; gap: 12px; flex: 1; overflow-y: auto; padding-right: 4px;">
+            <!-- Dinámico -->
+        </div>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; margin-top: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 14px; color: var(--text-muted); font-weight: 700;">Total a pagar:</span>
+                <span style="font-size: 22px; font-weight: 800; color: #ec4899;" id="cartDrawerTotal">0.00 EUR</span>
+            </div>
+            <button class="add-to-cart-btn" style="width: 100%; justify-content: center; padding: 15px; font-size: 14px;" onclick="proceedToCheckoutFromCart()">
+                Proceder al pago seguro <i class="fa-solid fa-lock" style="margin-left: 6px;"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+                <span class="server-main-title">ClickSense</span>
+            </div>
+            <button class="sidebar-toggle-icon" id="sidebarToggleBtn"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-category">General</div>
+            <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> Equipo</a>
+            <a href="/calendario.html" class="nav-item"><i class="fa-solid fa-calendar-days"></i> Calendario</a>
+            <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> Comercios</a>
+            <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> Postulaciones ilegales</a>
+            <div class="nav-category">Espacio de trabajo</div>
+            <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> Grupos</a>
+            <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> Documentos</a>
+            <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Whitelist</a>
+            <div class="nav-category">Mi Cuenta</div>
+            <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> Mi Perfil</a>
+            <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> Historias personaje</a>
+            <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+            
+            <!-- Botón de Tienda con Opciones Desplegables -->
+            <div class="nav-dropdown-container">
+                <a href="javascript:void(0);" class="nav-item active" id="storeMenuToggle" onclick="toggleStoreMenu(event)">
+                    <i class="fa-solid fa-cart-shopping"></i> <span>Tienda</span>
+                    <i class="fa-solid fa-chevron-down" id="storeChevron" style="margin-left: auto; font-size: 10px; transition: transform 0.3s; transform: rotate(180deg);"></i>
+                </a>
+                <div class="nav-submenu" id="storeSubmenu">
+                    <a href="javascript:void(0);" class="sub-nav-item" id="subNavItemConseguir" onclick="selectSidebarStoreMode('conseguir', event)">
+                        <i class="fa-solid fa-coins" style="font-size: 11px;"></i> Adquirir ClickPoints
+                    </a>
+                    <a href="javascript:void(0);" class="sub-nav-item" id="subNavItemTienda" onclick="selectSidebarStoreMode('tienda', event)">
+                        <i class="fa-solid fa-bag-shopping" style="font-size: 11px;"></i> Gastar ClickPoints
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-category">SASP</div>
+            <!-- Enlace modificado para abrir la facción de la policía de forma dinámica sin recargar -->
+            <a href="javascript:void(0);" class="nav-item" id="navItemPolice" onclick="switchSection('police', event)">
+                <i class="fa-solid fa-shield-halved"></i> Academia LSPD
+            </a>
+            <a href="/lssd-academia.html" class="nav-item" style="padding-left: 2.2rem; font-size: 13px;">Academia LSSD</a>
+            <a href="/public/defcon.html" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i> Defcon</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-scale-balanced"></i> Código penal</a>
+            <a href="/public/organigrama.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Organigrama</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile-mini" id="userProfileMini">
+                <div class="avatar-placeholder" id="userAvatarContainer">
+                    <span id="userAvatarFallback">?</span>
+                </div>
+                <div class="user-info">
+                    <span class="username" id="userNameDisplay">Usuario</span>
+                    <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted); display: block;">@tag</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+    <main class="main-content">
+        <header class="top-action-bar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div class="breadcrumb" id="breadcrumbNav">Tienda Oficial de ClickSense RP</div>
+            <div class="top-buttons" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <!-- Botón de Soporte -->
+                <div class="support-dropdown-container" id="supportDropdownContainer">
+                    <button class="top-btn highlight-btn" id="supportDropdownBtn">
+                        <i class="fa-solid fa-circle-question"></i> Soporte
+                    </button>
+                </div>
+                <!-- Botón del Carrito en la esquina superior derecha -->
+                <button onclick="openCartDrawer()" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #fff; padding: 10px 18px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 13px; transition: all 0.3s ease; position: relative; font-family: inherit;">
+                    <i class="fa-solid fa-cart-shopping" style="color: #ec4899; font-size: 15px;"></i> Carrito
+                    <span id="cartItemCount" style="background: #ec4899; color: #fff; font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 800; display: none;">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Menú desplegable de Soporte (al abrirse se mueve al body para quedar por encima de todo) -->
+        <div class="support-dropdown-menu" id="supportDropdownMenu">
+            <!-- Sección Soporte -->
+            <div class="support-menu-section">
+                <div class="support-menu-title">Soporte</div>
+                <a href="/tickets.html" class="support-dropdown-item"><i class="fa-solid fa-ticket"></i> Crear un ticket</a>
+            </div>
+            <!-- Sección Apoyo -->
+            <div class="support-menu-section">
+                <div class="support-menu-title">Apoyo</div>
+                <a href="/sugerencias.html" class="support-dropdown-item"><i class="fa-solid fa-lightbulb"></i> Enviar una sugerencia</a>
+                <a href="/feedback.html" class="support-dropdown-item"><i class="fa-solid fa-comment-dots"></i> Dar tu feedback</a>
+                <a href="/perfil.html" class="support-dropdown-item"><i class="fa-solid fa-user"></i> Acceder al perfil</a>
+                <a href="/index.html" class="support-dropdown-item"><i class="fa-solid fa-house-chimney"></i> Acceder al panel principal</a>
+            </div>
+            <!-- Sección Información -->
+            <div class="support-menu-section">
+                <div class="support-menu-title">Información</div>
+                <a href="/normativa.html" class="support-dropdown-item"><i class="fa-solid fa-book"></i> Normativa general</a>
+                <a href="/pol-privacidad.html" class="support-dropdown-item"><i class="fa-solid fa-shield-halved"></i> Política de privacidad</a>
+                <a href="/terminos.html" class="support-dropdown-item"><i class="fa-solid fa-file-contract"></i> Términos y condiciones</a>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 0: HUB / PANTALLA DE ENTRADA PRINCIPAL -->
+        <div id="storeHubSection">
+            <div class="store-banner" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <div style="max-width: 580px;">
+                    <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #c084fc; font-weight: 800; display: block; margin-bottom: 8px;">
+                        <i class="fa-solid fa-store" style="color: #ec4899; margin-right: 6px;"></i> ClickSense Store & Economy
+                    </span>
+                    <h2 style="font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: -0.5px;">Tienda Oficial de ClickSense RP</h2>
+                    <p style="font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6;">
+                        Selecciona una opción a continuación para adquirir saldo apoyando el proyecto o intercambiar tus ClickPoints por beneficios exclusivos.
+                    </p>
+                </div>
+                <div style="background: rgba(14, 10, 20, 0.85); border: 1px solid rgba(168, 85, 247, 0.4); padding: 18px 24px; border-radius: 18px; display: flex; align-items: center; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(168, 85, 247, 0.08);">
+                    <div style="width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3)); color: #f472b6; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(168, 85, 247, 0.4);">
+                        <i class="fa-solid fa-gem"></i>
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; color: var(--text-muted); display: block; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Tu Balance Actual</span>
+                        <span style="font-size: 20px; font-weight: 800; color: #fff; text-shadow: 0 0 15px rgba(236, 72, 153, 0.4);" id="userCpDisplay">0 CP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjetas de Entrada Grandes e Ííntegras -->
+            <div class="store-hub-grid">
+                <!-- Tarjeta 1: Adquirir ClickPoints -->
+                <div class="custom-card-item" onclick="switchStoreMode('conseguir')">
+                    <div class="custom-card-img-wrap">
+                        <img src="https://i.imgur.com/6WHmHZq.png" alt="Adquirir ClickPoints">
+                    </div>
+                    <div class="custom-card-footer">
+                        <span>Adquirir ClickPoints</span>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2: Gastar ClickPoints -->
+                <div class="custom-card-item" onclick="switchStoreMode('tienda')">
+                    <div class="custom-card-img-wrap">
+                        <img src="https://i.imgur.com/bi2lDYj.png" alt="Gastar ClickPoints">
+                    </div>
+                    <div class="custom-card-footer">
+                        <span>Gastar ClickPoints</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NUEVA SECCIÓN POLICÍA / LSPD (Desarrollada aquí mismo sin cambiar de archivo) -->
+        <div id="policeSection" style="display: none;">
+            <div class="police-hero-banner" id="policeHeroBanner">
+                <div class="police-hero-bg active" style="background-image: url('https://i.imgur.com/WoOWChm.jpeg');"></div>
+                <div class="police-hero-bg" style="background-image: url('https://i.imgur.com/5ZttU2P.jpeg');"></div>
+                <div class="police-hero-bg" style="background-image: url('https://i.imgur.com/hYrTNE1.jpeg');"></div>
+                <div class="police-hero-bg" style="background-image: url('https://i.imgur.com/fJrcg1I.jpeg');"></div>
+                <div class="police-hero-overlay"></div>
+                <div class="police-hero-content">
+                    <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #c084fc; font-weight: 800; display: block; margin-bottom: 8px;">
+                        <i class="fa-solid fa-shield-halved" style="color: #ec4899; margin-right: 6px;"></i> Departamento de Policía de Los Santos
+                    </span>
+                    <h2 style="font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 10px; letter-spacing: -0.5px;">Academia y Divisiones LSPD</h2>
+                    <p style="font-size: 13.5px; color: var(--text-muted); margin: 0; max-width: 600px; line-height: 1.6;">
+                        Portal oficial de la facción policial. Consulta convocatorias de oposiciones, información interna y divisiones especiales operativas.
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin-card" style="border-color: rgba(168, 85, 247, 0.3); margin-top: 24px;">
+                <h3 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-clipboard-user" style="color: #a855f7;"></i> Información Institucional LSPD
+                </h3>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0;">
+                    Bienvenido al centro operativo del cuerpo policial. Desde aquí gestionamos los procesos formativos, oposiciones de acceso al cuerpo y la asignación a las distintas unidades especiales del departamento.
+                </p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 1: VISTA DE CATÁLOGO / CONSEGUIR O GASTAR -->
+        <div id="catalogSection" style="display: none;">
+            <!-- CONTENEDOR 1: ADQUIRIR CLICKPOINTS -->
+            <div id="conseguirContainer" style="display: none;">
+                <div class="store-banner" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                    <div style="max-width: 580px;">
+                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #c084fc; font-weight: 800; display: block; margin-bottom: 6px;">
+                            <i class="fa-solid fa-coins" style="color: #ec4899; margin-right: 6px;"></i> ClickSense Economy System
+                        </span>
+                        <h2 style="font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 6px; letter-spacing: -0.5px;">Tienda de ClickPoints</h2>
+                        <p style="font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6;">
+                            Adquiere saldo virtual apoyando el mantenimiento y desarrollo continuo de ClickSense RP de forma totalmente segura.
+                        </p>
+                    </div>
+                    <div style="background: rgba(14, 10, 20, 0.85); border: 1px solid rgba(168, 85, 247, 0.4); padding: 18px 24px; border-radius: 18px; display: flex; align-items: center; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(168, 85, 247, 0.08);">
+                        <div style="width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3)); color: #f472b6; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(168, 85, 247, 0.4);">
+                            <i class="fa-solid fa-gem"></i>
+                        </div>
+                        <div>
+                            <span style="font-size: 11px; color: var(--text-muted); display: block; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Balance de CP</span>
+                            <span style="font-size: 20px; font-weight: 800; color: #fff; text-shadow: 0 0 15px rgba(236, 72, 153, 0.4);" id="conseguirCpDisplay">0 CP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="packages-grid">
+                    <!-- Paquete 300 CP -->
+                    <div class="package-item-wrapper">
+                        <div class="package-card">
+                            <div>
+                                <div class="package-img-box" onclick="openImageModal('https://i.imgur.com/UPRqBV5.png')">
+                                    <img src="https://i.imgur.com/UPRqBV5.png" alt="300 ClickPoints">
+                                </div>
+                                <div class="package-card-title-bar" style="margin-top: 14px;">300 CLICKPOINTS</div>
+                                <div class="package-price-row" style="margin-top: 10px;">
+                                    <span class="package-main-price">3.00 EUR</span>
+                                </div>
+                                <div class="package-features-box" style="margin-top: 10px;">
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Acreditación automática in-game</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> 100% Compatible con servidor</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Soporte administrativo</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <a href="terminos-donaciones.html" class="terms-link-btn"><i class="fa-solid fa-file-lines"></i> Términos y condiciones de donaciones</a>
+                                <button class="add-to-cart-btn" onclick="addToCart('300 ClickPoints', 3.00, 300)">
+                                    <i class="fa-solid fa-cart-plus"></i> Añadir al carrito
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paquete 500 CP -->
+                    <div class="package-item-wrapper">
+                        <div class="package-card">
+                            <div>
+                                <div class="package-img-box" onclick="openImageModal('https://i.imgur.com/mhw79GK.png')">
+                                    <img src="https://i.imgur.com/mhw79GK.png" alt="500 ClickPoints">
+                                </div>
+                                <div class="package-card-title-bar" style="margin-top: 14px;">500 CLICKPOINTS</div>
+                                <div class="package-price-row" style="margin-top: 10px;">
+                                    <span class="package-main-price">5.00 EUR</span>
+                                </div>
+                                <div class="package-features-box" style="margin-top: 10px;">
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Acreditación automática in-game</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> 100% Compatible con servidor</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Soporte administrativo</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <a href="terminos-donaciones.html" class="terms-link-btn"><i class="fa-solid fa-file-lines"></i> Términos y condiciones de donaciones</a>
+                                <button class="add-to-cart-btn" onclick="addToCart('500 ClickPoints', 5.00, 500)">
+                                    <i class="fa-solid fa-cart-plus"></i> Añadir al carrito
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paquete 1000 CP -->
+                    <div class="package-item-wrapper">
+                        <div class="package-card">
+                            <div>
+                                <div class="package-img-box" onclick="openImageModal('https://i.imgur.com/r3z3Fxw.png')">
+                                    <img src="https://i.imgur.com/r3z3Fxw.png" alt="1000 ClickPoints">
+                                </div>
+                                <div class="package-card-title-bar" style="margin-top: 14px;">1000 CLICKPOINTS</div>
+                                <div class="package-price-row" style="margin-top: 10px;">
+                                    <span class="package-main-price">10.00 EUR</span>
+                                </div>
+                                <div class="package-features-box" style="margin-top: 10px;">
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Acreditación automática in-game</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> 100% Compatible con servidor</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Soporte administrativo</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <a href="terminos-donaciones.html" class="terms-link-btn"><i class="fa-solid fa-file-lines"></i> Términos y condiciones de donaciones</a>
+                                <button class="add-to-cart-btn" onclick="addToCart('1,000 ClickPoints', 10.00, 1000)">
+                                    <i class="fa-solid fa-cart-plus"></i> Añadir al carrito
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paquete 1500 CP -->
+                    <div class="package-item-wrapper">
+                        <div class="package-card">
+                            <div>
+                                <div class="package-img-box" onclick="openImageModal('https://i.imgur.com/gj91lrB.png')">
+                                    <img src="https://i.imgur.com/gj91lrB.png" alt="1500 ClickPoints">
+                                </div>
+                                <div class="package-card-title-bar" style="margin-top: 14px;">1500 CLICKPOINTS</div>
+                                <div class="package-price-row" style="margin-top: 10px;">
+                                    <span class="package-main-price">15.00 EUR</span>
+                                </div>
+                                <div class="package-features-box" style="margin-top: 10px;">
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Acreditación automática in-game</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> 100% Compatible con servidor</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Soporte administrativo</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <a href="terminos-donaciones.html" class="terms-link-btn"><i class="fa-solid fa-file-lines"></i> Términos y condiciones de donaciones</a>
+                                <button class="add-to-cart-btn" onclick="addToCart('1,500 ClickPoints', 15.00, 1500)">
+                                    <i class="fa-solid fa-cart-plus"></i> Añadir al carrito
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paquete 3000 CP -->
+                    <div class="package-item-wrapper">
+                        <div class="package-card">
+                            <div>
+                                <div class="package-img-box" onclick="openImageModal('https://i.imgur.com/zlOzXiH.png')">
+                                    <img src="https://i.imgur.com/zlOzXiH.png" alt="3000 ClickPoints">
+                                </div>
+                                <div class="package-card-title-bar" style="margin-top: 14px;">3000 CLICKPOINTS</div>
+                                <div class="package-price-row" style="margin-top: 10px;">
+                                    <span class="package-main-price">30.00 EUR</span>
+                                </div>
+                                <div class="package-features-box" style="margin-top: 10px;">
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Acreditación automática in-game</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> 100% Compatible con servidor</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Soporte administrativo</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <a href="terminos-donaciones.html" class="terms-link-btn"><i class="fa-solid fa-file-lines"></i> Términos y condiciones de donaciones</a>
+                                <button class="add-to-cart-btn" onclick="addToCart('3,000 ClickPoints', 30.00, 3000)">
+                                    <i class="fa-solid fa-cart-plus"></i> Añadir al carrito
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR 2: TIENDA DE CANJE (Sin filtros superiores y textos actualizados) -->
+            <div id="tiendaContainer" style="display: none;">
+                <div class="store-banner" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                    <div style="max-width: 580px;">
+                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #c084fc; font-weight: 800; display: block; margin-bottom: 6px;">
+                            <i class="fa-solid fa-bag-shopping" style="color: #ec4899; margin-right: 6px;"></i> ClickSense Store
+                        </span>
+                        <h2 style="font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 6px; letter-spacing: -0.5px;">Catálogo para poder canjear tus ClickPoints</h2>
+                        <p style="font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6;">
+                            Intercambia tus ClickPoints acumulados por propiedades, negocios, slots y vehículos exclusivos para tu personaje in-game.
+                        </p>
+                    </div>
+                    <div style="background: rgba(14, 10, 20, 0.85); border: 1px solid rgba(168, 85, 247, 0.4); padding: 18px 24px; border-radius: 18px; display: flex; align-items: center; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(168, 85, 247, 0.08);">
+                        <div style="width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.3)); color: #f472b6; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(168, 85, 247, 0.4);">
+                            <i class="fa-solid fa-gem"></i>
+                        </div>
+                        <div>
+                            <span style="font-size: 11px; color: var(--text-muted); display: block; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Tu Balance</span>
+                            <span style="font-size: 20px; font-weight: 800; color: #fff; text-shadow: 0 0 15px rgba(236, 72, 153, 0.4);" id="tiendaCpDisplay">0 CP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="packages-grid" id="cpProductsGrid">
+                    <!-- Local Comercial (Carrusel con imágenes solicitadas) -->
+                    <div class="package-item-wrapper">
+                        <div class="package-card">
+                            <div>
+                                <div class="package-img-box carousel-box" data-images='["https://i.imgur.com/EmvcPGa.png", "https://i.imgur.com/dxld3s4.jpeg", "https://i.imgur.com/yulYHaW.png"]' onclick="openImageModal(this.getAttribute('data-active-src'))">
+                                    <img src="https://i.imgur.com/EmvcPGa.png" class="carousel-active-img" alt="Local Comercial">
+                                </div>
+                                <div class="package-card-title-bar" style="margin-top: 14px;">LOCAL COMERCIAL</div>
+                                <div class="package-price-row" style="margin-top: 10px;">
+                                    <span class="package-main-price" style="color: #f472b6;"><i class="fa-solid fa-gem" style="font-size: 18px; margin-right: 6px;"></i> 3,500 CP</span>
+                                </div>
+                                <div class="package-features-box" style="margin-top: 10px;">
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Gestión completa de negocio IC</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Interior y mapeo asignado</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <button class="add-to-cart-btn" style="background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);" onclick="redeemProduct('Aportación para Local Comercial', 3500)">
+                                    <i class="fa-solid fa-bag-shopping"></i> Canjear artículo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Casa de Donación (Carrusel con imágenes solicitadas) -->
+                    <div class="package-item-wrapper">
+                        <div class="package-card">
+                            <div>
+                                <div class="package-img-box carousel-box" data-images='["https://i.imgur.com/TnExxUq.jpeg", "https://i.imgur.com/L4mbKJr.jpeg", "https://i.imgur.com/4obodIn.jpeg"]' onclick="openImageModal(this.getAttribute('data-active-src'))">
+                                    <img src="https://i.imgur.com/TnExxUq.jpeg" class="carousel-active-img" alt="Casa de Donación">
+                                </div>
+                                <div class="package-card-title-bar" style="margin-top: 14px;">CASA DE DONACIÓN</div>
+                                <div class="package-price-row" style="margin-top: 10px;">
+                                    <span class="package-main-price" style="color: #f472b6;"><i class="fa-solid fa-gem" style="font-size: 18px; margin-right: 6px;"></i> 5,000 CP</span>
+                                </div>
+                                <div class="package-features-box" style="margin-top: 10px;">
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Propiedad privada exclusiva</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Garaje y personalización VIP</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <button class="add-to-cart-btn" style="background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);" onclick="redeemProduct('Casa de Donación (Estándar)', 5000)">
+                                    <i class="fa-solid fa-bag-shopping"></i> Canjear artículo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehículo de Donación (Carrusel con imágenes solicitadas) -->
+                    <div class="package-item-wrapper">
+                        <div class="package-card">
+                            <div>
+                                <div class="package-img-box carousel-box" data-images='["https://i.imgur.com/EvgwVgb.png", "https://i.imgur.com/c28ChY2.jpeg", "https://i.imgur.com/EMvVTDj.jpeg"]' onclick="openImageModal(this.getAttribute('data-active-src'))">
+                                    <img src="https://i.imgur.com/EvgwVgb.png" class="carousel-active-img" alt="Vehículo de Donación">
+                                </div>
+                                <div class="package-card-title-bar" style="margin-top: 14px;">VEHÍCULO DE DONACIÓN</div>
+                                <div class="package-price-row" style="margin-top: 10px;">
+                                    <span class="package-main-price" style="color: #f472b6;"><i class="fa-solid fa-gem" style="font-size: 18px; margin-right: 6px;"></i> 2,500 CP</span>
+                                </div>
+                                <div class="package-features-box" style="margin-top: 10px;">
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Importación de vehículo VIP</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Registro oficial en garaje</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <button class="add-to-cart-btn" style="background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);" onclick="redeemProduct('Vehículo de Donación', 2500)">
+                                    <i class="fa-solid fa-bag-shopping"></i> Canjear artículo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Segundo Slot de Personaje -->
+                    <div class="package-item-wrapper">
+                        <div class="package-card">
+                            <div>
+                                <div class="package-img-box" onclick="openImageModal('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop')">
+                                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop" alt="Slot de Personaje">
+                                </div>
+                                <div class="package-card-title-bar" style="margin-top: 14px;">SEGUNDO SLOT PERSONAJE</div>
+                                <div class="package-price-row" style="margin-top: 10px;">
+                                    <span class="package-main-price" style="color: #f472b6;"><i class="fa-solid fa-gem" style="font-size: 18px; margin-right: 6px;"></i> 2,500 CP</span>
+                                </div>
+                                <div class="package-features-box" style="margin-top: 10px;">
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Desbloqueo de ranura extra</div>
+                                    <div class="package-feature-item"><i class="fa-solid fa-circle-check"></i> Acceso completo IC in-game</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                                <button class="add-to-cart-btn" style="background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);" onclick="redeemProduct('Segundo Slot de Personaje', 2500)">
+                                    <i class="fa-solid fa-bag-shopping"></i> Canjear artículo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: APARTADO DE DETALLES Y PROCESAMIENTO DE PAGO -->
+        <div id="checkoutSection" style="display: none;">
+            <div style="margin-bottom: 20px;">
+                <button onclick="backToCatalog()" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver atrás
+                </button>
+            </div>
+
+            <div class="admin-card" style="border-color: rgba(168, 85, 247, 0.3);">
+                <div style="display: flex; align-items: center; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 16px; margin-bottom: 24px;">
+                    <div style="width: 50px; height: 50px; border-radius: 14px; background: rgba(168, 85, 247, 0.15); color: #c084fc; display: flex; align-items: center; justify-content: center; font-size: 22px; border: 1px solid rgba(168, 85, 247, 0.3);">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #c084fc; font-weight: 700; display: block; margin-bottom: 2px;">Proceso de Recarga</span>
+                        <h2 style="font-size: 20px; font-weight: 800; color: #fff; margin: 0;" id="detailProductName">Paquete</h2>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+                    <div style="display: flex; flex-direction: column; gap: 18px;">
+                        <div style="background: rgba(18, 12, 28, 0.85); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px;">
+                            <h4 style="font-size: 14px; color: #fff; margin-top: 0; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-circle-info" style="color: #a855f7;"></i> Información del paquete
+                            </h4>
+                            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0;" id="detailProductDesc">
+                                Descripción detallada.
+                            </p>
+                        </div>
+
+                        <div style="background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <i class="fa-solid fa-triangle-exclamation" style="color: #ec4899; font-size: 18px; margin-top: 2px;"></i>
+                                <div>
+                                    <h4 style="font-size: 14px; color: #fff; margin: 0 0 6px 0;">Aviso importante sobre donaciones</h4>
+                                    <p style="font-size: 12px; color: var(--text-muted); line-height: 1.6; margin: 0;">
+                                        Las aportaciones realizadas para conseguir ClickPoints son <strong>estrictamente voluntarias</strong> y se destinan por completo al mantenimiento del servidor.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(18, 12, 28, 0.85); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; gap: 20px;">
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <h4 style="font-size: 15px; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-credit-card" style="color: #a855f7;"></i> Pasarela de Pago
+                            </h4>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: #fff;">Personaje / ID en Servidor</label>
+                                <input type="text" id="checkoutCharacterInput" placeholder="Ej. John_Miller (ID: 42)" style="background: rgba(14, 10, 20, 0.9); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 13px; outline: none; font-family: inherit;">
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 600; color: #fff;">Método de pago seleccionado</label>
+                                <select id="checkoutPaymentMethod" style="background: rgba(14, 10, 20, 0.9); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 13px; outline: none; font-family: inherit; cursor: pointer;">
+                                    <option value="card">Tarjeta de Crédito / Débito (Stripe)</option>
+                                    <option value="paypal">PayPal</option>
+                                    <option value="crypto">Criptomonedas (USDT / BTC)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 18px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 14px; color: var(--text-muted); font-weight: 600;">Total a pagar:</span>
+                                <span style="font-size: 22px; font-weight: 800; color: #ec4899;" id="detailProductPrice">0.00 EUR</span>
+                            </div>
+
+                            <input type="hidden" id="detailCpValue" value="0">
+
+                            <button class="add-to-cart-btn" style="width: 100%; padding: 14px; font-size: 14px; justify-content: center;" onclick="completePurchaseFromDetails()">
+                                Confirmar y efectuar pago seguro <i class="fa-solid fa-lock" style="margin-left: 6px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+// Sistema del Carrito y ClickPoints
+let userClickPoints = parseInt(localStorage.getItem('user_clickpoints')) || 0;
+let cartItems = JSON.parse(localStorage.getItem('user_cart')) || [];
+
+function updateCpDisplay() {
+    const el1 = document.getElementById('userCpDisplay');
+    const el2 = document.getElementById('conseguirCpDisplay');
+    const el3 = document.getElementById('tiendaCpDisplay');
+    const text = userClickPoints.toLocaleString() + ' CP';
+    if (el1) el1.textContent = text;
+    if (el2) el2.textContent = text;
+    if (el3) el3.textContent = text;
+    localStorage.setItem('user_clickpoints', userClickPoints);
+}
+updateCpDisplay();
+
+function updateCartBadge() {
+    const badge = document.getElementById('cartItemCount');
+    const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    if (badge) {
+        if (totalCount > 0) {
+            badge.textContent = totalCount;
+            badge.style.display = 'inline-block';
+            badge.style.animation = 'badgePop 0.3s ease';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+    localStorage.setItem('user_cart', JSON.stringify(cartItems));
+}
+updateCartBadge();
+
+function showToast(title, desc) {
+    const toast = document.getElementById('toastNotification');
+    document.getElementById('toastTitle').textContent = title;
+    document.getElementById('toastDesc').textContent = desc;
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    toast.style.opacity = '1';
+    setTimeout(() => {
+        toast.style.transform = 'translateX(-50%) translateY(-120px)';
+        toast.style.opacity = '0';
+    }, 3200);
+}
+
+function openImageModal(imgSrc) {
+    if (!imgSrc) return;
+    document.getElementById('imgModalSrc').src = imgSrc;
+    document.getElementById('imageModal').classList.add('open');
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').classList.remove('open');
+}
+
+function addToCart(name, priceEUR, cpAmount) {
+    const existingIndex = cartItems.findIndex(item => item.name === name);
+    if (existingIndex > -1) {
+        if (cartItems[existingIndex].quantity < 5) {
+            cartItems[existingIndex].quantity += 1;
+        } else {
+            showToast("Límite alcanzado", "El máximo permitido es 5 unidades por artículo.");
+            return;
+        }
+    } else {
+        cartItems.push({
+            name: name,
+            price: priceEUR,
+            cp: cpAmount,
+            quantity: 1
+        });
+    }
+    updateCartBadge();
+    showToast("¡Añadido al carrito!", `Has agregado "${name}" correctamente.`);
+}
+
+function changeItemQty(index, change) {
+    let newQty = cartItems[index].quantity + change;
+    if (newQty < 1) newQty = 1;
+    if (newQty > 5) {
+        newQty = 5;
+        showToast("Límite alcanzado", "El máximo permitido es 5 unidades por artículo.");
+        return;
+    }
+    cartItems[index].quantity = newQty;
+    updateCartBadge();
+    renderCartItems();
+}
+
+function openCartDrawer() {
+    renderCartItems();
+    document.getElementById('cartDrawerOverlay').classList.add('open');
+}
+
+function closeCartDrawer() {
+    document.getElementById('cartDrawerOverlay').classList.remove('open');
+}
+
+function renderCartItems() {
+    const container = document.getElementById('cartItemsList');
+    const totalEl = document.getElementById('cartDrawerTotal');
+    if (!container) return;
+
+    if (cartItems.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 80px 20px; color: var(--text-muted); font-size: 13px;">
+                <i class="fa-solid fa-cart-shopping" style="font-size: 40px; margin-bottom: 12px; color: rgba(168,85,247,0.3); display: block;"></i>
+                Tu carrito está vacío actualmente.
+            </div>
+        `;
+        if (totalEl) totalEl.textContent = '0.00 EUR';
+        return;
+    }
+
+    let html = '';
+    let totalPrice = 0;
+
+    cartItems.forEach((item, index) => {
+        const subtotal = item.price * item.quantity;
+        totalPrice += subtotal;
+        html += `
+            <div class="cart-item-row">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <span style="font-size: 14px; font-weight: 700; color: #fff; display: block; margin-bottom: 2px;">${item.name}</span>
+                        <span style="font-size: 11.5px; color: var(--text-muted);">${item.price.toFixed(2)} EUR por unidad</span>
+                    </div>
+                    <span style="font-size: 15px; font-weight: 800; color: #ec4899;">${subtotal.toFixed(2)} EUR</span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 11.5px; color: var(--text-muted);">Cantidad:</span>
+                        <button onclick="changeItemQty(${index}, -1)" style="background: rgba(168,85,247,0.2); border: 1px solid rgba(168,85,247,0.4); color: #fff; width: 26px; height: 26px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: background 0.2s;"><i class="fa-solid fa-minus"></i></button>
+                        <span style="font-size: 13px; font-weight: 700; color: #fff; min-width: 22px; text-align: center; background: rgba(0,0,0,0.3); padding: 3px 0; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">${item.quantity}</span>
+                        <button onclick="changeItemQty(${index}, 1)" style="background: rgba(168,85,247,0.2); border: 1px solid rgba(168,85,247,0.4); color: #fff; width: 26px; height: 26px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: background 0.2s;"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <button class="cart-delete-btn" onclick="removeFromCart(${index})" title="Eliminar artículo"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+    if (totalEl) totalEl.textContent = totalPrice.toFixed(2) + ' EUR';
+}
+
+function removeFromCart(index) {
+    cartItems.splice(index, 1);
+    updateCartBadge();
+    renderCartItems();
+    showToast("Artículo eliminado", "Se ha actualizado tu carrito.");
+}
+
+function proceedToCheckoutFromCart() {
+    if (cartItems.length === 0) {
+        showToast("Carrito vacío", "Añade algún paquete antes de proceder.");
+        return;
+    }
+    let totalCP = cartItems.reduce((sum, item) => sum + (item.cp * item.quantity), 0);
+    let totalPriceEUR = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    closeCartDrawer();
+    openCheckoutView(`Paquete Combinado (${totalCP.toLocaleString()} CP)`, totalPriceEUR.toFixed(2) + ' EUR', totalCP, `Compra acumulada desde el carrito de la tienda oficial por valor de ${totalPriceEUR.toFixed(2)} EUR.`);
+}
+
+async function loadDiscordSessionData() {
+    const storedUser = localStorage.getItem('discord_user');
+    const avatarContainer = document.getElementById('userAvatarContainer');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const userHandleDisplay = document.getElementById('userHandleDisplay');
+    if (!storedUser) return;
+    try {
+        const discordUser = JSON.parse(storedUser);
+        if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+        if (userHandleDisplay) userHandleDisplay.textContent = "@" + (discordUser.username || "discord");
+        if (avatarContainer && discordUser.avatarUrl) {
+            avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    } catch (e) {
+        console.error("Error al cargar sesión de Discord", e);
+    }
+}
+loadDiscordSessionData();
+
+const toggleBtn = document.getElementById('sidebarToggleBtn');
+const revealBtn = document.getElementById('sidebarRevealBtn');
+const sidebar = document.getElementById('sidebar');
+if (toggleBtn && revealBtn && sidebar) {
+    toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+    revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+}
+
+// Menú desplegable de Soporte: se coloca justo debajo del botón y se cierra al pulsar fuera
+const supportBtn = document.getElementById('supportDropdownBtn');
+const supportMenu = document.getElementById('supportDropdownMenu');
+
+if (supportBtn && supportMenu) {
+    supportBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = supportMenu.classList.contains('show');
+
+        if (!isOpen) {
+            if (supportMenu.parentElement !== document.body) {
+                document.body.appendChild(supportMenu);
+            }
+            const rect = supportBtn.getBoundingClientRect();
+            supportMenu.style.top = (rect.bottom + 8) + 'px';
+            supportMenu.style.right = (window.innerWidth - rect.right) + 'px';
+            supportMenu.classList.add('show');
+        } else {
+            supportMenu.classList.remove('show');
+        }
+    });
+
+    window.addEventListener('click', () => {
+        supportMenu.classList.remove('show');
+    });
+
+    window.addEventListener('resize', () => {
+        supportMenu.classList.remove('show');
+    });
+}
+
+function toggleStoreMenu(e) {
+    if (e) e.preventDefault();
+    const submenu = document.getElementById('storeSubmenu');
+    const chevron = document.getElementById('storeChevron');
+    if (submenu.classList.contains('collapsed-submenu')) {
+        submenu.classList.remove('collapsed-submenu');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+    } else {
+        submenu.classList.add('collapsed-submenu');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+// Función unificada para cambiar entre secciones dinámicamente en la misma página
+function switchSection(sectionName, e) {
+    if (e) e.preventDefault();
+    const hubSec = document.getElementById('storeHubSection');
+    const catalogSec = document.getElementById('catalogSection');
+    const checkoutSec = document.getElementById('checkoutSection');
+    const policeSec = document.getElementById('policeSection');
+    
+    hubSec.style.display = 'none';
+    catalogSec.style.display = 'none';
+    checkoutSec.style.display = 'none';
+    policeSec.style.display = 'none';
+
+    // Limpiar clases activas del menú lateral
+    document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => item.classList.remove('active'));
+
+    const breadcrumb = document.getElementById('breadcrumbNav');
+
+    if (sectionName === 'hub') {
+        hubSec.style.display = 'block';
+        breadcrumb.textContent = 'Tienda Oficial de ClickSense RP';
+        const storeToggle = document.getElementById('storeMenuToggle');
+        if (storeToggle) storeToggle.classList.add('active');
+    } else if (sectionName === 'police') {
+        policeSec.style.display = 'block';
+        breadcrumb.textContent = 'Academia LSPD | ClickSense RP';
+        const policeNavItem = document.getElementById('navItemPolice');
+        if (policeNavItem) policeNavItem.classList.add('active');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function switchStoreMode(mode) {
+    const hubSec = document.getElementById('storeHubSection');
+    const catalogSec = document.getElementById('catalogSection');
+    const checkoutSec = document.getElementById('checkoutSection');
+    const policeSec = document.getElementById('policeSection');
+    
+    hubSec.style.display = 'none';
+    catalogSec.style.display = 'block';
+    checkoutSec.style.display = 'none';
+    policeSec.style.display = 'none';
+
+    document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => item.classList.remove('active'));
+    const storeToggle = document.getElementById('storeMenuToggle');
+    if (storeToggle) storeToggle.classList.add('active');
+
+    const subConseguir = document.getElementById('subNavItemConseguir');
+    const subTienda = document.getElementById('subNavItemTienda');
+    if (subConseguir && subTienda) {
+        subConseguir.classList.remove('active');
+        subTienda.classList.remove('active');
+        if (mode === 'conseguir') {
+            subConseguir.classList.add('active');
+        } else {
+            subTienda.classList.add('active');
+        }
+    }
+
+    const conseguirCont = document.getElementById('conseguirContainer');
+    const tiendaCont = document.getElementById('tiendaContainer');
+    const breadcrumb = document.getElementById('breadcrumbNav');
+
+    if (mode === 'conseguir') {
+        conseguirCont.style.display = 'block';
+        tiendaCont.style.display = 'none';
+        breadcrumb.textContent = 'Tienda Oficial de ClickSense RP';
+    } else {
+        conseguirCont.style.display = 'none';
+        tiendaCont.style.display = 'block';
+        breadcrumb.textContent = 'Tienda Oficial de ClickSense RP';
+    }
+    updateCpDisplay();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function selectSidebarStoreMode(mode, e) {
+    if (e) e.preventDefault();
+    switchStoreMode(mode);
+}
+
+function openCheckoutView(productName, price, cpAmount, description) {
+    document.getElementById('detailProductName').textContent = productName;
+    document.getElementById('detailProductPrice').textContent = price;
+    document.getElementById('detailProductDesc').textContent = description;
+    document.getElementById('detailCpValue').value = cpAmount;
+    
+    document.getElementById('storeHubSection').style.display = 'none';
+    document.getElementById('catalogSection').style.display = 'none';
+    document.getElementById('checkoutSection').style.display = 'block';
+    document.getElementById('policeSection').style.display = 'none';
+    document.getElementById('breadcrumbNav').textContent = 'Tienda Oficial de ClickSense RP';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function backToCatalog() {
+    const activeMode = document.getElementById('subNavItemConseguir').classList.contains('active') ? 'conseguir' : 'tienda';
+    switchStoreMode(activeMode);
+}
+
+function redeemProduct(productName, costCP) {
+    if (userClickPoints >= costCP) {
+        userClickPoints -= costCP;
+        updateCpDisplay();
+        showToast("¡Canje exitoso!", `Has adquirido "${productName}" por ${costCP} CP.`);
+    } else {
+        const missing = costCP - userClickPoints;
+        const goToBuy = confirm(`No tienes suficientes ClickPoints.\nTe faltan ${missing} CP para adquirir "${productName}".\n\n¿Deseas ir al apartado de "Adquirir ClickPoints" para recargar?`);
+        if (goToBuy) {
+            switchStoreMode('conseguir');
+        }
+    }
+}
+
+function openRulesModal(e) {
+    if (e) e.preventDefault();
+    document.getElementById('rulesModal').classList.add('open');
+}
+
+function closeRulesModal() {
+    document.getElementById('rulesModal').classList.remove('open');
+}
+
+function completePurchaseFromDetails() {
+    const character = document.getElementById('checkoutCharacterInput').value.trim();
+    if (!character) {
+        alert('Por favor, introduce el nombre o ID de tu personaje antes de continuar.');
+        document.getElementById('checkoutCharacterInput').focus();
+        return;
+    }
+    const payment = document.getElementById('checkoutPaymentMethod').value;
+    const addedCP = parseInt(document.getElementById('detailCpValue').value) || 0;
+
+    userClickPoints += addedCP;
+    updateCpDisplay();
+
+    cartItems = [];
+    updateCartBadge();
+
+    showToast("¡Pago procesado con éxito!", `Se han añadido ${addedCP} ClickPoints a "${character}".`);
+    backToCatalog();
+}
+
+// Carruseles de tarjetas de canje
+function initCarousels() {
+    const carousels = document.querySelectorAll('.carousel-box');
+    carousels.forEach(box => {
+        const imgEl = box.querySelector('.carousel-active-img');
+        const images = JSON.parse(box.getAttribute('data-images'));
+        let currentIndex = 0;
+        box.setAttribute('data-active-src', images[0]);
+
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % images.length;
+            imgEl.style.opacity = 0;
+            setTimeout(() => {
+                imgEl.src = images[currentIndex];
+                box.setAttribute('data-active-src', images[currentIndex]);
+                imgEl.style.opacity = 1;
+            }, 350);
+        }, 3500);
+    });
+}
+
+// Carruseles automáticos de fondo para la sección de policía con las 4 primeras imágenes
+let policeSlideInterval = null;
+function initPoliceHeroSlideshow() {
+    const banner = document.getElementById('policeHeroBanner');
+    if (!banner) return;
+    const slides = banner.querySelectorAll('.police-hero-bg');
+    if (slides.length === 0) return;
+    let currentSlide = 0;
+
+    if (policeSlideInterval) clearInterval(policeSlideInterval);
+
+    policeSlideInterval = setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }, 4000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initCarousels();
+    initPoliceHeroSlideshow();
+});
+</script>
+
+<script src="/guards.js"></script>
+</body>
+</html>

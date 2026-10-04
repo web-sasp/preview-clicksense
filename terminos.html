@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Normativas y Condiciones | ClickSense RP</title>
+    <!-- Google Fonts: Plus Jakarta Sans e Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/src/assets/home.css">
+    
+    
+    <!-- Estilos específicos para la página de Términos -->
+    <style>
+        /* Scrollbar personalizado con acento rosa/morado */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 18, 25, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            transition: background 0.3s ease;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(236, 72, 153, 0.6);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0b0f19;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .full-width-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+        }
+
+        /* Barra superior con botón de inicio a la derecha */
+        .top-action-bar-clean {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .breadcrumb {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .home-btn {
+            background: rgba(236, 72, 153, 0.15);
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            color: #f472b6;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .home-btn:hover {
+            background: rgba(236, 72, 153, 0.3);
+            border-color: rgba(236, 72, 153, 0.7);
+            color: #fff;
+        }
+
+        /* Pestañas de navegación de normativas */
+        .terms-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .term-tab-btn {
+            background: rgba(20, 24, 33, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .term-tab-btn:hover {
+            background: rgba(30, 38, 54, 0.8);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .term-tab-btn.active {
+            background: rgba(236, 72, 153, 0.15);
+            color: #f472b6;
+            border-color: rgba(236, 72, 153, 0.4);
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.2);
+        }
+
+        /* Secciones de contenido */
+        .terms-content-section {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .terms-content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Aviso Legal Moderno */
+        .modern-legal-box {
+            background: linear-gradient(135deg, rgba(20, 24, 33, 0.85) 0%, rgba(30, 27, 45, 0.9) 100%);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-legal-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #ec4899, #8b5cf6);
+        }
+
+        .legal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0.75rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #f472b6;
+        }
+
+        .legal-header i {
+            font-size: 1.25rem;
+        }
+
+        .modern-legal-box p {
+            margin: 0 0 0.75rem 0;
+            color: #cbd5e1;
+            font-size: 0.93rem;
+            line-height: 1.6;
+        }
+
+        .modern-legal-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .legal-highlight {
+            color: #ffffff;
+            font-weight: 600;
+            background: rgba(236, 72, 153, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Grid de las 3 tarjetas de normativas del servidor */
+        .rules-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .rule-img-card {
+            background: rgba(20, 24, 33, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .rule-img-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(236, 72, 153, 0.5);
+            box-shadow: 0 12px 30px rgba(236, 72, 153, 0.2);
+        }
+
+        .rule-card-banner {
+            position: relative;
+            height: 160px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .rule-card-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+        }
+
+        .rule-card-banner h2 {
+            position: relative;
+            z-index: 1;
+            color: #fff;
+            font-size: 1.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+            margin: 0;
+        }
+
+        .rule-card-info {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .rule-card-info h4 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .rule-card-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        /* Tarjetas de texto estándar */
+        .rule-card {
+            background: rgba(20, 24, 33, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .rule-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .rule-card h3 i {
+            color: #f472b6;
+        }
+
+        .rule-card p {
+            color: #94a3b8;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Botones externos centrados */
+        .external-links-container-centered {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .external-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .discord-link-btn {
+            background: rgba(88, 101, 242, 0.25);
+            border-color: rgba(88, 101, 242, 0.5);
+        }
+
+        .discord-link-btn:hover {
+            background: rgba(88, 101, 242, 0.45);
+            border-color: rgba(88, 101, 242, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .fivem-link-btn {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .fivem-link-btn:hover {
+            background: rgba(239, 68, 68, 0.45);
+            border-color: rgba(239, 68, 68, 0.8);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fondo de cuadrícula 3D unificado -->
+    <div class="grid-background"></div>
+
+    <div class="full-width-container">
+        
+        <!-- Barra superior con botón de inicio a la derecha -->
+        <header class="top-action-bar-clean animate-fade-down">
+            <div class="breadcrumb">Normativas y Condiciones</div>
+            <a href="/index.html" class="home-btn" title="Ir al inicio">
+                <i class="fa-solid fa-house"></i> Inicio
+            </a>
+        </header>
+
+        <!-- Tarjeta de Bienvenida -->
+        <div class="welcome-banner-card animate-fade-up" style="margin-bottom: 2rem;">
+            <div class="welcome-text-content" style="margin-left: 0;">
+                <h1>Normativas y Condiciones</h1>
+                <p>Consulta las reglas generales del servidor, directrices de facciones, normativas de Discord y políticas oficiales de FiveM.</p>
+            </div>
+        </div>
+
+        <!-- Botones de Pestañas (Selector) -->
+        <div class="terms-tabs animate-fade-up delay-1">
+            <button class="term-tab-btn active" onclick="switchTab('server', this)">
+                <i class="fa-solid fa-server"></i> Normativa del Servidor
+            </button>
+            <button class="term-tab-btn" onclick="switchTab('discord', this)">
+                <i class="fa-brands fa-discord"></i> Normas de Discord
+            </button>
+            <button class="term-tab-btn" onclick="switchTab('fivem', this)">
+                <i class="fa-solid fa-gamepad"></i> Normas de FiveM
+            </button>
+        </div>
+
+        <!-- SECCIÓN 1: NORMATIVA DEL SERVIDOR -->
+        <div id="serverTab" class="terms-content-section active animate-fade-up delay-2">
+            
+            <!-- Aviso legal y de aceptación Moderno con el nuevo texto -->
+            <div class="modern-legal-box">
+                <div class="legal-header">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <span>Términos Legales y Código de Convivencia</span>
+                </div>
+                <p>
+                    Las presentes normativas y condiciones de servicio pueden ser modificadas, actualizadas o complementadas por el equipo de administración en cualquier momento y sin previo aviso para garantizar la salud de la comunidad. 
+                </p>
+                <p>
+                    Al registrarte en nuestra plataforma, acceder al servidor de juego o <span class="legal-highlight">marcar la casilla de verificación</span> obligatoria en los canales de validación, se da por sentado que has leído detalladamente, comprendido y aceptado la totalidad de las reglas aquí expuestas. 
+                </p>
+                <p style="color: #94a3b8; font-size: 0.88rem; margin-top: 0.5rem;">
+                    El desconocimiento de las normas bajo ningún concepto exime al usuario de la responsabilidad de su cumplimiento, ni de la aplicación automática de sanciones disciplinarias, bloqueos temporales o expulsiones permanentes.
+                </p>
+            </div>
+
+            <div class="rules-grid-3">
+                
+                <!-- Tarjeta 1: Normativa General -->
+                <div class="rule-img-card">
+                    <div class="rule-card-banner" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600&auto=format&fit=crop');">
+                        <h2>NORMATIVA GENERAL</h2>
+                    </div>
+                    <div class="rule-card-info">
+                        <h4>Normativa</h4>
+                        <p>Reglas generales del servidor, conceptos fundamentales de rol (Metagaming, Powergaming, Deathmatching) y convivencia ciudadana.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2: Normativa Ilegal -->
+                <div class="rule-img-card">
+                    <div class="rule-card-banner" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop');">
+                        <h2>NORMATIVA ILEGAL</h2>
+                    </div>
+                    <div class="rule-card-info">
+                        <h4>Normativa ilegal</h4>
+                        <p>Normas específicas para bandas, mafias, atracos, secuestros, zonas calientes y actividades delictivas organizadas.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3: Normativa Locales -->
+                <div class="rule-img-card">
+                    <div class="rule-card-banner" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=600&auto=format&fit=crop');">
+                        <h2>NORMATIVA LOCALES</h2>
+                    </div>
+                    <div class="rule-card-info">
+                        <h4>Normativa locales</h4>
+                        <p>Regulación de negocios, establecimientos, tiendas oficiales, empleados y normativas de economía interna de la ciudad.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: NORMAS DE DISCORD (Con 5 reglas y botón centrado) -->
+        <div id="discordTab" class="terms-content-section">
+            
+            <div class="rule-card">
+                <h3><i class="fa-solid fa-handshake"></i> 1. Respeto y Convivencia Mutua</h3>
+                <p>El servidor de Discord es un espacio de reunión para toda la comunidad. Queda estrictamente prohibido cualquier tipo de acoso, insultos discriminatorios, comentarios racistas, homófobos o toxicidad intencionada hacia cualquier miembro o miembro del staff.</p>
+            </div>
+
+            <div class="rule-card">
+                <h3><i class="fa-solid fa-ban"></i> 2. Cero Spam, Flood y Publicidad No Autorizada</h3>
+                <p>No está permitido el envío masivo de mensajes idénticos (spam), saturación de canales (flood), menciones injustificadas a roles o usuarios, ni la difusión de enlaces de invitación a otros servidores o comunidades ajenas sin autorización expresa.</p>
+            </div>
+
+            <div class="rule-card">
+                <h3><i class="fa-solid fa-user-shield"></i> 3. Privacidad y Protección de Datos</h3>
+                <p>Está terminantemente prohibida la divulgación de información personal, fotografías, datos privados o contenido sensible de cualquier usuario (doxxing) dentro de los canales públicos o privados de la comunidad.</p>
+            </div>
+
+            <div class="rule-card">
+                <h3><i class="fa-solid fa-comments"></i> 4. Uso Adecuado de Canales de Texto y Voz</h3>
+                <p>Cada canal tiene una temática específica (general, sugerencias, soporte). Respeta dichos espacios. En los canales de voz queda prohibido el uso de soundboards molestos, distorsiones de voz extremas o música con volumen molesto.</p>
+            </div>
+
+            <div class="rule-card">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> 5. Seguridad, Enlaces Maliciosos y Contenido NSFW</h3>
+                <p>Se prohíbe de forma absoluta la compartición de archivos adjuntos con malware, links de estafas (phishing), contenido para adultos (NSFW) o material explícito/gore en cualquiera de los canales de la comunidad.</p>
+            </div>
+
+            <!-- Botón de Redirección a Normas Oficiales de Discord (Centrado) -->
+            <div class="external-links-container-centered">
+                <a href="https://discord.com/terms" target="_blank" class="external-link-btn discord-link-btn">
+                    <i class="fa-brands fa-discord"></i> Normas Oficiales y Términos de Discord
+                </a>
+            </div>
+
+        </div>
+
+        <!-- SECCIÓN 3: NORMAS DE FIVEM (Con 5 reglas y botón centrado) -->
+        <div id="fivemTab" class="terms-content-section">
+            
+            <div class="rule-card">
+                <h3><i class="fa-solid fa-shield-halved"></i> 1. Respeto al EULA de Rockstar Games</h3>
+                <p>FiveM opera como una modificación autorizada de Grand Theft Auto V. Todos los usuarios de la plataforma están obligados a cumplir rigurosamente con los acuerdos de usuario final (EULA) estipulados por Rockstar Games y Take-Two Interactive.</p>
+            </div>
+
+            <div class="rule-card">
+                <h3><i class="fa-solid fa-ban"></i> 2. Tolerancia Cero con Cheats, Hacks y Exploits</h3>
+                <p>El uso de software de terceros no autorizado, inyección de menús de trucos (mod menus), alteraciones de memoria o aprovechamiento de errores de programación (exploits) conlleva un baneo global e inapelable en la infraestructura de Cfx.re.</p>
+            </div>
+
+            <div class="rule-card">
+                <h3><i class="fa-solid fa-copyright"></i> 3. Propiedad Intelectual y Modificaciones</h3>
+                <p>Queda prohibido sustraer, extraer o utilizar de forma ilícita recursos protegidos (scripts, mapeados, vehículos exclusivos) de otros servidores o creadores independientes sin contar con el consentimiento explícito de sus dueños.</p>
+            </div>
+
+            <div class="rule-card">
+                <h3><i class="fa-solid fa-hand-holding-dollar"></i> 4. Cumplimiento de Políticas de Monetización</h3>
+                <p>Las donaciones y transacciones económicas dentro de la comunidad deben ajustarse estrictamente a las directrices comerciales permitidas por Cfx.re, estando prohibida la venta de ventajas directas de juego ventajistas (Pay-to-Win).</p>
+            </div>
+
+            <div class="rule-card">
+                <h3><i class="fa-solid fa-network-wired"></i> 5. Estabilidad de Red y Seguridad</h3>
+                <p>Está terminantemente prohibido perpetrar ataques de denegación de servicio (DDoS), saturación intencionada de paquetes o cualquier acción orientada a sabotear la conectividad de los servidores oficiales y pasarelas de la plataforma.</p>
+            </div>
+
+            <!-- Botón de Redirección a Normas Oficiales de FiveM (Centrado) -->
+            <div class="external-links-container-centered">
+                <a href="https://fivem.net" target="_blank" class="external-link-btn fivem-link-btn">
+                    <i class="fa-solid fa-gamepad"></i> Portal Oficial y Normas de FiveM (Cfx.re)
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Scripts de interactividad (Pestañas) -->
+    <script>
+    function switchTab(tabName, btnElement) {
+        document.querySelectorAll('.terms-content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        document.querySelectorAll('.term-tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        if (tabName === 'server') {
+            document.getElementById('serverTab').classList.add('active');
+        } else if (tabName === 'discord') {
+            document.getElementById('discordTab').classList.add('active');
+        } else if (tabName === 'fivem') {
+            document.getElementById('fivemTab').classList.add('active');
+        }
+
+        btnElement.classList.add('active');
+    }
+    </script>
+
+    <script src="/guards.js"></script>
+</body>
+</html>

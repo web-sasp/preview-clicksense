@@ -1,0 +1,12 @@
+{
+  "name": "clicksenserp",
+  "version": "1.0.0",
+  "description": "Plataforma web inmersiva para servidores de rol serio",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

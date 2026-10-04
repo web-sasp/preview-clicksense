@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Donaciones - Panel Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/src/assets/admin.css">
+</head>
+<body>
+    <div class="grid-background"></div>
+    <div class="app-container">
+        <main class="main-content" style="width: 100%;">
+            <header class="top-action-bar">
+                <div class="breadcrumb">Panel de administración / Donaciones</div>
+                <a href="/admin.html" class="top-btn"><i class="fa-solid fa-arrow-left"></i> Volver al Panel</a>
+            </header>
+            <div class="admin-card">
+                <h3><i class="fa-solid fa-gem" style="color: #ef4444;"></i> Control de Donaciones y VIP</h3>
+                <p>Verifica transacciones económicas, asigna paquetes VIP y vehículos exclusivos a los usuarios.</p>
+                <div style="margin-top: 20px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1);">
+                    <p style="color: var(--text-muted);">[ Registro de transacciones y beneficios VIP ]</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/src/views/permissions.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const hasAccess = typeof checkUserPermissions === 'function' ? await checkUserPermissions() : false;
+            if (!hasAccess) window.location.href = '/admin.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Política de Donaciones | ClickSense RP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/src/assets/admin.css">
+<link rel="stylesheet" href="/src/assets/perfil.css">
+<style>
+    /* Scrollbar personalizado acorde al diseño */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(15, 18, 25, 0.6);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 4px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+        transition: background 0.3s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(168, 85, 247, 0.5);
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+
+    /* Notificación flotante Toast centrada arriba */
+    #toastNotification {
+        position: fixed; top: 25px; left: 50%;
+        transform: translateX(-50%) translateY(-120px);
+        background: linear-gradient(135deg, #1f142e 0%, #140f1d 100%);
+        border: 1px solid rgba(168,85,247,0.5);
+        padding: 16px 22px; border-radius: 16px; color: #fff;
+        box-shadow: 0 12px 35px rgba(0,0,0,0.7), 0 0 20px rgba(168,85,247,0.2);
+        z-index: 200000; display: flex; align-items: center; gap: 14px;
+        opacity: 0;
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Tarjeta superior de bienvenida */
+    .normativa-hero-card {
+        position: relative !important;
+        background: linear-gradient(90deg, rgba(28, 16, 38, 0.85) 0%, rgba(15, 12, 22, 0.95) 100%) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(168, 85, 247, 0.2) !important;
+        border-radius: 16px !important;
+        padding: 28px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
+        margin-bottom: 20px !important;
+        overflow: hidden !important;
+    }
+    .normativa-hero-card::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 5px !important;
+        height: 100% !important;
+        background: linear-gradient(to bottom, #a855f7, #ec4899) !important;
+    }
+
+    /* Sistema de Pestañas (Tabs Navigation) */
+    .normativa-tabs-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    /* Barra de Filtro de Búsqueda con Icono de Lupa en Morado */
+    .search-filter-input-container {
+        position: relative;
+        width: 300px;
+        max-width: 100%;
+    }
+
+    .search-filter-input-container i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a855f7; /* Color morado solicitado */
+        font-size: 14px;
+        pointer-events: none;
+        transition: color 0.3s ease;
+    }
+
+    .search-filter-input {
+        width: 100%;
+        background: rgba(20, 24, 33, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 11px 14px 11px 40px;
+        color: #ffffff;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;
+        outline: none;
+        backdrop-filter: blur(8px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .search-filter-input:focus {
+        border-color: rgba(168, 85, 247, 0.6);
+        background: rgba(25, 30, 42, 0.9);
+        box-shadow: 0 4px 20px rgba(168, 85, 247, 0.2);
+    }
+
+    .search-filter-input:focus ~ i {
+        color: #ec4899;
+    }
+
+    /* Estilo para las cabeceras estáticas de sección */
+    .section-header-static {
+        background: linear-gradient(90deg, rgba(30, 25, 45, 0.9) 0%, rgba(20, 18, 30, 0.95) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.35);
+        border-radius: 10px;
+        padding: 16px 24px;
+        font-family: 'Lexend', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-top: 25px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .section-header-static span {
+        color: #ec4899;
+    }
+
+    /* Contenedores de Secciones (Pestañas) */
+    .normativa-section-pane {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 2rem;
+    }
+
+    /* Elemento del Acordeón */
+    .accordion-item {
+        background: rgba(17, 18, 20, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: border-color 0.3s ease, background 0.3s ease;
+        backdrop-filter: blur(8px);
+    }
+
+    .accordion-item:hover {
+        border-color: rgba(255, 255, 255, 0.15);
+        background: rgba(23, 25, 30, 0.95);
+    }
+
+    .accordion-item.active {
+        border-color: rgba(168, 85, 247, 0.4);
+        background: rgba(22, 20, 30, 0.95);
+    }
+
+    /* Cabecera Clicable del Acordeón */
+    .accordion-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 24px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .accordion-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .accordion-number {
+        font-family: 'Lexend', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #94a3b8;
+        letter-spacing: 0.5px;
+        min-width: 85px;
+    }
+
+    .accordion-title {
+        font-family: 'Lexend', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .accordion-icon {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
+    }
+
+    .accordion-item.active .accordion-icon {
+        transform: rotate(180deg);
+        color: #ec4899;
+    }
+
+    .accordion-item.active .accordion-number {
+        color: #ec4899;
+    }
+
+    /* Cuerpo / Contenido Desplegable Animado */
+    .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease;
+        padding: 0 24px;
+        background: rgba(13, 14, 18, 0.6);
+        border-top: 0px solid rgba(255, 255, 255, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .accordion-item.active .accordion-content {
+        max-height: 2500px;
+        padding: 20px 24px 24px 24px;
+        border-top-width: 1px;
+    }
+
+    .accordion-body-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        color: #cbd5e1;
+        line-height: 1.6;
+        margin: 0;
+        flex: 1;
+        min-width: 250px;
+    }
+
+    /* Estilo del Botón de Confirmación con animación de escalado al pasar el ratón */
+    #acceptPolicyBtn {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: #fff;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'Lexend', sans-serif;
+    }
+    #acceptPolicyBtn:hover {
+        transform: scale(1.04);
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.45);
+    }
+</style>
+</head>
+<body>
+<div class="grid-background"></div>
+
+<!-- Notificación Flotante Estilo Toast (Centrada Arriba) -->
+<div id="toastNotification">
+    <i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 20px;"></i>
+    <div>
+        <strong style="font-size: 13.5px; display: block; color: #fff;" id="toastTitle">Política aceptada</strong>
+        <span style="font-size: 12px; color: var(--text-muted);" id="toastDesc">Has leído, comprendido y aceptado la normativa de donaciones correctamente.</span>
+    </div>
+</div>
+
+<div class="app-container">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+                <span class="server-main-title">ClickSense</span>
+            </div>
+            <button class="sidebar-toggle-icon" id="sidebarToggleBtn"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-category">General</div>
+            <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> Equipo</a>
+            <a href="/calendario.html" class="nav-item"><i class="fa-solid fa-calendar-days"></i> Calendario</a>
+            <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> Comercios</a>
+            <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> Postulaciones ilegales</a>
+            <div class="nav-category">Espacio de trabajo</div>
+            <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> Grupos</a>
+            <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> Documentos</a>
+            <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> Whitelist</a>
+            <div class="nav-category">Mi Cuenta</div>
+            <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> Mi Perfil</a>
+            <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> Historias personaje</a>
+            <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+            <div class="nav-category">SASP</div>
+            <a href="/lspd-academia.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Academia LSPD</a>
+            <a href="/lssd-academia.html" class="nav-item" style="padding-left: 2.2rem; font-size: 13px;">Academia LSSD</a>
+            <a href="/public/defcon.html" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i> Defcon</a>
+            <a href="/codigo-penal.html" class="nav-item"><i class="fa-solid fa-scale-balanced"></i> Código penal</a>
+            <a href="/public/organigrama.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Organigrama</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile-mini" id="userProfileMini">
+                <div class="avatar-placeholder" id="userAvatarContainer">
+                    <span id="userAvatarFallback">?</span>
+                </div>
+                <div class="user-info">
+                    <span class="username" id="userNameDisplay">Usuario</span>
+                    <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted); display: block;">@tag</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+    
+    <main class="main-content">
+        <header class="top-action-bar" style="display: flex; justify-content: flex-start; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 24px;">
+            <div class="breadcrumb" id="breadcrumbNav">Política de Donaciones</div>
+        </header>
+
+        <!-- Tarjeta Hero Superior -->
+        <div class="normativa-hero-card">
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #c084fc; font-weight: 800; display: block; margin-bottom: 8px;">
+                <i class="fa-solid fa-file-shield" style="color: #ec4899; margin-right: 6px;"></i> Marco Legal y Financiero
+            </span>
+            <h1 style="font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: -0.5px; font-family: 'Lexend', sans-serif;">Política de Donaciones Oficial</h1>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin: 0; line-height: 1.6; font-family: 'Inter', sans-serif;">
+                Compendio oficial de términos, condiciones, restricciones y directrices aplicables a las donaciones y beneficios en ClickSense RP.
+            </p>
+        </div>
+
+        <!-- Barra de Búsqueda con Icono de Lupa Morado -->
+        <div class="normativa-tabs-container">
+            <div class="search-filter-input-container">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" class="search-filter-input" placeholder="Buscar artículo o contenido..." onkeyup="filterArticles()">
+            </div>
+        </div>
+
+        <!-- Cabecera de Sección Estática -->
+        <div class="section-header-static">
+            <i class="fa-solid fa-bookmark"></i> DISPOSICIONES GENERALES SOBRE LAS DONACIONES, BENEFICIOS, RESTRICCIONES Y POLÍTICAS DEL SERVIDOR
+        </div>
+
+        <!-- Listado de Artículos (Acordeones) -->
+        <div class="normativa-section-pane active" id="articlesList">
+            
+            <div class="accordion-item" data-search="1.0 igualdad ante la normativa ser donador no te hace inmune a sanciones">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title-wrapper">
+                        <span class="accordion-number">1.0</span>
+                        <span class="accordion-title">Igualdad ante la normativa</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <p class="accordion-body-text">Ser donador no te hace inmune a sanciones. Todas las normas del servidor aplican por igual, sin excepciones.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-search="2.0 no reembolsos no se realizan reembolsos bajo ningún concepto voluntarias desinteresadas">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title-wrapper">
+                        <span class="accordion-number">2.0</span>
+                        <span class="accordion-title">No reembolsos</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <p class="accordion-body-text">No se realizan reembolsos bajo ningún concepto. Las donaciones son voluntarias y desinteresadas, realizadas con el fin de apoyar al servidor.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-search="3.0 donaciones personales e intransferibles únicas personales intransferibles terceros">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title-wrapper">
+                        <span class="accordion-number">3.0</span>
+                        <span class="accordion-title">Donaciones personales e intransferibles</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <p class="accordion-body-text">Las donaciones son únicas, personales e intransferibles. No pueden compartirse o venderse a terceros.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-search="4.0 donaciones regaladas a otro jugador regalar usuario entregada registrada exclusivamente renuncia reclamación modificación">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title-wrapper">
+                        <span class="accordion-number">4.0</span>
+                        <span class="accordion-title">Donaciones regaladas a otro jugador</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <p class="accordion-body-text">Un jugador podrá regalar una donación a otro usuario. Una vez entregada y registrada, la donación pasará a ser exclusivamente del jugador que la recibe. Desde ese momento, el jugador que realizó la donación <strong>renuncia a cualquier derecho de reclamación, modificación o recuperación</strong> relacionada con dicha donación. Cualquier gestión relacionada con la donación deberá ser realizada únicamente por el jugador que la recibió como regalo.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-search="5.0 derecho de reclamación solo persona realizó donación podrá presentar reclamaciones solicitudes">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title-wrapper">
+                        <span class="accordion-number">5.0</span>
+                        <span class="accordion-title">Derecho de reclamación</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <p class="accordion-body-text">Solo la persona que realizó la donación podrá presentar reclamaciones o solicitudes relacionadas con la misma.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-search="6.0 uso indebido de beneficios lucrativos rol alquiler casas coches ganancias económicas ic ooc">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title-wrapper">
+                        <span class="accordion-number">6.0</span>
+                        <span class="accordion-title">Uso indebido de beneficios</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <p class="accordion-body-text">No está permitido utilizar beneficios obtenidos mediante donación con fines lucrativos dentro del rol, incluyendo alquiler de casas, coches o cualquier uso destinado a obtener ganancias económicas IC y OOC.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-search="7.0 cambio de personaje reclamar nuevamente ticket donaciones modificaciones intercambios cambios beneficio adquirido">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title-wrapper">
+                        <span class="accordion-number">7.0</span>
+                        <span class="accordion-title">Cambio de personaje</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <p class="accordion-body-text">En caso de cambio de personaje, el usuario podrá reclamar nuevamente su donación mediante ticket de donaciones. No se realizarán modificaciones, intercambios ni cambios sobre el beneficio originalmente adquirido.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-search="8.0 inactividad prolongada superior 50 días consecutivos conexión pérdida donación beneficios">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title-wrapper">
+                        <span class="accordion-number">8.0</span>
+                        <span class="accordion-title">Inactividad prolongada</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <p class="accordion-body-text">La inactividad superior a <em>50 días consecutivos</em> sin conexión al servidor podrá resultar en la pérdida de la donación y sus beneficios asociados.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-search="9.0 reinicio del servidor wipe donaciones beneficios asociados eliminados excepción canales oficiales">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title-wrapper">
+                        <span class="accordion-number">9.0</span>
+                        <span class="accordion-title">Reinicio del servidor (Wipe)</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <p class="accordion-body-text">Con cada Wipe del servidor, todas las donaciones y beneficios asociados serán eliminados. Cualquier excepción será comunicada previamente por los canales oficiales.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item" data-search="10.0 aceptación de la política realizar donación clicksenserp confirmas leído entendido aceptado total">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title-wrapper">
+                        <span class="accordion-number">10.0</span>
+                        <span class="accordion-title">Aceptación de la política</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down accordion-icon"></i>
+                </div>
+                <div class="accordion-content">
+                    <p class="accordion-body-text">Al realizar una donación en ClickSenseRP, confirmas que has leído, entendido y aceptado esta Política de Donaciones en su totalidad.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Casilla con el botón de confirmación y el mensaje verde -->
+        <div class="section-header-static" style="flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 25px; margin-bottom: 40px;">
+            <button id="acceptPolicyBtn" onclick="acceptPolicy()">
+                <i class="fa-solid fa-check"></i> Confirmar y aceptar la política de donaciones
+            </button>
+            <div id="acceptPolicySuccess" style="display: none; color: #22c55e; font-size: 0.9rem; font-weight: 600; font-family: 'Inter', sans-serif; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-circle-check"></i> Has leído, comprendido y aceptado la normativa de donaciones correctamente.
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+// Función para mostrar notificación Toast centrada arriba
+function showToast(title, desc) {
+    const toast = document.getElementById('toastNotification');
+    document.getElementById('toastTitle').textContent = title;
+    document.getElementById('toastDesc').textContent = desc;
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    toast.style.opacity = '1';
+    setTimeout(() => {
+        toast.style.transform = 'translateX(-50%) translateY(-120px)';
+        toast.style.opacity = '0';
+    }, 3500);
+}
+
+// Función para abrir/cerrar acordeones con la clase .active
+function toggleAccordion(headerElement) {
+    const item = headerElement.parentElement;
+    item.classList.toggle('active');
+}
+
+// Búsqueda en tiempo real
+function filterArticles() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    const items = document.querySelectorAll('#articlesList .accordion-item');
+
+    items.forEach(item => {
+        const searchText = item.getAttribute('data-search') || '';
+        const textContent = item.textContent.toLowerCase();
+        if (searchText.includes(query) || textContent.includes(query)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Acción de aceptar política
+function acceptPolicy() {
+    const successMsg = document.getElementById('acceptPolicySuccess');
+    const btn = document.getElementById('acceptPolicyBtn');
+    
+    successMsg.style.display = 'inline-flex';
+    btn.style.opacity = '0.75';
+    btn.style.pointerEvents = 'none';
+    btn.innerHTML = '<i class="fa-solid fa-check-double"></i> Política aceptada';
+    
+    localStorage.setItem('donations_policy_accepted', 'true');
+    
+    // Lanzar notificación Toast flotante arriba centrada
+    showToast("Política aceptada", "Has leído, comprendido y aceptado la normativa de donaciones correctamente.");
+}
+
+// Cargar estado guardado al iniciar
+window.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('donations_policy_accepted') === 'true') {
+        const successMsg = document.getElementById('acceptPolicySuccess');
+        const btn = document.getElementById('acceptPolicyBtn');
+        if (successMsg && btn) {
+            successMsg.style.display = 'inline-flex';
+            btn.style.opacity = '0.75';
+            btn.style.pointerEvents = 'none';
+            btn.innerHTML = '<i class="fa-solid fa-check-double"></i> Política aceptada';
+        }
+    }
+});
+
+async function loadDiscordSessionData() {
+    const storedUser = localStorage.getItem('discord_user');
+    const avatarContainer = document.getElementById('userAvatarContainer');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const userHandleDisplay = document.getElementById('userHandleDisplay');
+    if (!storedUser) return;
+    try {
+        const discordUser = JSON.parse(storedUser);
+        if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+        if (userHandleDisplay) userHandleDisplay.textContent = "@" + (discordUser.username || "discord");
+        if (avatarContainer && discordUser.avatarUrl) {
+            avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    } catch (e) {
+        console.error("Error al cargar sesión de Discord", e);
+    }
+}
+loadDiscordSessionData();
+
+const toggleBtn = document.getElementById('sidebarToggleBtn');
+const revealBtn = document.getElementById('sidebarRevealBtn');
+const sidebar = document.getElementById('sidebar');
+if (toggleBtn && revealBtn && sidebar) {
+    toggleBtn.addEventListener('click', () => sidebar.classList.add('collapsed'));
+    revealBtn.addEventListener('click', () => sidebar.classList.remove('collapsed'));
+}
+</script>
+
+<script src="/guards.js"></script>
+</body>
+</html>

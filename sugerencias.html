@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sugerencias | ClickSense RP</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Lexend:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/src/assets/home.css">
+    <link rel="stylesheet" href="/src/assets/perfil.css">
+
+    <style>
+        :root {
+            --sg-card: rgba(23, 20, 35, 0.78);
+            --sg-card-hover: rgba(31, 27, 47, 0.92);
+            --sg-soft: rgba(255, 255, 255, 0.04);
+            --sg-line: rgba(255, 255, 255, 0.08);
+            --sg-line-2: rgba(255, 255, 255, 0.15);
+            --sg-text: #f3f1fa;
+            --sg-muted: #9a95ad;
+            --sg-morado: #a855f7;
+            --sg-rosa: #ec4899;
+            --sg-nueva: #60a5fa;
+            --sg-revision: #fbbf24;
+            --sg-implementada: #34d399;
+            --sg-rechazada: #f87171;
+            --sg-ease: cubic-bezier(.16, 1, .3, 1);
+        }
+
+        /* ============ Página ============ */
+        .sg { width: 100%; max-width: 1560px; margin: 0 auto; container-type: inline-size; font-family: 'Plus Jakarta Sans', sans-serif; color: var(--sg-text); }
+        .sg *, .sg-modal *, .sg-toast * { box-sizing: border-box; }
+        .sg button, .sg-modal button, .sg input, .sg-modal input, .sg-modal textarea { font-family: inherit; }
+        .sg :focus-visible, .sg-modal :focus-visible { outline: 2px solid #c084fc; outline-offset: 2px; }
+
+        @keyframes sgSube { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+        @keyframes sgAparece { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes sgPop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
+        @keyframes sgBrillo { from { transform: translateX(-120%) skewX(-18deg); } to { transform: translateX(260%) skewX(-18deg); } }
+        @keyframes sgLatido { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 55%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
+
+        .sg-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 14px 0 26px; animation: sgSube .6s var(--sg-ease) both; }
+        .sg-head h1 { margin: 0 0 6px; font-family: 'Lexend', sans-serif; font-size: clamp(1.7rem, 3.2cqi, 2.3rem); font-weight: 700; letter-spacing: -0.4px; line-height: 1.1; color: #fff; }
+        .sg-head p { margin: 0; color: var(--sg-muted); font-size: .98rem; line-height: 1.55; max-width: 64ch; }
+
+        /* Botones */
+        .sg-btn {
+            position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+            padding: 11px 20px; border-radius: 12px; cursor: pointer; white-space: nowrap; text-decoration: none;
+            font-size: .9rem; font-weight: 600; color: var(--sg-text);
+            background: var(--sg-soft); border: 1px solid var(--sg-line);
+            transition: transform .25s var(--sg-ease), background .25s, border-color .25s, box-shadow .25s, color .25s, opacity .25s;
+        }
+        .sg-btn:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--sg-line-2); color: #fff; transform: translateY(-1px); }
+        .sg-btn:active { transform: translateY(0) scale(.97); }
+        .sg-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+        .sg-btn i { transition: transform .4s var(--sg-ease); }
+        .sg-btn.primario { border-color: transparent; color: #fff; background: linear-gradient(135deg, var(--sg-rosa), #8b5cf6); box-shadow: 0 6px 22px rgba(236, 72, 153, 0.28); }
+        .sg-btn.primario::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent); transform: translateX(-120%) skewX(-18deg); pointer-events: none; }
+        .sg-btn.primario:hover { box-shadow: 0 10px 30px rgba(236, 72, 153, 0.45); background: linear-gradient(135deg, var(--sg-rosa), #8b5cf6); }
+        .sg-btn.primario:hover::after { animation: sgBrillo .8s ease; }
+        .sg-btn.primario:hover .fa-plus { transform: rotate(90deg); }
+        .sg-btn.primario:hover .fa-paper-plane { transform: translate(3px, -3px); }
+
+        /* Barra: buscar, ordenar, categoría */
+        .sg-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; animation: sgSube .6s var(--sg-ease) .08s both; position: relative; z-index: 5; }
+        .sg-search { position: relative; flex: 1 1 260px; max-width: 360px; display: flex; align-items: center; }
+        .sg-search i { position: absolute; left: 14px; color: var(--sg-muted); font-size: .85rem; pointer-events: none; transition: color .25s; }
+        .sg-search input {
+            width: 100%; padding: 11px 14px 11px 38px; border-radius: 12px; outline: none;
+            background: var(--sg-soft); border: 1px solid var(--sg-line); color: #fff; font-size: .9rem;
+            transition: border-color .25s, background .25s, box-shadow .25s;
+        }
+        .sg-search input::placeholder { color: var(--sg-muted); }
+        .sg-search input:focus { border-color: var(--sg-morado); background: rgba(168, 85, 247, 0.06); box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.14); }
+        .sg-search:focus-within i { color: #c084fc; }
+
+        .sg-seg { position: relative; display: inline-flex; padding: 4px; border-radius: 12px; background: var(--sg-soft); border: 1px solid var(--sg-line); }
+        .sg-seg-thumb { position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 9px; background: rgba(255, 255, 255, 0.1); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); transition: transform .4s var(--sg-ease), width .4s var(--sg-ease); }
+        .sg-seg button { position: relative; z-index: 1; padding: 7px 14px; border: none; background: none; cursor: pointer; border-radius: 9px; font-size: .86rem; font-weight: 600; color: var(--sg-muted); transition: color .25s; }
+        .sg-seg button:hover { color: #fff; }
+        .sg-seg button.on { color: #fff; }
+
+        .sg-dd { position: relative; }
+        .sg-dd-btn i.fa-chevron-down { font-size: .65rem; color: var(--sg-muted); }
+        .sg-dd.abierto .sg-dd-btn i.fa-chevron-down { transform: rotate(180deg); }
+        .sg-dd-menu {
+            position: absolute; left: 0; top: calc(100% + 8px); min-width: 240px; padding: 6px; border-radius: 14px;
+            background: #16131f; border: 1px solid var(--sg-line-2); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            opacity: 0; transform: translateY(-8px) scale(.97); transform-origin: top left; pointer-events: none;
+            transition: opacity .22s ease, transform .3s var(--sg-ease);
+        }
+        .sg-dd.abierto .sg-dd-menu { opacity: 1; transform: none; pointer-events: auto; }
+        .sg-dd-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 11px; border: none; background: none; border-radius: 9px; cursor: pointer; text-align: left; font-size: .87rem; font-weight: 500; color: #cfcadd; transition: background .2s, color .2s, padding-left .25s var(--sg-ease); }
+        .sg-dd-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; padding-left: 15px; }
+        .sg-dd-item.on { background: rgba(168, 85, 247, 0.16); color: #fff; }
+        .sg-dd-item i { width: 16px; text-align: center; }
+        .sg-total { margin-left: auto; font-size: .84rem; color: var(--sg-muted); }
+
+        /* Pestañas de columna (solo cuando no caben las columnas) */
+        .sg-tabs { display: none; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+        .sg-tab { display: inline-flex; align-items: center; gap: 8px; padding: 8px 13px; border-radius: 999px; cursor: pointer; white-space: nowrap; font-size: .84rem; font-weight: 600; color: var(--sg-muted); background: var(--sg-soft); border: 1px solid var(--sg-line); transition: color .25s, background .25s, border-color .25s; }
+        .sg-tab.on { color: #fff; background: color-mix(in srgb, var(--c) 16%, transparent); border-color: color-mix(in srgb, var(--c) 55%, transparent); }
+        .sg-tab b { font-weight: 700; font-size: .76rem; opacity: .8; }
+
+        /* Tablero */
+        .sg-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; align-items: start; }
+        .sg-col { --c: var(--sg-nueva); min-width: 0; animation: sgSube .7s var(--sg-ease) both; animation-delay: calc(.12s + var(--n, 0) * .07s); }
+        .sg-col[data-col="revision"] { --c: var(--sg-revision); }
+        .sg-col[data-col="implementada"] { --c: var(--sg-implementada); }
+        .sg-col[data-col="rechazada"] { --c: var(--sg-rechazada); }
+        .sg-col-head { display: flex; align-items: center; gap: 10px; padding: 6px 4px 12px; margin-bottom: 12px; border-bottom: 1px solid var(--sg-line); position: relative; }
+        .sg-col-head::after { content: ''; position: absolute; left: 0; bottom: -1px; height: 2px; width: 44px; border-radius: 2px; background: var(--c); }
+        .sg-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex-shrink: 0; animation: sgLatido 2.6s ease-in-out infinite; }
+        .sg-col-head h2 { margin: 0; flex: 1; font-size: .95rem; font-weight: 700; color: #fff; }
+        .sg-count { font-size: .78rem; font-weight: 700; color: var(--sg-muted); padding: 2px 9px; border-radius: 999px; background: var(--sg-soft); border: 1px solid var(--sg-line); }
+        .sg-count.pop { animation: sgPop .45s var(--sg-ease); }
+        .sg-list { display: flex; flex-direction: column; gap: 10px; }
+
+        /* Tarjeta */
+        .sg-card {
+            position: relative; padding: 15px 15px 13px; border-radius: 16px; cursor: pointer;
+            background: var(--sg-card); border: 1px solid var(--sg-line);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            transition: transform .35s var(--sg-ease), border-color .3s, background .3s, box-shadow .35s;
+        }
+        .sg-board.animar .sg-card { animation: sgSube .55s var(--sg-ease) both; animation-delay: calc(.18s + min(var(--i, 0), 10) * .045s); }
+        .sg-card::before { content: ''; position: absolute; left: 0; top: 16px; bottom: 16px; width: 3px; border-radius: 0 3px 3px 0; background: var(--c); opacity: 0; transform: scaleY(.3); transition: opacity .3s, transform .4s var(--sg-ease); }
+        .sg-card:hover, .sg-card:focus-within { transform: translateY(-3px); background: var(--sg-card-hover); border-color: color-mix(in srgb, var(--c) 45%, transparent); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38); }
+        .sg-card:hover::before, .sg-card:focus-within::before { opacity: 1; transform: none; }
+        .sg-card-top { display: flex; align-items: flex-start; gap: 10px; }
+        .sg-card-open { flex: 1; min-width: 0; padding: 0; border: none; background: none; cursor: pointer; text-align: left; color: #fff; font-size: .94rem; font-weight: 700; line-height: 1.38; }
+        .sg-card-open span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+        .sg-card-open::after { content: ''; position: absolute; inset: 0; border-radius: 16px; }   /* toda la tarjeta abre el detalle */
+        .sg-card-open:focus-visible { outline: none; }
+        .sg-card:has(.sg-card-open:focus-visible) { outline: 2px solid #c084fc; outline-offset: 2px; }
+
+        .sg-votes { position: relative; z-index: 1; display: flex; gap: 6px; flex-shrink: 0; }
+        .sg-vote {
+            display: inline-flex; align-items: center; gap: 6px; min-width: 46px; justify-content: center;
+            padding: 5px 9px; border-radius: 10px; cursor: pointer;
+            font-size: .8rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--sg-muted);
+            background: var(--sg-soft); border: 1px solid var(--sg-line);
+            transition: color .2s, background .2s, border-color .2s, transform .25s var(--sg-ease);
+        }
+        .sg-vote i { font-size: .72rem; transition: transform .3s var(--sg-ease); }
+        .sg-vote:active { transform: scale(.92); }
+        .sg-vote.up:hover, .sg-vote.up.on { color: var(--sg-implementada); border-color: rgba(52, 211, 153, 0.45); background: rgba(52, 211, 153, 0.1); }
+        .sg-vote.down:hover, .sg-vote.down.on { color: var(--sg-rechazada); border-color: rgba(248, 113, 113, 0.45); background: rgba(248, 113, 113, 0.1); }
+        .sg-vote.up:hover i { transform: translateY(-2px); }
+        .sg-vote.down:hover i { transform: translateY(2px); }
+        .sg-vote.on { box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 14%, transparent); }
+        .sg-vote.pop span { display: inline-block; animation: sgPop .45s var(--sg-ease); }
+
+        .sg-tag { position: relative; z-index: 0; display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; padding: 3px 10px; border-radius: 999px; font-size: .74rem; font-weight: 600; color: #ddd8ea; background: var(--sg-soft); border: 1px solid var(--sg-line); }
+        .sg-tag i { width: 6px; height: 6px; border-radius: 50%; background: var(--t, #a855f7); }
+
+        .sg-card-foot { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: .8rem; color: var(--sg-muted); min-width: 0; }
+        .sg-av { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #2a2540; }
+        .sg-autor { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #c9c4d8; font-weight: 500; }
+        .sg-sep { opacity: .5; }
+        .sg-fecha { white-space: nowrap; }
+        .sg-card-staff { position: relative; z-index: 1; margin-left: auto; display: inline-flex; align-items: center; flex-shrink: 0; }
+        .sg-card-staff img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 2px solid color-mix(in srgb, var(--c) 70%, transparent); background: #2a2540; transition: transform .3s var(--sg-ease); }
+        .sg-card:hover .sg-card-staff img { transform: scale(1.12); }
+        .sg-sync { margin-left: auto; color: var(--sg-revision); font-size: .8rem; }
+
+        .sg-empty { padding: 26px 14px; text-align: center; border-radius: 16px; border: 1px dashed var(--sg-line-2); color: var(--sg-muted); font-size: .86rem; line-height: 1.5; animation: sgAparece .5s ease both; }
+        .sg-empty i { display: block; font-size: 1.2rem; margin-bottom: 8px; color: color-mix(in srgb, var(--c) 70%, #fff 0%); opacity: .8; }
+        .sg-mas { width: 100%; margin-top: 2px; }
+        .sg-skel { height: 96px; border-radius: 16px; background: linear-gradient(100deg, rgba(255,255,255,.03) 30%, rgba(255,255,255,.07) 50%, rgba(255,255,255,.03) 70%); background-size: 220% 100%; animation: sgSkel 1.3s linear infinite; }
+        @keyframes sgSkel { to { background-position: -220% 0; } }
+
+        /* Columnas según el ancho disponible */
+        @container (max-width: 1099px) { .sg-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @container (max-width: 639px) {
+            .sg-board { grid-template-columns: 1fr; }
+            .sg-tabs { display: flex; }
+            .sg-col { display: none; animation: none; }
+            .sg-board[data-activa="nueva"] .sg-col[data-col="nueva"],
+            .sg-board[data-activa="revision"] .sg-col[data-col="revision"],
+            .sg-board[data-activa="implementada"] .sg-col[data-col="implementada"],
+            .sg-board[data-activa="rechazada"] .sg-col[data-col="rechazada"] { display: block; animation: sgSube .45s var(--sg-ease) both; }
+            .sg-col-head { display: none; }
+            .sg-total { display: none; }
+            .sg-search { max-width: none; }
+            .sg-head .sg-btn { width: 100%; }
+        }
+
+        /* ============ Ventanas (detalle y nueva sugerencia) ============ */
+        .sg-modal {
+            position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center; padding: 20px;
+            background: rgba(6, 4, 12, 0); backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0);
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity .3s ease, background .3s ease, backdrop-filter .3s ease, visibility 0s linear .3s;
+            font-family: 'Plus Jakarta Sans', sans-serif; color: var(--sg-text);
+        }
+        .sg-modal.abierto { background: rgba(6, 4, 12, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .3s ease, background .3s ease, backdrop-filter .3s ease, visibility 0s; }
+        .sg-panel {
+            --c: var(--sg-nueva);
+            width: 100%; max-width: 640px; max-height: calc(100vh - 40px); overflow-y: auto;
+            background: #14121d; border: 1px solid var(--sg-line-2); border-radius: 22px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+            transform: translateY(26px) scale(.96); opacity: 0;
+            transition: transform .45s var(--sg-ease), opacity .3s ease;
+        }
+        .sg-modal.abierto .sg-panel { transform: none; opacity: 1; }
+        .sg-panel[data-col="revision"] { --c: var(--sg-revision); }
+        .sg-panel[data-col="implementada"] { --c: var(--sg-implementada); }
+        .sg-panel[data-col="rechazada"] { --c: var(--sg-rechazada); }
+        .sg-panel-top { height: 3px; background: linear-gradient(90deg, var(--c), transparent 85%); border-radius: 22px 22px 0 0; }
+        .sg-panel-in { padding: 22px 26px 26px; }
+        .sg-modal.abierto .sg-panel-in > * { animation: sgSube .5s var(--sg-ease) both; }
+        .sg-modal.abierto .sg-panel-in > *:nth-child(2) { animation-delay: .05s; }
+        .sg-modal.abierto .sg-panel-in > *:nth-child(3) { animation-delay: .1s; }
+        .sg-modal.abierto .sg-panel-in > *:nth-child(4) { animation-delay: .15s; }
+        .sg-modal.abierto .sg-panel-in > *:nth-child(n+5) { animation-delay: .2s; }
+
+        .sg-det-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .sg-estado { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 999px; font-size: .78rem; font-weight: 700; color: var(--c); background: color-mix(in srgb, var(--c) 13%, transparent); border: 1px solid color-mix(in srgb, var(--c) 40%, transparent); }
+        .sg-estado i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+        .sg-id { font-size: .8rem; font-weight: 600; color: var(--sg-muted); }
+        .sg-x { margin-left: auto; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; color: #cfcadd; background: var(--sg-soft); border: 1px solid var(--sg-line); transition: background .25s, color .25s, transform .4s var(--sg-ease); }
+        .sg-x:hover { background: rgba(255, 255, 255, 0.12); color: #fff; transform: rotate(90deg); }
+
+        .sg-det-titulo { margin: 0 0 12px; font-family: 'Lexend', sans-serif; font-size: 1.45rem; font-weight: 600; line-height: 1.25; color: #fff; overflow-wrap: anywhere; }
+        .sg-det-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; font-size: .86rem; color: var(--sg-muted); }
+        .sg-det-meta .sg-av { width: 26px; height: 26px; }
+        .sg-det-meta strong { color: #fff; font-weight: 600; }
+        .sg-det-meta .sg-tag { margin-top: 0; }
+        .sg-det-desc { margin: 0 0 20px; padding: 16px 18px; border-radius: 14px; background: var(--sg-soft); border: 1px solid var(--sg-line); font-size: .95rem; line-height: 1.7; color: #dedaea; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+        .sg-det-votos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .sg-voto-g { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 14px; cursor: pointer; font-size: .9rem; font-weight: 600; color: #cfcadd; background: var(--sg-soft); border: 1px solid var(--sg-line); transition: color .25s, background .25s, border-color .25s, transform .25s var(--sg-ease), box-shadow .25s; }
+        .sg-voto-g b { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+        .sg-voto-g:hover { transform: translateY(-2px); }
+        .sg-voto-g:active { transform: scale(.97); }
+        .sg-voto-g.up:hover, .sg-voto-g.up.on { color: var(--sg-implementada); border-color: rgba(52, 211, 153, 0.5); background: rgba(52, 211, 153, 0.1); }
+        .sg-voto-g.down:hover, .sg-voto-g.down.on { color: var(--sg-rechazada); border-color: rgba(248, 113, 113, 0.5); background: rgba(248, 113, 113, 0.1); }
+        .sg-voto-g.on { box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 14%, transparent); }
+        .sg-voto-g.pop b { display: inline-block; animation: sgPop .45s var(--sg-ease); }
+
+        .sg-sub { margin: 0 0 10px; font-size: .78rem; font-weight: 700; color: var(--sg-muted); }
+        .sg-staff { display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 14px; border-radius: 16px; background: color-mix(in srgb, var(--c) 7%, transparent); border: 1px solid color-mix(in srgb, var(--c) 30%, transparent); }
+        .sg-staff img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid color-mix(in srgb, var(--c) 65%, transparent); background: #2a2540; flex-shrink: 0; }
+        .sg-staff-txt { flex: 1; min-width: 0; }
+        .sg-staff-txt small { display: block; font-size: .78rem; color: var(--sg-muted); margin-bottom: 2px; }
+        .sg-staff-txt strong { display: block; font-size: 1rem; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sg-staff-txt span { display: block; font-size: .8rem; color: var(--sg-muted); margin-top: 2px; }
+        .sg-rango { display: inline-block !important; margin-top: 5px !important; padding: 2px 9px; border-radius: 999px; font-size: .72rem !important; font-weight: 700; color: #e9d5ff !important; background: rgba(168, 85, 247, 0.16); border: 1px solid rgba(168, 85, 247, 0.35); }
+        .sg-privado { font-size: .8rem; color: var(--sg-muted); white-space: nowrap; }
+        .sg-nota { margin: 0 0 18px; padding: 12px 16px; border-left: 3px solid var(--c); border-radius: 0 12px 12px 0; background: var(--sg-soft); font-size: .92rem; line-height: 1.6; color: #dedaea; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+        .sg-gestion { margin-top: 6px; padding: 16px; border-radius: 16px; border: 1px dashed var(--sg-line-2); }
+        .sg-gestion-estados { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+        .sg-est-btn { --c: var(--sg-nueva); display: flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 6px; border-radius: 11px; cursor: pointer; font-size: .8rem; font-weight: 600; color: var(--sg-muted); background: var(--sg-soft); border: 1px solid var(--sg-line); transition: color .25s, background .25s, border-color .25s, transform .25s var(--sg-ease); }
+        .sg-est-btn i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); flex-shrink: 0; }
+        .sg-est-btn:hover { color: #fff; transform: translateY(-1px); }
+        .sg-est-btn.on { color: #fff; background: color-mix(in srgb, var(--c) 15%, transparent); border-color: color-mix(in srgb, var(--c) 60%, transparent); }
+        .sg-est-btn[data-estado="revision"] { --c: var(--sg-revision); }
+        .sg-est-btn[data-estado="implementada"] { --c: var(--sg-implementada); }
+        .sg-est-btn[data-estado="rechazada"] { --c: var(--sg-rechazada); }
+
+        .sg-campo { margin-bottom: 16px; }
+        .sg-campo label, .sg-campo .sg-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; font-size: .84rem; font-weight: 600; color: #dedaea; }
+        .sg-campo label small, .sg-campo .sg-label small { font-weight: 500; color: var(--sg-muted); font-variant-numeric: tabular-nums; }
+        .sg-input {
+            width: 100%; padding: 12px 14px; border-radius: 12px; outline: none; resize: vertical;
+            background: var(--sg-soft); border: 1px solid var(--sg-line); color: #fff; font-size: .93rem; line-height: 1.5;
+            transition: border-color .25s, background .25s, box-shadow .25s;
+        }
+        .sg-input::placeholder { color: #6f6a82; }
+        .sg-input:focus { border-color: var(--sg-morado); background: rgba(168, 85, 247, 0.06); box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.14); }
+        .sg-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .sg-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 13px; border-radius: 999px; cursor: pointer; font-size: .84rem; font-weight: 600; color: #cfcadd; background: var(--sg-soft); border: 1px solid var(--sg-line); transition: color .25s, background .25s, border-color .25s, transform .25s var(--sg-ease); }
+        .sg-chip i { color: var(--t); font-size: .8rem; }
+        .sg-chip:hover { transform: translateY(-1px); color: #fff; border-color: var(--sg-line-2); }
+        .sg-chip.on { color: #fff; background: color-mix(in srgb, var(--t) 16%, transparent); border-color: color-mix(in srgb, var(--t) 60%, transparent); }
+        .sg-acciones { display: flex; justify-content: flex-end; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+        .sg-nuevo-titulo { margin: 0; font-family: 'Lexend', sans-serif; font-size: 1.25rem; font-weight: 600; color: #fff; }
+
+        /* Aviso superior */
+        .sg-toast {
+            position: fixed; top: 22px; left: 50%; z-index: 100000; max-width: calc(100vw - 30px);
+            display: flex; align-items: center; gap: 12px; padding: 11px 20px 11px 12px; border-radius: 999px;
+            background: #17141f; border: 1px solid rgba(52, 211, 153, 0.45); color: #fff; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+            font-family: 'Plus Jakarta Sans', sans-serif; font-size: .9rem; font-weight: 500;
+            transform: translate(-50%, -90px); opacity: 0; pointer-events: none;
+            transition: transform .5s var(--sg-ease), opacity .3s ease, border-color .2s;
+        }
+        .sg-toast.ver { transform: translate(-50%, 0); opacity: 1; }
+        .sg-toast-ico { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .78rem; flex-shrink: 0; background: rgba(52, 211, 153, 0.16); color: var(--sg-implementada); }
+        .sg-toast.error { border-color: rgba(248, 113, 113, 0.5); }
+        .sg-toast.error .sg-toast-ico { background: rgba(248, 113, 113, 0.16); color: var(--sg-rechazada); }
+
+        @media (max-width: 600px) {
+            .sg-modal { padding: 0; align-items: flex-end; }
+            .sg-panel { max-height: 94vh; border-radius: 22px 22px 0 0; transform: translateY(60px); }
+            .sg-panel-in { padding: 20px 18px 24px; }
+            .sg-det-titulo { font-size: 1.25rem; }
+            .sg-gestion-estados { grid-template-columns: 1fr 1fr; }
+            .sg-staff { flex-wrap: wrap; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .sg *, .sg-modal *, .sg-modal, .sg-toast { animation: none !important; transition-duration: .01ms !important; }
+        }
+
+        /* ===== Menú desplegable de Soporte (igual que en Home y Equipo) ===== */
+        .support-dropdown-container { position: relative; display: inline-block; }
+        .support-dropdown-menu {
+            position: fixed; width: 250px; background: #13141f; border: 1px solid rgba(168, 85, 247, 0.5);
+            border-radius: 14px; box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(168, 85, 247, 0.4);
+            display: flex; flex-direction: column; z-index: 2147483647; overflow: hidden; opacity: 0;
+            transform: translateY(-10px) scale(0.95); pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); padding: 6px 0;
+        }
+        .support-dropdown-menu.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        .support-menu-section { padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+        .support-menu-section:last-child { border-bottom: none; }
+        .support-menu-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; padding: 6px 16px 4px 16px; letter-spacing: 0.5px; }
+        .support-dropdown-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: #cbd5e1; text-decoration: none; transition: background 0.2s, color 0.2s; font-weight: 500; }
+        .support-dropdown-item:hover { background: rgba(168, 85, 247, 0.2); color: #fff; }
+        .support-dropdown-item i { color: #a855f7; width: 16px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <!-- Aviso superior -->
+    <div class="sg-toast" id="sgToast" role="status" aria-live="polite">
+        <span class="sg-toast-ico"><i class="fa-solid fa-check" id="sgToastIcon"></i></span>
+        <span id="sgToastText">Acción realizada con éxito</span>
+    </div>
+
+    <div class="grid-background"></div>
+    
+    <div class="app-container">
+        
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+                    <span class="server-main-title">ClickSense</span>
+                </div>
+                <button class="sidebar-toggle-icon" id="sidebarToggleBtn" title="Colapsar menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Gestionado dinámicamente por guards.js -->
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-mini" id="userProfileMini">
+                    <div class="avatar-placeholder" id="userAvatarContainer">
+                        <span id="userAvatarFallback">?</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">Usuario</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@tag</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <main class="main-content">
+            
+            <header class="top-action-bar animate-fade-down">
+                <div class="breadcrumb">Sugerencias</div>
+                <div class="top-buttons">
+                    <!-- Botón de Soporte -->
+                    <div class="support-dropdown-container" id="supportDropdownContainer">
+                        <button class="top-btn highlight-btn" id="supportDropdownBtn">
+                            <i class="fa-solid fa-circle-question"></i> Soporte
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Menú desplegable de Soporte (al abrirse se mueve al body para quedar por encima de todo) -->
+            <div class="support-dropdown-menu" id="supportDropdownMenu">
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Soporte</div>
+                    <a href="/tickets.html" class="support-dropdown-item"><i class="fa-solid fa-ticket"></i> Crear un ticket</a>
+                </div>
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Apoyo</div>
+                    <a href="/sugerencias.html" class="support-dropdown-item"><i class="fa-solid fa-lightbulb"></i> Enviar una sugerencia</a>
+                    <a href="/feedback.html" class="support-dropdown-item"><i class="fa-solid fa-comment-dots"></i> Dar tu feedback</a>
+                    <a href="/perfil.html" class="support-dropdown-item"><i class="fa-solid fa-user"></i> Acceder al perfil</a>
+                    <a href="/index.html" class="support-dropdown-item"><i class="fa-solid fa-house-chimney"></i> Acceder al panel principal</a>
+                </div>
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Información</div>
+                    <a href="/normativa.html" class="support-dropdown-item"><i class="fa-solid fa-book"></i> Normativa general</a>
+                    <a href="/pol-privacidad.html" class="support-dropdown-item"><i class="fa-solid fa-shield-halved"></i> Política de privacidad</a>
+                    <a href="/terminos.html" class="support-dropdown-item"><i class="fa-solid fa-file-contract"></i> Términos y condiciones</a>
+                </div>
+            </div>
+
+            <div class="sg" id="sgRoot">
+
+                <header class="sg-head">
+                    <div>
+                        <h1>Sugerencias</h1>
+                        <p>Vota las ideas que quieres ver en ClickSense. Las que más apoyo tienen pasan a revisión y, si encajan, se implementan.</p>
+                    </div>
+                    <button type="button" class="sg-btn primario" id="sgNuevaBtn"><i class="fa-solid fa-plus"></i> Nueva sugerencia</button>
+                </header>
+
+                <div class="sg-toolbar">
+                    <label class="sg-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="search" id="sgBuscar" placeholder="Buscar por título, autor o categoría" aria-label="Buscar sugerencias" autocomplete="off">
+                    </label>
+
+                    <div class="sg-seg" id="sgOrden" role="group" aria-label="Ordenar sugerencias">
+                        <span class="sg-seg-thumb" aria-hidden="true"></span>
+                        <button type="button" class="on" data-orden="votos" aria-pressed="true">Más votadas</button>
+                        <button type="button" data-orden="recientes" aria-pressed="false">Recientes</button>
+                    </div>
+
+                    <div class="sg-dd" id="sgCat">
+                        <button type="button" class="sg-btn sg-dd-btn" id="sgCatBtn" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa-solid fa-filter" style="color: #c084fc; font-size: .8rem;"></i>
+                            <span id="sgCatTexto">Todas las categorías</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                        <div class="sg-dd-menu" id="sgCatMenu"></div>
+                    </div>
+
+                    <span class="sg-total" id="sgTotal"></span>
+                </div>
+
+                <div class="sg-tabs" id="sgTabs" role="tablist" aria-label="Estado de las sugerencias"></div>
+
+                <div class="sg-board animar" id="sgBoard" data-activa="nueva"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Ventana: detalle de una sugerencia -->
+    <div class="sg-modal" id="sgDetalle" role="dialog" aria-modal="true" aria-labelledby="sgDetTitulo">
+        <div class="sg-panel" id="sgDetPanel">
+            <div class="sg-panel-top"></div>
+            <div class="sg-panel-in" id="sgDetContenido"></div>
+        </div>
+    </div>
+
+    <!-- Ventana: nueva sugerencia -->
+    <div class="sg-modal" id="sgNueva" role="dialog" aria-modal="true" aria-labelledby="sgNuevaTitulo">
+        <div class="sg-panel" style="--c: var(--sg-rosa);">
+            <div class="sg-panel-top"></div>
+            <form class="sg-panel-in" id="sgForm" novalidate>
+                <div class="sg-det-bar">
+                    <h3 class="sg-nuevo-titulo" id="sgNuevaTitulo">Nueva sugerencia</h3>
+                    <button type="button" class="sg-x" data-cerrar aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div class="sg-campo">
+                    <label for="inputTitulo">Título <small id="sgCuentaTitulo">0 / 80</small></label>
+                    <input class="sg-input" type="text" id="inputTitulo" maxlength="80" placeholder="Ej. Sistema de robos a joyerías" autocomplete="off">
+                </div>
+
+                <div class="sg-campo">
+                    <div class="sg-label">Categoría</div>
+                    <div class="sg-chips" id="sgChips" role="radiogroup" aria-label="Categoría"></div>
+                </div>
+
+                <div class="sg-campo">
+                    <label for="inputDescripcion">Descripción <small id="sgCuentaDesc">0 / 1500</small></label>
+                    <textarea class="sg-input" id="inputDescripcion" rows="5" maxlength="1500" placeholder="Explica en qué consiste tu idea y por qué mejoraría el servidor."></textarea>
+                </div>
+
+                <div class="sg-acciones">
+                    <button type="button" class="sg-btn" data-cerrar>Cancelar</button>
+                    <button type="submit" class="sg-btn primario" id="submitSugerenciaBtn"><i class="fa-solid fa-paper-plane"></i> Enviar sugerencia</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ------------------------------------------------------------------
+         * SUGERENCIAS
+         *  - Fuente principal: el servidor (/api/sugerencias), lista compartida.
+         *  - Cada sugerencia lleva el ID de Discord de su autor (discordId).
+         *  - Además de la copia del usuario (sugerencias_backup_<ID>), se leen
+         *    las sugerencias antiguas de este navegador (sugerencias_data) y las
+         *    copias de otros usuarios de este mismo navegador: todo se junta,
+         *    se evita duplicar (clave = fecha + título) y se sube al servidor.
+         *  - Nunca se envía nada al servidor si no se ha leído bien antes.
+         *
+         *  Campos que usa el tablero además de los de siempre:
+         *    status          'Pendiente' | 'En revisión' | 'Implementada' | 'Rechazada'
+         *    staff           { discordId, usuario, avatarUrl }  quien cambió el estado
+         *    fechaEstado     fecha del cambio de estado
+         *    respuestaStaff  comentario opcional del staff
+         * ------------------------------------------------------------------
+         */
+        const MASTER_ADMIN_ID = '732650490588037160';
+        const AVATAR_DEFECTO = 'https://cdn.discordapp.com/embed/avatars/0.png';
+        const POR_COLUMNA = 12;   // tarjetas visibles por columna antes de "Mostrar más"
+
+        const COLUMNAS = [
+            { id: 'nueva',        nombre: 'Nueva',        guardar: 'Pendiente',    vacio: 'Todavía no hay sugerencias nuevas.',        icono: 'fa-regular fa-lightbulb' },
+            { id: 'revision',     nombre: 'En revisión',  guardar: 'En revisión',  vacio: 'El staff no tiene ninguna en revisión.',     icono: 'fa-solid fa-magnifying-glass' },
+            { id: 'implementada', nombre: 'Implementada', guardar: 'Implementada', vacio: 'Aún no se ha implementado ninguna.',         icono: 'fa-solid fa-circle-check' },
+            { id: 'rechazada',    nombre: 'Rechazada',    guardar: 'Rechazada',    vacio: 'No hay sugerencias rechazadas.',             icono: 'fa-solid fa-ban' }
+        ];
+        const CATEGORIAS = [
+            { valor: 'General',              nombre: 'General / Servidor',   icono: 'fa-solid fa-globe',         color: '#38bdf8' },
+            { valor: 'Mecánicas',            nombre: 'Mecánicas y Scripts',  icono: 'fa-solid fa-gears',         color: '#fbbf24' },
+            { valor: 'Rol Ilegal',           nombre: 'Rol Ilegal',           icono: 'fa-solid fa-skull',         color: '#f87171' },
+            { valor: 'Fuerzas de Seguridad', nombre: 'Fuerzas de Seguridad', icono: 'fa-solid fa-shield-halved', color: '#60a5fa' },
+            { valor: 'Economía y Comercios', nombre: 'Economía y Comercios', icono: 'fa-solid fa-store',         color: '#34d399' }
+        ];
+
+        let selectedCategoryFilter = '';
+        let ordenActual = 'votos';
+        let columnaActiva = 'nueva';
+        let limites = { nueva: POR_COLUMNA, revision: POR_COLUMNA, implementada: POR_COLUMNA, rechazada: POR_COLUMNA };
+
+        let sugerenciasCache = [];
+        let serverLoadedOk = false;
+        let needsSync = false;
+        let lastServerKeys = new Set();
+        let busy = false;
+        let primeraCarga = true;
+
+        let staffList = [];              // /api/staff (para el rango y saber si quien mira es staff)
+        const perfilPublico = {};        // id -> true / false (se consulta al abrir un detalle)
+
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const esperar = ms => new Promise(r => setTimeout(r, ms));
+        const sinTildes = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+        function getSession() {
+            try { return JSON.parse(localStorage.getItem('discord_user')) || {}; } catch (e) { return {}; }
+        }
+        // ID de Discord real (vacío si no hay sesión válida)
+        function getRealId() {
+            const u = getSession();
+            const id = String(u.id || u.discordId || '').trim();
+            return id === 'demo-local-user' ? '' : id;
+        }
+        function isMine(s) {
+            const me = getRealId();
+            return !!me && String(s.discordId || '') === me;
+        }
+        // Clave única de una sugerencia (no depende del ID, que puede repetirse)
+        function keyOf(s) { return String(s.fechaRegistro || '') + '|' + String(s.titulo || ''); }
+
+        function backupKey() { return 'sugerencias_backup_' + getRealId(); }
+
+        // Todas las sugerencias guardadas localmente en este navegador (antiguas + copias)
+        function readAllLocal() {
+            const out = [];
+            const push = arr => { if (Array.isArray(arr)) arr.forEach(s => { if (s && s.titulo) out.push(s); }); };
+            try { push(JSON.parse(localStorage.getItem('sugerencias_data') || '[]')); } catch (e) {}
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && k.startsWith('sugerencias_backup_')) {
+                        try { push(JSON.parse(localStorage.getItem(k) || '[]')); } catch (e) {}
+                    }
+                }
+            } catch (e) {}
+            return out;
+        }
+
+        function writeBackup() {
+            if (!getRealId()) return;
+            try {
+                localStorage.setItem(backupKey(), JSON.stringify(sugerenciasCache.filter(isMine)));
+            } catch (e) { console.error('No se pudo escribir la copia de seguridad:', e); }
+        }
+
+        function nextSugerenciaId() {
+            let max = -1;
+            sugerenciasCache.forEach(s => {
+                const m = /(\d+)$/.exec(String(s.id || ''));
+                if (m) max = Math.max(max, parseInt(m[1], 10));
+            });
+            return '#SUG-' + String(max + 1).padStart(4, '0');
+        }
+
+        async function fetchServerSugerencias() {
+            try {
+                const res = await fetch('/api/sugerencias', { cache: 'no-store' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                return Array.isArray(data) ? data : [];
+            } catch (e) {
+                console.error('Error al cargar /api/sugerencias:', e);
+                return null; // null = fallo (no es lo mismo que lista vacía)
+            }
+        }
+
+        // Une la lista base con las sugerencias locales que falten. Devuelve cuántas se han añadido.
+        function mergeLocalInto(list) {
+            const keys = new Set(list.map(keyOf));
+            const ids = new Set(list.map(s => s.id));
+            let added = 0;
+            readAllLocal().forEach(b => {
+                const k = keyOf(b);
+                if (keys.has(k)) return;
+                const copy = JSON.parse(JSON.stringify(b));
+                if (!copy.id || ids.has(copy.id)) {
+                    // el ID ya lo usa otra sugerencia: se asigna uno nuevo
+                    let max = -1;
+                    list.forEach(s => { const m = /(\d+)$/.exec(String(s.id || '')); if (m) max = Math.max(max, parseInt(m[1], 10)); });
+                    copy.id = '#SUG-' + String(max + 1).padStart(4, '0');
+                }
+                list.push(copy);
+                keys.add(k); ids.add(copy.id);
+                added++;
+            });
+            return added;
+        }
+
+        // Carga del servidor + sugerencias locales que el servidor no tenga
+        async function loadSugerencias() {
+            const server = await fetchServerSugerencias();
+
+            if (server === null) {
+                if (!sugerenciasCache.length) {
+                    sugerenciasCache = [];
+                    mergeLocalInto(sugerenciasCache);
+                    needsSync = sugerenciasCache.length > 0;
+                }
+                return false;
+            }
+
+            lastServerKeys = new Set(server.map(keyOf));
+            sugerenciasCache = server.slice();
+            const added = mergeLocalInto(sugerenciasCache);
+
+            serverLoadedOk = true;
+            needsSync = added > 0;
+            writeBackup();
+            return true;
+        }
+
+        // Envía la lista completa. true solo si el servidor confirma.
+        async function saveSugerencias() {
+            if (!serverLoadedOk) return false; // nunca pisar el servidor sin haberlo leído antes
+            try {
+                const res = await fetch('/api/sugerencias', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sugerenciasCache)
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                lastServerKeys = new Set(sugerenciasCache.map(keyOf));
+                return true;
+            } catch (e) {
+                console.error('Error al sincronizar sugerencias:', e);
+                return false;
+            }
+        }
+
+        // Si hay un refresco en marcha, se espera un momento en vez de ignorar la acción
+        async function esperarLibre() {
+            for (let i = 0; i < 40 && busy; i++) await esperar(100);
+            return !busy;
+        }
+
+        // Aplica un cambio sobre la versión MÁS RECIENTE del servidor y lo guarda
+        async function mutateSugerencia(key, mutator) {
+            busy = true;
+            try {
+                const loaded = await loadSugerencias();
+                if (!loaded) return false;
+                const s = sugerenciasCache.find(x => keyOf(x) === key);
+                if (!s) return false;
+                mutator(s);
+                writeBackup();
+                const ok = await saveSugerencias();
+                needsSync = !ok;
+                return ok;
+            } finally {
+                busy = false;
+            }
+        }
+
+        async function refreshSugerencias() {
+            if (busy) return;
+            busy = true;
+            try {
+                await loadSugerencias();
+                if (needsSync) {
+                    const ok = await saveSugerencias(); // sube las que faltaban
+                    if (ok) needsSync = false;
+                }
+            } finally {
+                busy = false;
+            }
+            renderTablero();
+            refrescarDetalleAbierto();
+        }
+
+        async function loadDiscordSessionData() {
+            const avatarContainer = document.getElementById('userAvatarContainer');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const userHandleDisplay = document.getElementById('userHandleDisplay');
+            const discordUser = getSession();
+
+            if (discordUser && Object.keys(discordUser).length) {
+                if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+                if (userHandleDisplay) userHandleDisplay.textContent = "@" + (discordUser.username || "discord");
+                if (avatarContainer && discordUser.avatarUrl) {
+                    avatarContainer.innerHTML = `<img src="${esc(discordUser.avatarUrl)}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                }
+            }
+
+            await Promise.all([refreshSugerencias(), cargarStaff()]);
+            renderTablero(true);   // con el staff ya cargado (rangos y avatares)
+        }
+
+        /* ---------- Staff y perfiles ---------- */
+        async function cargarStaff() {
+            try {
+                const r = await fetch('/api/staff', { cache: 'no-store', credentials: 'same-origin' });
+                if (r.ok) { const d = await r.json(); staffList = Array.isArray(d) ? d : []; }
+            } catch (e) {}
+        }
+
+        function staffActivo(s) {
+            return !['inactivo', 'inactive', '0', 'false'].includes(String(s.status || 'Activo').toLowerCase().trim());
+        }
+        function fichaStaff(id) {
+            id = String(id || '').trim();
+            return id ? staffList.find(s => String(s.discordId || '').trim() === id && staffActivo(s)) : null;
+        }
+        // ¿Quien está mirando la página es staff? (solo cambia lo que se muestra)
+        function soyStaff() {
+            const me = getRealId();
+            return !!me && (me === MASTER_ADMIN_ID || !!fichaStaff(me));
+        }
+
+        function urlSegura(u) { return typeof u === 'string' && /^https:\/\//i.test(u) ? u : ''; }
+        function avatarPorId(id) {
+            try { if (/^\d+$/.test(String(id))) return `https://cdn.discordapp.com/embed/avatars/${Number((BigInt(id) >> 22n) % 6n)}.png`; } catch (e) {}
+            return AVATAR_DEFECTO;
+        }
+        function avatarDe(id, guardado) {
+            const yo = getSession();
+            if (id && String(yo.id || '') === String(id) && urlSegura(yo.avatarUrl)) return yo.avatarUrl;
+            return urlSegura(guardado) || avatarPorId(id);
+        }
+
+        // Staff que cambió el estado. Acepta también otros nombres de campo por si el panel de admin los guarda distinto.
+        function staffDe(s) {
+            const o = s.staff || s.revisadoPor || s.gestionadoPor || null;
+            let id = '', nombre = '', avatar = '';
+            if (o && typeof o === 'object') {
+                id = o.discordId || o.id || '';
+                nombre = o.usuario || o.nombre || o.username || '';
+                avatar = o.avatarUrl || o.avatar || '';
+            } else if (typeof o === 'string') {
+                nombre = o;
+            }
+            id = String(id || s.staffId || s.staffDiscordId || '').trim();
+            nombre = String(nombre || s.staffNombre || s.staffUsuario || s.aprobador || '').trim();
+            avatar = avatar || s.staffAvatar || '';
+            if (!id && !nombre) return null;
+            const ficha = fichaStaff(id);
+            return {
+                id,
+                nombre: nombre || (ficha && ficha.usuario) || 'Staff',
+                rango: ficha ? (ficha.rango || '') : '',
+                avatar: avatarDe(id, avatar),
+                enEquipo: !!ficha
+            };
+        }
+
+        // Solo se enlaza el perfil si es público (y si esa persona aparece en la página Equipo)
+        async function comprobarPerfil(id) {
+            if (!id) return false;
+            if (id in perfilPublico) return perfilPublico[id];
+            try {
+                const r = await fetch('/api/perfil-settings?userId=' + encodeURIComponent(id), { cache: 'no-store', credentials: 'same-origin' });
+                if (!r.ok) return false;                       // no comprobado: no se enlaza
+                const d = await r.json();
+                perfilPublico[id] = !!d && d.publico !== false;
+            } catch (e) { return false; }
+            return perfilPublico[id];
+        }
+
+        /* ---------- Clasificación, orden y filtros ---------- */
+        function columnaDe(s) {
+            const e = sinTildes(s.status);
+            if (e.includes('rechaz') || e.includes('deneg')) return 'rechazada';
+            if (e.includes('implement') || e.includes('complet')) return 'implementada';
+            if (e.includes('revis') || e.includes('aprob') || e.includes('acept') || e.includes('proceso')) return 'revision';
+            return 'nueva';
+        }
+        const votosDe = s => ({ up: Math.max(0, Number(s.upvotes) || 0), down: Math.max(0, Number(s.downvotes) || 0) });
+        function categoriaDe(valor) {
+            return CATEGORIAS.find(c => c.valor === valor) || { valor, nombre: valor || 'General', icono: 'fa-solid fa-tag', color: '#a855f7' };
+        }
+        function fechaCorta(iso) {
+            if (!iso) return 'Sin fecha';
+            const d = new Date(iso);
+            return isNaN(d) ? 'Sin fecha' : d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function listaFiltrada() {
+            const q = sinTildes(document.getElementById('sgBuscar').value.trim());
+            const lista = sugerenciasCache.filter(s => {
+                if (!s || !s.titulo) return false;
+                if (selectedCategoryFilter && s.categoria !== selectedCategoryFilter) return false;
+                if (!q) return true;
+                return sinTildes(s.titulo).includes(q) || sinTildes(s.usuario).includes(q) ||
+                       sinTildes(s.categoria).includes(q) || sinTildes(s.id).includes(q);
+            });
+            const fecha = s => new Date(s.fechaRegistro || 0).getTime() || 0;
+            if (ordenActual === 'recientes') {
+                lista.sort((a, b) => fecha(b) - fecha(a));
+            } else {
+                lista.sort((a, b) => {
+                    const va = votosDe(a), vb = votosDe(b);
+                    return (vb.up - vb.down) - (va.up - va.down) || vb.up - va.up || fecha(b) - fecha(a);
+                });
+            }
+            return lista;
+        }
+
+        /* ---------- Tablero ---------- */
+        const board = document.getElementById('sgBoard');
+        let ultimaFirma = '';
+        let ultimosConteos = {};
+
+        function tarjetaHtml(s, i) {
+            const me = getRealId();
+            const v = votosDe(s);
+            const miVoto = me && s.voters ? s.voters[me] : null;
+            const cat = categoriaDe(s.categoria);
+            const k = esc(encodeURIComponent(keyOf(s)));
+            const st = columnaDe(s) !== 'nueva' ? staffDe(s) : null;
+            const sincronizando = !lastServerKeys.has(keyOf(s));
+
+            return `
+                <article class="sg-card" style="--i:${i}" data-key="${k}">
+                    <div class="sg-card-top">
+                        <button type="button" class="sg-card-open" data-abrir aria-haspopup="dialog"><span>${esc(s.titulo)}</span></button>
+                        <div class="sg-votes">
+                            <button type="button" class="sg-vote up ${miVoto === 'up' ? 'on' : ''}" data-voto="up" aria-pressed="${miVoto === 'up'}" aria-label="Votar a favor. ${v.up} votos" title="A favor"><i class="fa-solid fa-arrow-up"></i><span>${v.up}</span></button>
+                            <button type="button" class="sg-vote down ${miVoto === 'down' ? 'on' : ''}" data-voto="down" aria-pressed="${miVoto === 'down'}" aria-label="Votar en contra. ${v.down} votos" title="En contra"><i class="fa-solid fa-arrow-down"></i><span>${v.down}</span></button>
+                        </div>
+                    </div>
+                    <span class="sg-tag" style="--t:${esc(cat.color)}"><i></i>${esc(cat.nombre)}</span>
+                    <div class="sg-card-foot">
+                        <img class="sg-av" src="${esc(avatarDe(s.discordId, s.avatarUrl))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${AVATAR_DEFECTO}'">
+                        <span class="sg-autor">${esc(s.usuario || 'Anónimo')}</span>
+                        <span class="sg-sep">·</span>
+                        <span class="sg-fecha">${esc(fechaCorta(s.fechaRegistro))}</span>
+                        ${st ? `<span class="sg-card-staff" title="Gestionada por ${esc(st.nombre)}"><img src="${esc(st.avatar)}" alt="Gestionada por ${esc(st.nombre)}" loading="lazy" onerror="this.onerror=null;this.src='${AVATAR_DEFECTO}'"></span>` : ''}
+                        ${sincronizando ? `<span class="sg-sync" title="Se está sincronizando con el servidor"><i class="fa-solid fa-cloud-arrow-up"></i></span>` : ''}
+                    </div>
+                </article>`;
+        }
+
+        // animar = true repite la animación de entrada de las tarjetas (primera carga, filtros, orden)
+        function renderTablero(animar) {
+            const lista = listaFiltrada();
+            const porCol = { nueva: [], revision: [], implementada: [], rechazada: [] };
+            lista.forEach(s => porCol[columnaDe(s)].push(s));
+
+            // Si no ha cambiado nada (refresco automático), no se vuelve a pintar: así no parpadea
+            const firma = JSON.stringify([lista.map(s => [keyOf(s), s.status, s.upvotes, s.downvotes, s.voters && s.voters[getRealId()], lastServerKeys.has(keyOf(s)), s.staff, s.categoria, s.usuario]), limites, staffList.length]);
+            if (!animar && firma === ultimaFirma) return;
+            ultimaFirma = firma;
+
+            const filtrando = !!(document.getElementById('sgBuscar').value.trim() || selectedCategoryFilter);
+
+            board.innerHTML = COLUMNAS.map((c, n) => {
+                const items = porCol[c.id];
+                const visibles = items.slice(0, limites[c.id]);
+                const cuerpo = primeraCarga
+                    ? `<div class="sg-skel"></div><div class="sg-skel"></div>`
+                    : items.length
+                        ? visibles.map(tarjetaHtml).join('') +
+                          (items.length > visibles.length ? `<button type="button" class="sg-btn sg-mas" data-mas="${c.id}"><i class="fa-solid fa-chevron-down"></i> Mostrar ${Math.min(POR_COLUMNA, items.length - visibles.length)} más</button>` : '')
+                        : `<div class="sg-empty"><i class="${c.icono}"></i>${filtrando ? 'Nada coincide con la búsqueda.' : c.vacio}</div>`;
+                return `
+                    <section class="sg-col" data-col="${c.id}" style="--n:${n}" aria-label="${c.nombre}">
+                        <div class="sg-col-head"><span class="sg-dot"></span><h2>${c.nombre}</h2><span class="sg-count ${ultimosConteos[c.id] !== undefined && ultimosConteos[c.id] !== items.length ? 'pop' : ''}">${items.length}</span></div>
+                        <div class="sg-list">${cuerpo}</div>
+                    </section>`;
+            }).join('');
+
+            board.classList.toggle('animar', !!animar);
+            board.dataset.activa = columnaActiva;
+
+            document.getElementById('sgTabs').innerHTML = COLUMNAS.map(c =>
+                `<button type="button" class="sg-tab ${c.id === columnaActiva ? 'on' : ''}" role="tab" aria-selected="${c.id === columnaActiva}" data-tab="${c.id}" style="--c: var(--sg-${c.id});">${c.nombre} <b>${porCol[c.id].length}</b></button>`).join('');
+
+            COLUMNAS.forEach(c => { ultimosConteos[c.id] = porCol[c.id].length; });
+            const total = lista.length;
+            document.getElementById('sgTotal').textContent = primeraCarga ? '' : `${total} ${total === 1 ? 'sugerencia' : 'sugerencias'}`;
+        }
+
+        board.addEventListener('click', (e) => {
+            const mas = e.target.closest('[data-mas]');
+            if (mas) { limites[mas.dataset.mas] += POR_COLUMNA; renderTablero(); return; }
+            const card = e.target.closest('.sg-card');
+            if (!card) return;
+            const key = decodeURIComponent(card.dataset.key);
+            const voto = e.target.closest('[data-voto]');
+            if (voto) { handleVote(key, voto.dataset.voto); return; }
+            abrirDetalle(key);
+        });
+
+        document.getElementById('sgTabs').addEventListener('click', (e) => {
+            const tab = e.target.closest('[data-tab]');
+            if (!tab) return;
+            columnaActiva = tab.dataset.tab;
+            renderTablero(true);
+        });
+
+        /* ---------- Aviso superior ---------- */
+        let notifTimeout;
+        function showTopNotification(message, isSuccess = true) {
+            const toast = document.getElementById('sgToast');
+            document.getElementById('sgToastText').textContent = message;
+            document.getElementById('sgToastIcon').className = isSuccess ? 'fa-solid fa-check' : 'fa-solid fa-xmark';
+            toast.classList.toggle('error', !isSuccess);
+            toast.classList.add('ver');
+            clearTimeout(notifTimeout);
+            notifTimeout = setTimeout(() => toast.classList.remove('ver'), 4000);
+        }
+
+        /* ---------- Votar ---------- */
+        let votando = false;
+        async function handleVote(key, type) {
+            const me = getRealId();
+            if (!me) { showTopNotification('Inicia sesión con Discord para votar.', false); return; }
+            if (votando) return;
+            votando = true;
+            let message = "";
+            try {
+                if (!(await esperarLibre())) throw new Error('ocupado');
+                const ok = await mutateSugerencia(key, (s) => {
+                    if (!s.upvotes) s.upvotes = 0;
+                    if (!s.downvotes) s.downvotes = 0;
+                    if (!s.voters) s.voters = {};
+
+                    const existingVote = s.voters[me] || null;
+
+                    if (existingVote === type) {
+                        if (type === 'up') s.upvotes--;
+                        if (type === 'down') s.downvotes--;
+                        delete s.voters[me];
+                        message = "Has retirado tu voto.";
+                    } else {
+                        if (existingVote === 'up') s.upvotes--;
+                        if (existingVote === 'down') s.downvotes--;
+
+                        if (type === 'up') { s.upvotes++; message = "Has votado a favor."; }
+                        if (type === 'down') { s.downvotes++; message = "Has votado en contra."; }
+                        s.voters[me] = type;
+                    }
+                    s.upvotes = Math.max(0, s.upvotes);
+                    s.downvotes = Math.max(0, s.downvotes);
+                });
+
+                renderTablero();
+                refrescarDetalleAbierto(true);
+                if (ok) {
+                    // pequeña animación en el contador que ha cambiado (tarjeta y detalle)
+                    document.querySelectorAll('.sg-card').forEach(c => {
+                        if (decodeURIComponent(c.dataset.key) === key) c.querySelector(`[data-voto="${type}"]`)?.classList.add('pop');
+                    });
+                    document.querySelector(`#sgDetContenido [data-voto-g="${type}"]`)?.classList.add('pop');
+                    showTopNotification(message, true);
+                } else {
+                    showTopNotification("No se ha podido registrar el voto. Inténtalo de nuevo.", false);
+                }
+            } catch (e) {
+                console.error("Error al procesar el voto:", e);
+                showTopNotification("No se ha podido registrar el voto. Inténtalo de nuevo.", false);
+            } finally {
+                votando = false;
+            }
+        }
+
+        /* ---------- Ventanas ---------- */
+        let focoPrevio = null;
+        function abrirModal(el) {
+            focoPrevio = document.activeElement;
+            el.classList.add('abierto');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => (el.querySelector('[data-foco]') || el.querySelector('.sg-x'))?.focus(), 60);
+        }
+        function cerrarModal(el) {
+            if (!el.classList.contains('abierto')) return;
+            el.classList.remove('abierto');
+            if (!document.querySelector('.sg-modal.abierto')) document.body.style.overflow = '';
+            if (el.id === 'sgDetalle') { detalleKey = null; gestionSucia = false; }
+            if (focoPrevio && focoPrevio.focus && document.contains(focoPrevio)) focoPrevio.focus();
+        }
+        document.querySelectorAll('.sg-modal').forEach(m => {
+            m.addEventListener('click', (e) => { if (e.target === m || e.target.closest('[data-cerrar]')) cerrarModal(m); });
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            const abierto = document.querySelector('.sg-modal.abierto');
+            if (abierto) cerrarModal(abierto);
+            document.getElementById('sgCat').classList.remove('abierto');
+        });
+
+        /* ---------- Detalle de una sugerencia ---------- */
+        let detalleKey = null;
+        let gestionSucia = false;      // el staff está escribiendo: no se repinta el detalle por debajo
+        let gestionEstado = null;
+
+        function bloqueStaffHtml(s, col) {
+            if (col === 'nueva') return '';
+            const st = staffDe(s);
+            if (!st) return '';
+            const titulo = { revision: 'En revisión por', implementada: 'Implementada por', rechazada: 'Rechazada por' }[col];
+            return `
+                <div>
+                    <div class="sg-staff">
+                        <img src="${esc(st.avatar)}" alt="" onerror="this.onerror=null;this.src='${AVATAR_DEFECTO}'">
+                        <div class="sg-staff-txt">
+                            <small>${titulo}</small>
+                            <strong>${esc(st.nombre)}</strong>
+                            ${st.rango ? `<span class="sg-rango">${esc(st.rango)}</span>` : ''}
+                            ${s.fechaEstado ? `<span>el ${esc(fechaCorta(s.fechaEstado))}</span>` : ''}
+                        </div>
+                        <span id="sgPerfilStaff" data-id="${esc(st.id)}" data-equipo="${st.enEquipo ? '1' : ''}"></span>
+                    </div>
+                    ${s.respuestaStaff ? `<p class="sg-sub">Respuesta del staff</p><p class="sg-nota">${esc(s.respuestaStaff)}</p>` : ''}
+                </div>`;
+        }
+
+        function gestionHtml(s, col) {
+            if (!soyStaff()) return '';
+            gestionEstado = col;
+            return `
+                <div class="sg-gestion">
+                    <p class="sg-sub"><i class="fa-solid fa-user-shield" style="margin-right: 6px;"></i>Gestión del staff</p>
+                    <div class="sg-gestion-estados" role="radiogroup" aria-label="Estado de la sugerencia">
+                        ${COLUMNAS.map(c => `<button type="button" class="sg-est-btn ${c.id === col ? 'on' : ''}" role="radio" aria-checked="${c.id === col}" data-estado="${c.id}"><i></i>${c.nombre}</button>`).join('')}
+                    </div>
+                    <div class="sg-campo" style="margin-bottom: 12px;">
+                        <label for="sgRespuesta">Respuesta para el autor (opcional) <small id="sgCuentaResp">${String(s.respuestaStaff || '').length} / 500</small></label>
+                        <textarea class="sg-input" id="sgRespuesta" rows="2" maxlength="500" placeholder="Por ejemplo, por qué se rechaza o cuándo estará disponible.">${esc(s.respuestaStaff || '')}</textarea>
+                    </div>
+                    <div class="sg-acciones">
+                        <button type="button" class="sg-btn primario" id="sgGuardarEstado"><i class="fa-solid fa-floppy-disk"></i> Guardar estado</button>
+                    </div>
+                </div>`;
+        }
+
+        function pintarDetalle() {
+            const s = sugerenciasCache.find(x => keyOf(x) === detalleKey);
+            const cont = document.getElementById('sgDetContenido');
+            if (!s) { cerrarModal(document.getElementById('sgDetalle')); return; }
+
+            const col = columnaDe(s);
+            const colInfo = COLUMNAS.find(c => c.id === col);
+            const cat = categoriaDe(s.categoria);
+            const v = votosDe(s);
+            const me = getRealId();
+            const miVoto = me && s.voters ? s.voters[me] : null;
+            // Si el panel de admin usa otro texto ("Aprobada"), se muestra ese texto
+            const etiqueta = s.status && !['pendiente', ''].includes(sinTildes(s.status)) && sinTildes(s.status) !== sinTildes(colInfo.guardar) ? s.status : colInfo.nombre;
+
+            document.getElementById('sgDetPanel').dataset.col = col;
+            cont.innerHTML = `
+                <div class="sg-det-bar">
+                    <span class="sg-estado"><i></i>${esc(etiqueta)}</span>
+                    <span class="sg-id">${esc(s.id || '')}</span>
+                    <button type="button" class="sg-x" data-cerrar aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <h3 class="sg-det-titulo" id="sgDetTitulo">${esc(s.titulo)}</h3>
+                <div class="sg-det-meta">
+                    <img class="sg-av" src="${esc(avatarDe(s.discordId, s.avatarUrl))}" alt="" onerror="this.onerror=null;this.src='${AVATAR_DEFECTO}'">
+                    <span>Por <strong>${esc(s.usuario || 'Anónimo')}</strong> el ${esc(fechaCorta(s.fechaRegistro))}</span>
+                    <span class="sg-tag" style="--t:${esc(cat.color)}"><i></i>${esc(cat.nombre)}</span>
+                </div>
+                <p class="sg-det-desc">${esc(s.descripcion || 'Sin descripción.')}</p>
+                <div class="sg-det-votos">
+                    <button type="button" class="sg-voto-g up ${miVoto === 'up' ? 'on' : ''}" data-voto-g="up" aria-pressed="${miVoto === 'up'}"><i class="fa-solid fa-arrow-up"></i> A favor <b>${v.up}</b></button>
+                    <button type="button" class="sg-voto-g down ${miVoto === 'down' ? 'on' : ''}" data-voto-g="down" aria-pressed="${miVoto === 'down'}"><i class="fa-solid fa-arrow-down"></i> En contra <b>${v.down}</b></button>
+                </div>
+                ${bloqueStaffHtml(s, col)}
+                ${gestionHtml(s, col)}`;
+
+            // Enlace al perfil del staff, solo si es público
+            const hueco = document.getElementById('sgPerfilStaff');
+            if (hueco && hueco.dataset.id && hueco.dataset.equipo) {
+                const id = hueco.dataset.id, keyAlPedir = detalleKey;
+                comprobarPerfil(id).then(publico => {
+                    const h = document.getElementById('sgPerfilStaff');
+                    if (!h || h.dataset.id !== id || detalleKey !== keyAlPedir) return;
+                    h.innerHTML = publico
+                        ? `<a class="sg-btn" href="/equipo.html?perfil=${encodeURIComponent(id)}"><i class="fa-solid fa-user"></i> Ver perfil</a>`
+                        : `<span class="sg-privado"><i class="fa-solid fa-lock"></i> Perfil privado</span>`;
+                });
+            }
+        }
+
+        function abrirDetalle(key) {
+            detalleKey = key;
+            gestionSucia = false;
+            pintarDetalle();
+            abrirModal(document.getElementById('sgDetalle'));
+        }
+
+        // forzar = true tras una acción propia (votar, guardar estado)
+        function refrescarDetalleAbierto(forzar) {
+            if (!detalleKey || !document.getElementById('sgDetalle').classList.contains('abierto')) return;
+            if (gestionSucia && !forzar) return;
+            const panel = document.getElementById('sgDetPanel');
+            const scroll = panel.scrollTop;
+            const cont = document.getElementById('sgDetContenido');
+            cont.style.animation = 'none';
+            pintarDetalle();
+            cont.querySelectorAll(':scope > *').forEach(n => n.style.animation = 'none');   // sin repetir la entrada
+            panel.scrollTop = scroll;
+        }
+
+        document.getElementById('sgDetContenido').addEventListener('click', (e) => {
+            const voto = e.target.closest('[data-voto-g]');
+            if (voto && detalleKey) { handleVote(detalleKey, voto.dataset.votoG); return; }
+
+            const est = e.target.closest('[data-estado]');
+            if (est) {
+                gestionEstado = est.dataset.estado;
+                gestionSucia = true;
+                document.querySelectorAll('#sgDetContenido .sg-est-btn').forEach(b => {
+                    b.classList.toggle('on', b === est);
+                    b.setAttribute('aria-checked', b === est);
+                });
+                return;
+            }
+            if (e.target.closest('#sgGuardarEstado')) guardarEstado();
+        });
+        document.getElementById('sgDetContenido').addEventListener('input', (e) => {
+            if (e.target.id === 'sgRespuesta') {
+                gestionSucia = true;
+                document.getElementById('sgCuentaResp').textContent = `${e.target.value.length} / 500`;
+            }
+        });
+
+        // El staff cambia el estado: queda guardado quién lo hizo y cuándo
+        async function guardarEstado() {
+            if (!soyStaff() || !detalleKey) return;
+            const btn = document.getElementById('sgGuardarEstado');
+            const destino = COLUMNAS.find(c => c.id === gestionEstado) || COLUMNAS[0];
+            const respuesta = (document.getElementById('sgRespuesta')?.value || '').trim().slice(0, 500);
+            const yo = getSession();
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Guardando...';
+
+            let ok = false;
+            try {
+                if (await esperarLibre()) {
+                    ok = await mutateSugerencia(detalleKey, (s) => {
+                        s.status = destino.guardar;
+                        if (destino.id === 'nueva') {
+                            delete s.staff; delete s.fechaEstado;
+                        } else {
+                            s.staff = { discordId: getRealId(), usuario: yo.displayName || yo.username || 'Staff', avatarUrl: urlSegura(yo.avatarUrl) };
+                            s.fechaEstado = new Date().toISOString();
+                        }
+                        if (respuesta) s.respuestaStaff = respuesta; else delete s.respuestaStaff;
+                    });
+                }
+            } catch (e) { console.error('Error al cambiar el estado:', e); }
+
+            gestionSucia = false;
+            renderTablero();
+            refrescarDetalleAbierto(true);
+            if (ok) showTopNotification(`Sugerencia movida a «${destino.nombre}».`, true);
+            else {
+                showTopNotification('No se ha podido guardar el estado. Inténtalo de nuevo.', false);
+                const b = document.getElementById('sgGuardarEstado');
+                if (b) { b.disabled = false; b.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar estado'; }
+            }
+        }
+
+        /* ---------- Barra: buscar, ordenar, categoría ---------- */
+        let buscarTimer;
+        document.getElementById('sgBuscar').addEventListener('input', () => {
+            clearTimeout(buscarTimer);
+            buscarTimer = setTimeout(() => { reiniciarLimites(); renderTablero(true); }, 160);
+        });
+        function reiniciarLimites() { Object.keys(limites).forEach(k => limites[k] = POR_COLUMNA); }
+
+        const seg = document.getElementById('sgOrden');
+        function moverThumb() {
+            const activo = seg.querySelector('button.on');
+            const thumb = seg.querySelector('.sg-seg-thumb');
+            if (!activo || !thumb) return;
+            thumb.style.width = activo.offsetWidth + 'px';
+            thumb.style.transform = `translateX(${activo.offsetLeft}px)`;
+        }
+        seg.addEventListener('click', (e) => {
+            const b = e.target.closest('[data-orden]');
+            if (!b || b.dataset.orden === ordenActual) return;
+            ordenActual = b.dataset.orden;
+            seg.querySelectorAll('button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
+            moverThumb();
+            renderTablero(true);
+        });
+        window.addEventListener('resize', moverThumb);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(moverThumb);
+
+        const catDd = document.getElementById('sgCat');
+        const catMenu = document.getElementById('sgCatMenu');
+        function pintarMenuCategorias() {
+            catMenu.innerHTML =
+                `<button type="button" class="sg-dd-item ${selectedCategoryFilter === '' ? 'on' : ''}" data-cat=""><i class="fa-solid fa-layer-group" style="color:#c084fc;"></i> Todas las categorías</button>` +
+                CATEGORIAS.map(c => `<button type="button" class="sg-dd-item ${selectedCategoryFilter === c.valor ? 'on' : ''}" data-cat="${esc(c.valor)}"><i class="${c.icono}" style="color:${c.color};"></i> ${esc(c.nombre)}</button>`).join('');
+        }
+        document.getElementById('sgCatBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('supportDropdownMenu')?.classList.remove('show');
+            const abierto = catDd.classList.toggle('abierto');
+            document.getElementById('sgCatBtn').setAttribute('aria-expanded', abierto);
+        });
+        catMenu.addEventListener('click', (e) => {
+            const item = e.target.closest('[data-cat]');
+            if (!item) return;
+            selectedCategoryFilter = item.dataset.cat;
+            document.getElementById('sgCatTexto').textContent = selectedCategoryFilter ? categoriaDe(selectedCategoryFilter).nombre : 'Todas las categorías';
+            catDd.classList.remove('abierto');
+            pintarMenuCategorias();
+            reiniciarLimites();
+            renderTablero(true);
+        });
+        window.addEventListener('click', (e) => { if (!e.target.closest('#sgCat')) catDd.classList.remove('abierto'); });
+
+        /* ---------- Nueva sugerencia ---------- */
+        const modalNueva = document.getElementById('sgNueva');
+        const sugerenciaForm = document.getElementById('sgForm');
+        const inputTitulo = document.getElementById('inputTitulo');
+        const inputDescripcion = document.getElementById('inputDescripcion');
+        let categoriaNueva = CATEGORIAS[0].valor;
+
+        function pintarChips() {
+            document.getElementById('sgChips').innerHTML = CATEGORIAS.map(c =>
+                `<button type="button" class="sg-chip ${c.valor === categoriaNueva ? 'on' : ''}" role="radio" aria-checked="${c.valor === categoriaNueva}" data-chip="${esc(c.valor)}" style="--t:${c.color}"><i class="${c.icono}"></i>${esc(c.nombre)}</button>`).join('');
+        }
+        document.getElementById('sgChips').addEventListener('click', (e) => {
+            const chip = e.target.closest('[data-chip]');
+            if (!chip) return;
+            categoriaNueva = chip.dataset.chip;
+            pintarChips();
+        });
+        inputTitulo.addEventListener('input', () => document.getElementById('sgCuentaTitulo').textContent = `${inputTitulo.value.length} / 80`);
+        inputDescripcion.addEventListener('input', () => document.getElementById('sgCuentaDesc').textContent = `${inputDescripcion.value.length} / 1500`);
+
+        document.getElementById('sgNuevaBtn').addEventListener('click', () => {
+            if (!getRealId()) { showTopNotification('Inicia sesión con Discord para enviar una sugerencia.', false); return; }
+            pintarChips();
+            abrirModal(modalNueva);
+            setTimeout(() => inputTitulo.focus(), 80);
+        });
+
+        // Creación de la sugerencia (asociada al ID de Discord del autor)
+        sugerenciaForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const ownerId = getRealId();
+            if (!ownerId) {
+                showTopNotification("No se ha detectado tu sesión de Discord. Vuelve a iniciar sesión para enviar una sugerencia.", false);
+                return;
+            }
+            const titulo = inputTitulo.value.trim();
+            const descripcion = inputDescripcion.value.trim();
+            if (titulo.length < 4) { showTopNotification('Escribe un título de al menos 4 caracteres.', false); inputTitulo.focus(); return; }
+            if (descripcion.length < 10) { showTopNotification('Explica tu idea con un poco más de detalle.', false); inputDescripcion.focus(); return; }
+
+            const submitBtn = document.getElementById('submitSugerenciaBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Enviando...';
+
+            await esperarLibre();
+            busy = true; // pausa el refresco automático mientras se crea
+            let savedOk = false;
+
+            try {
+                const user = getSession();
+                const username = user.displayName || user.username || "Ciudadano";
+
+                // 1. Última versión del servidor (para no pisar sugerencias de otros)
+                await loadSugerencias();
+
+                const nuevaSugerencia = {
+                    id: nextSugerenciaId(),
+                    discordId: ownerId,
+                    usuario: username,
+                    avatarUrl: urlSegura(user.avatarUrl),
+                    titulo,
+                    categoria: categoriaNueva,
+                    descripcion,
+                    status: 'Pendiente',
+                    fechaRegistro: new Date().toISOString(),
+                    upvotes: 0,
+                    downvotes: 0,
+                    voters: {}
+                };
+
+                // 2. Se añade a la lista y a la copia del usuario ANTES de guardar:
+                //    aunque el servidor falle, la sugerencia NO desaparece.
+                sugerenciasCache.unshift(nuevaSugerencia);
+                writeBackup();
+
+                // 3. Guardar en el servidor
+                savedOk = await saveSugerencias();
+
+                // 4. Verificar que de verdad está en el servidor
+                if (savedOk) {
+                    const check = await fetchServerSugerencias();
+                    savedOk = !!(check && check.some(s => keyOf(s) === keyOf(nuevaSugerencia)));
+                }
+                needsSync = !savedOk;
+            } catch (err) {
+                console.error("Error al publicar la sugerencia:", err);
+                savedOk = false;
+                needsSync = true;
+            } finally {
+                busy = false;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar sugerencia';
+            }
+
+            sugerenciaForm.reset();
+            categoriaNueva = CATEGORIAS[0].valor;
+            document.getElementById('sgCuentaTitulo').textContent = '0 / 80';
+            document.getElementById('sgCuentaDesc').textContent = '0 / 1500';
+            cerrarModal(modalNueva);
+            columnaActiva = 'nueva';
+            renderTablero(true);
+
+            if (savedOk) {
+                showTopNotification("¡Sugerencia publicada!", true);
+            } else {
+                showTopNotification("Sugerencia creada, pero aún no confirmada en el servidor. Se reintentará sola.", false);
+            }
+        });
+
+        /* ---------- Arranque ---------- */
+        document.addEventListener('DOMContentLoaded', async () => {
+            pintarMenuCategorias();
+            pintarChips();
+            moverThumb();
+            renderTablero(true);            // esqueleto de carga
+
+            await loadDiscordSessionData().catch(e => console.error(e));
+            primeraCarga = false;
+            renderTablero(true);
+
+            // Si se llega con ?sugerencia=#SUG-0003 se abre directamente
+            const pedida = new URLSearchParams(location.search).get('sugerencia');
+            if (pedida) {
+                const s = sugerenciasCache.find(x => String(x.id) === pedida);
+                if (s) abrirDetalle(keyOf(s));
+            }
+
+            // Refresco automático para ver sugerencias y votos de otros usuarios
+            setInterval(refreshSugerencias, 20000);
+            window.addEventListener('focus', refreshSugerencias);
+        });
+
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+        const revealBtn = document.getElementById('sidebarRevealBtn');
+        const sidebar = document.getElementById('sidebar');
+        
+        if (toggleBtn && revealBtn && sidebar) {
+            toggleBtn.addEventListener('click', () => { sidebar.classList.add('collapsed'); setTimeout(moverThumb, 450); });
+            revealBtn.addEventListener('click', () => { sidebar.classList.remove('collapsed'); setTimeout(moverThumb, 450); });
+        }
+
+        // Menú desplegable de Soporte: se coloca justo debajo del botón y se cierra al pulsar fuera
+        const supportBtn = document.getElementById('supportDropdownBtn');
+        const supportMenu = document.getElementById('supportDropdownMenu');
+
+        if (supportBtn && supportMenu) {
+            supportBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = supportMenu.classList.contains('show');
+
+                // Si el filtro de categorías está abierto, se cierra al abrir Soporte
+                catDd.classList.remove('abierto');
+
+                if (!isOpen) {
+                    if (supportMenu.parentElement !== document.body) {
+                        document.body.appendChild(supportMenu);
+                    }
+                    const rect = supportBtn.getBoundingClientRect();
+                    supportMenu.style.top = (rect.bottom + 8) + 'px';
+                    supportMenu.style.right = (window.innerWidth - rect.right) + 'px';
+                    supportMenu.classList.add('show');
+                } else {
+                    supportMenu.classList.remove('show');
+                }
+            });
+
+            window.addEventListener('click', () => {
+                supportMenu.classList.remove('show');
+            });
+
+            window.addEventListener('resize', () => {
+                supportMenu.classList.remove('show');
+            });
+        }
+    </script>
+
+    <script src="/guards.js"></script>
+</body>
+</html>

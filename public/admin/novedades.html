@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Novedades | ClickSense RP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/src/assets/admin.css">
+    <style>
+        :root { 
+            --nv-card: var(--bg-card, #130d1c); 
+            --nv-border: var(--border-color, rgba(168,85,247,.25)); 
+            --nv-muted: var(--text-muted, #9ca3af); 
+            --nv-accent: #a855f7; 
+            --nv-glow: rgba(168,85,247,.4);
+        }
+
+        /* Sistema de pestañas mejorado y estilizado */
+        .nv-tabs-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 15px;
+        }
+        .nv-tab-btn {
+            background: linear-gradient(135deg, rgba(19, 16, 29, 0.9), rgba(28, 20, 42, 0.9));
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            color: #94a3b8;
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        }
+        .nv-tab-btn:hover {
+            color: #fff;
+            border-color: rgba(168, 85, 247, 0.6);
+            background: linear-gradient(135deg, rgba(28, 20, 42, 1), rgba(40, 25, 60, 1));
+            transform: translateY(-1px);
+        }
+        .nv-tab-btn.active {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 6px 25px rgba(168,85,247,0.45);
+        }
+
+        .nv-view-section { display: none; }
+        .nv-view-section.active { display: block; animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+        /* Contenedores alargados y desarrollados */
+        .nv-card-wide {
+            background: var(--nv-card);
+            border: 1px solid var(--nv-border);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+        .nv-card-wide h3 {
+            font-size: 18px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .nv-label { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--nv-muted); margin: 18px 0 8px; }
+        .nv-input, .nv-textarea {
+            width: 100%;
+            background: #0f0b18;
+            border: 1px solid rgba(168,85,247,0.3);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .nv-input:focus, .nv-textarea:focus {
+            border-color: var(--nv-accent);
+            box-shadow: 0 0 15px var(--nv-glow);
+        }
+        .nv-textarea { min-height: 160px; resize: vertical; }
+
+        /* Dropdown con animaciones fluidas al abrir y cerrar */
+        .custom-dropdown-container {
+            position: relative;
+            user-select: none;
+            width: 100%;
+        }
+        .custom-dropdown-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0f0b18;
+            border: 1px solid rgba(168,85,247,0.3);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .custom-dropdown-btn:hover, .custom-dropdown-btn.active {
+            border-color: var(--nv-accent);
+            box-shadow: 0 0 15px var(--nv-glow);
+        }
+        .custom-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 100%;
+            background: #130d1c;
+            border: 1px solid rgba(168,85,247,0.4);
+            border-radius: 14px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-8px) scale(0.98);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .custom-dropdown-menu.show {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .custom-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            font-size: 13.5px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .custom-dropdown-item:hover {
+            background: rgba(168, 85, 247, 0.2);
+            color: #fff;
+        }
+
+        /* Botón/Caja de destacado mejorada */
+        .nv-check-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 24px;
+            background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(236,72,153,0.06));
+            border: 1px solid rgba(168,85,247,0.35);
+            padding: 16px 20px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .nv-check-container:hover {
+            border-color: #a855f7;
+            box-shadow: 0 0 18px rgba(168,85,247,0.25);
+            transform: translateY(-1px);
+        }
+        .nv-check-container input {
+            width: 20px;
+            height: 20px;
+            accent-color: #a855f7;
+            cursor: pointer;
+        }
+        .nv-check-container span {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Botones de acción del formulario */
+        .nv-actions-wide {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .nv-btn-custom {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .nv-btn-custom:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+        .nv-btn-custom:disabled { opacity: .6; cursor: not-allowed; }
+        .nv-btn-custom.primary {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            border: none;
+            box-shadow: 0 4px 15px rgba(168,85,247,0.3);
+        }
+        .nv-btn-custom.primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+        /* Lista de publicaciones */
+        .nv-toolbar-wide {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+        .nv-item-wide {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            background: #0f0b18;
+            border: 1px solid rgba(168,85,247,0.2);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .nv-item-wide:hover {
+            border-color: #a855f7;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(168,85,247,0.15);
+        }
+        .nv-item-wide h4 { color: #fff; font-size: 16px; margin: 8px 0 6px; }
+        .nv-item-wide p { color: var(--nv-muted); font-size: 13.5px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .nv-meta-wide { font-size: 12px; color: var(--nv-muted); margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+        
+        .nv-icon-btn-danger {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .nv-icon-btn-danger:hover { background: rgba(239, 68, 68, 0.25); border-color: #ef4444; }
+
+        /* Modal idéntico al de public/novedades.html */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content-box {
+            background: #13141f;
+            border: 1px solid rgba(236, 72, 153, 0.5);
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.3);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 550px;
+            padding: 25px;
+            position: relative;
+            animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+            color: #fff;
+        }
+        @keyframes modalIn { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+        .modal-close-btn {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: rgba(236, 72, 153, 0.2);
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            color: #fff;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .modal-close-btn:hover { background: rgba(236, 72, 153, 0.4); }
+
+        /* Estilo personalizado de la etiqueta pill según la imagen proporcionada */
+        .custom-category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #231f14;
+            border: 1px solid rgba(234, 179, 8, 0.25);
+            color: #facc15;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        /* Toast notificaciones */
+        .nv-toast { position: fixed; bottom: 24px; right: 24px; background: #130d1c; border: 1px solid rgba(168,85,247,0.4); color: #fff; padding: 14px 20px; border-radius: 12px; font-size: 14px; opacity: 0; transform: translateY(10px); transition: .3s; z-index: 3000; pointer-events: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); max-width: 380px; }
+        .nv-toast.show { opacity: 1; transform: translateY(0); }
+        
+        #nvDenied { display: none; position: fixed; inset: 0; z-index: 999999; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 25%, #160a2b 0%, #040207 92%); padding: 24px; text-align: center; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
+        #nvDenied a { display: inline-block; margin-top: 20px; background: linear-gradient(135deg, #a855f7, #ec4899); color: #fff; text-decoration: none; padding: 14px 30px; border-radius: 14px; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="grid-background"></div>
+
+    <div id="nvDenied">
+        <div>
+            <i class="fa-solid fa-shield-halved" style="font-size: 54px; color: #f87171; margin-bottom: 18px;"></i>
+            <h1 style="font-size: 30px; margin-bottom: 10px;">ACCESO NO AUTORIZADO</h1>
+            <p style="color: #94a3b8;">Solo el staff activo puede gestionar las novedades.</p>
+            <a href="/home.html"><i class="fa-solid fa-house"></i> Volver a la página principal</a>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display:flex;align-items:center;gap:10px;">
+                    <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width:32px;height:32px;object-fit:contain;" onerror="this.style.display='none'">
+                    <span class="server-main-title">ClickSense</span>
+                </div>
+                <button class="sidebar-toggle-icon" id="sidebarToggleBtn"><i class="fa-solid fa-bars"></i></button>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-category">General</div>
+                <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> Home</a>
+                <a href="/admin.html" class="nav-item"><i class="fa-solid fa-shield-halved"></i> Panel Admin</a>
+                <a href="/admin/novedades.html" class="nav-item active"><i class="fa-solid fa-newspaper"></i> Novedades</a>
+                <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> Equipo</a>
+                <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> Tickets</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile-mini">
+                    <div class="avatar-placeholder" id="userAvatarContainer"><span>?</span></div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">Usuario</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size:11px;color:var(--text-muted,#94a3b8);display:block;">@tag</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú"><i class="fa-solid fa-chevron-right"></i></button>
+
+        <main class="main-content">
+            <header class="top-action-bar animate-fade-down">
+                <div class="breadcrumb">Administración / Novedades</div>
+                <div class="top-buttons">
+                    <a href="/admin.html" class="top-btn" style="color:#fff;background:rgba(255,255,255,.05);text-decoration:none;padding:8px 16px;border-radius:8px;border:1px solid var(--border-color);display:inline-flex;align-items:center;gap:8px;font-size:13.5px;"><i class="fa-solid fa-arrow-left"></i> Panel Admin</a>
+                    <a href="/home.html#novedades" class="top-btn" style="color:#fff;background:rgba(255,255,255,.05);text-decoration:none;padding:8px 16px;border-radius:8px;border:1px solid var(--border-color);display:inline-flex;align-items:center;gap:8px;font-size:13.5px;"><i class="fa-solid fa-eye"></i> Ver en Home</a>
+                </div>
+            </header>
+
+            <div class="welcome-banner-card animate-fade-up">
+                <div class="welcome-avatar" style="background:rgba(168,85,247,.2);display:flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;border:2px solid rgba(168,85,247,.4);flex-shrink:0;">
+                    <i class="fa-solid fa-newspaper" style="font-size:24px;color:#a855f7;"></i>
+                </div>
+                <div class="welcome-text-content">
+                    <h1 style="color:#fff;margin-bottom:4px;font-size:22px;font-weight:700;">Gestión de Novedades y Anuncios</h1>
+                    <p style="font-size:14px;color:var(--text-muted);">Administra y publica contenido relevante para la comunidad de ClickSense RP.</p>
+                </div>
+            </div>
+
+            <!-- Botones de Pestañas Superiores con diseño mejorado -->
+            <div class="nv-tabs-bar animate-fade-up delay-1">
+                <button class="nv-tab-btn active" onclick="switchTab('crear', this)">
+                    <i class="fa-solid fa-circle-plus"></i> Crear una novedad
+                </button>
+                <button class="nv-tab-btn" onclick="switchTab('publicadas', this)">
+                    <i class="fa-solid fa-newspaper"></i> Novedades publicadas <span id="tabCountBadge" style="background:rgba(168,85,247,0.3);color:#fff;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700;">0</span>
+                </button>
+            </div>
+
+            <!-- Pestaña 1: Crear Novedad -->
+            <div class="nv-view-section active animate-fade-up delay-2" id="tabCrear">
+                <div class="nv-card-wide">
+                    <h3><i class="fa-solid fa-pen-to-nib" style="color:var(--nv-accent);"></i> Redactar nueva novedad</h3>
+                    
+                    <label class="nv-label" for="nvTitulo">Título del comunicado</label>
+                    <input class="nv-input" id="nvTitulo" maxlength="90" placeholder="Ej: ClickSense 2.0 ya está aquí">
+
+                    <label class="nv-label">Categoría asignada</label>
+                    <div class="custom-dropdown-container" id="formDropdownContainer">
+                        <div class="custom-dropdown-btn" id="formDropdownBtn">
+                            <span style="display:flex; align-items:center; gap:8px;">
+                                <i class="fa-solid fa-tag" style="color:#a855f7;"></i> <span id="formDropdownLabel">Comunicados</span>
+                            </span>
+                            <i class="fa-solid fa-chevron-down" style="font-size:11px; color:#94a3b8; transition: transform 0.25s ease;" id="formDropdownChevron"></i>
+                        </div>
+                        <div class="custom-dropdown-menu" id="formDropdownMenu">
+                            <div class="custom-dropdown-item" data-cat="Comunicados"><i class="fa-solid fa-bullhorn" style="color:#a855f7;"></i> Comunicados</div>
+                            <div class="custom-dropdown-item" data-cat="Changelog"><i class="fa-solid fa-code-merge" style="color:#ec4899;"></i> Changelog</div>
+                            <div class="custom-dropdown-item" data-cat="Eventos"><i class="fa-solid fa-calendar-days" style="color:#3b82f6;"></i> Eventos</div>
+                            <div class="custom-dropdown-item" data-cat="Avisos"><i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i> Avisos</div>
+                            <div class="custom-dropdown-item" data-cat="Otros"><i class="fa-solid fa-folder-open" style="color:#10b981;"></i> Otros</div>
+                        </div>
+                    </div>
+
+                    <label class="nv-label" for="nvDescripcion">Descripción detallada</label>
+                    <textarea class="nv-textarea" id="nvDescripcion" maxlength="800" placeholder="Escribe el cuerpo de la novedad con todo lujo de detalles..."></textarea>
+
+                    <label class="nv-check-container">
+                        <input type="checkbox" id="nvDestacada">
+                        <span><i class="fa-solid fa-star" style="color:#f472b6; margin-right:6px;"></i> Marcar como novedad destacada</span>
+                    </label>
+
+                    <div class="nv-actions-wide">
+                        <button class="nv-btn-custom" onclick="resetForm()"><i class="fa-solid fa-rotate-left"></i> Limpiar formulario</button>
+                        <button class="nv-btn-custom primary" id="nvPublicarBtn" onclick="guardarNovedad()"><i class="fa-solid fa-paper-plane"></i> Publicar novedad</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña 2: Novedades Publicadas -->
+            <div class="nv-view-section animate-fade-up delay-2" id="tabPublicadas">
+                <div class="nv-card-wide">
+                    <div class="nv-toolbar-wide">
+                        <h3 style="margin:0;"><i class="fa-solid fa-list-check" style="color:var(--nv-accent);"></i> Listado de publicaciones</h3>
+                        
+                        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                            <!-- Filtro de Categorías con animación -->
+                            <div class="custom-dropdown-container" id="filterDropdownContainer" style="width: 180px;">
+                                <div class="custom-dropdown-btn" id="filterDropdownBtn">
+                                    <span style="display:flex; align-items:center; gap:8px; font-size:13px;">
+                                        <i class="fa-solid fa-filter" style="color:#a855f7;"></i> <span id="filterDropdownLabel">Todas</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down" style="font-size:10px; color:#94a3b8; transition: transform 0.25s ease;" id="filterDropdownChevron"></i>
+                                </div>
+                                <div class="custom-dropdown-menu" id="filterDropdownMenu">
+                                    <div class="custom-dropdown-item" data-cat="Todas"><i class="fa-solid fa-border-all" style="color:#a855f7;"></i> Todas</div>
+                                    <div class="custom-dropdown-item" data-cat="Comunicados"><i class="fa-solid fa-bullhorn" style="color:#a855f7;"></i> Comunicados</div>
+                                    <div class="custom-dropdown-item" data-cat="Changelog"><i class="fa-solid fa-code-merge" style="color:#ec4899;"></i> Changelog</div>
+                                    <div class="custom-dropdown-item" data-cat="Eventos"><i class="fa-solid fa-calendar-days" style="color:#3b82f6;"></i> Eventos</div>
+                                    <div class="custom-dropdown-item" data-cat="Avisos"><i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i> Avisos</div>
+                                    <div class="custom-dropdown-item" data-cat="Otros"><i class="fa-solid fa-folder-open" style="color:#10b981;"></i> Otros</div>
+                                </div>
+                            </div>
+
+                            <!-- Buscador por texto -->
+                            <div style="position:relative; width:230px;">
+                                <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:13px;"></i>
+                                <input class="nv-input" id="nvBuscar" style="padding-left:38px;" placeholder="Buscar..." oninput="renderLista()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="nvLista">
+                        <div style="text-align:center; color:var(--nv-muted); padding:40px;">Cargando novedades publicadas...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal idéntico al de public/novedades.html sin rango -->
+    <div class="modal-overlay" id="novedadModal">
+        <div class="modal-content-box">
+            <button class="modal-close-btn" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header-meta" style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
+                <span class="ann-badge" id="modalBadge"></span>
+                <span id="modalStarContainer" style="display:none;"><i class="fa-solid fa-star" style="color:#f472b6; font-size:12px; margin-left:6px;"></i> <span style="font-size:12px; color:#f472b6; font-weight:600;">Destacada</span></span>
+            </div>
+            <h2 id="modalTitle" style="font-size: 20px; font-weight: 700; margin-bottom: 5px; color:#fff;"></h2>
+            <div class="modal-body">
+                <p id="modalDescription" style="color: #94a3b8; font-size: 14.5px; line-height: 1.6; margin-top: 15px; white-space: pre-wrap;"></p>
+            </div>
+            <div class="modal-footer-info" style="margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items:center; font-size: 13px; color: #64748b;">
+                <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" id="modalAuthorBox">
+                    <img id="modalAuthorAvatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover;" alt="Avatar">
+                    <div>
+                        <span id="modalAuthorName" style="color:#fff; font-weight:600; display:block; font-size: 13.5px;">Usuario</span>
+                    </div>
+                </div>
+                <div id="modalTime" style="color: #64748b; font-size: 12px; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-clock"></i> <span id="modalTimeText">Hace un momento</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nv-toast" id="nvToast"></div>
+
+    <script src="/src/views/permissions.js"></script>
+    <script>
+        const BADGES = {
+            'Comunicados': { cls: 'notice', icon: 'fa-bullhorn' },
+            'Changelog': { cls: 'rocket', icon: 'fa-code-merge' },
+            'Eventos': { cls: 'calendar', icon: 'fa-calendar-days' },
+            'Avisos': { cls: 'notice', icon: 'fa-triangle-exclamation' },
+            'Otros': { cls: 'charity', icon: 'fa-folder-open' }
+        };
+        let novedades = [];
+        let categoriaFormSeleccionada = 'Comunicados';
+        let categoriaFiltroSeleccionada = 'Todas';
+        let publicando = false;
+
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        
+        function toast(msg) {
+            const t = document.getElementById('nvToast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3400);
+        }
+
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.nv-view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nv-tab-btn').forEach(b => b.classList.remove('active'));
+            if (tabName === 'crear') {
+                document.getElementById('tabCrear').classList.add('active');
+            } else {
+                document.getElementById('tabPublicadas').classList.add('active');
+                renderLista();
+            }
+            btn.classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            let ok = false;
+            try { ok = await checkUserPermissions(); } catch (e) {}
+            if (!ok) {
+                document.querySelector('.app-container').style.display = 'none';
+                document.getElementById('nvDenied').style.display = 'flex';
+                return;
+            }
+            loadSession();
+
+            const sb = document.getElementById('sidebar');
+            document.getElementById('sidebarToggleBtn').addEventListener('click', () => sb.classList.add('collapsed'));
+            document.getElementById('sidebarRevealBtn').addEventListener('click', () => sb.classList.remove('collapsed'));
+            
+            setupCustomDropdowns();
+            await cargarNovedades();
+        });
+
+        function loadSession() {
+            try {
+                const u = JSON.parse(localStorage.getItem('discord_user') || 'null');
+                if (!u) return;
+                document.getElementById('userNameDisplay').textContent = u.displayName || u.username || 'Usuario';
+                document.getElementById('userHandleDisplay').textContent = '@' + (u.username || 'discord');
+                if (u.avatarUrl) document.getElementById('userAvatarContainer').innerHTML = `<img src="${esc(u.avatarUrl)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } catch (e) {}
+        }
+
+        // Dropdowns con animación fluida al abrir/cerrar
+        function setupCustomDropdowns() {
+            const fBtn = document.getElementById('formDropdownBtn');
+            const fMenu = document.getElementById('formDropdownMenu');
+            const fLabel = document.getElementById('formDropdownLabel');
+            const fChevron = document.getElementById('formDropdownChevron');
+
+            fBtn.addEventListener('click', (e) => { 
+                e.stopPropagation(); 
+                const isOpen = fMenu.classList.toggle('show'); 
+                fBtn.classList.toggle('active');
+                fChevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+
+            fMenu.querySelectorAll('.custom-dropdown-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    categoriaFormSeleccionada = item.dataset.cat;
+                    fLabel.textContent = categoriaFormSeleccionada;
+                    fMenu.classList.remove('show');
+                    fBtn.classList.remove('active');
+                    fChevron.style.transform = 'rotate(0deg)';
+                });
+            });
+
+            const flBtn = document.getElementById('filterDropdownBtn');
+            const flMenu = document.getElementById('filterDropdownMenu');
+            const flLabel = document.getElementById('filterDropdownLabel');
+            const flChevron = document.getElementById('filterDropdownChevron');
+
+            flBtn.addEventListener('click', (e) => { 
+                e.stopPropagation(); 
+                const isOpen = flMenu.classList.toggle('show'); 
+                flBtn.classList.toggle('active');
+                flChevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+
+            flMenu.querySelectorAll('.custom-dropdown-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    categoriaFiltroSeleccionada = item.dataset.cat;
+                    flLabel.textContent = categoriaFiltroSeleccionada;
+                    flMenu.classList.remove('show');
+                    flBtn.classList.remove('active');
+                    flChevron.style.transform = 'rotate(0deg)';
+                    renderLista();
+                });
+            });
+
+            window.addEventListener('click', () => {
+                fMenu.classList.remove('show'); fBtn.classList.remove('active'); if(fChevron) fChevron.style.transform = 'rotate(0deg)';
+                flMenu.classList.remove('show'); flBtn.classList.remove('active'); if(flChevron) flChevron.style.transform = 'rotate(0deg)';
+            });
+        }
+
+        async function cargarNovedades() {
+            try {
+                const r = await fetch('/api/novedades');
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                const data = await r.json();
+                novedades = Array.isArray(data) ? data : [];
+            } catch (e) {
+                try { novedades = JSON.parse(localStorage.getItem('novedades_cache') || '[]'); } catch { novedades = []; }
+            }
+            renderLista();
+        }
+
+        async function persistir() {
+            localStorage.setItem('novedades_cache', JSON.stringify(novedades));
+            try {
+                const r = await fetch('/api/novedades', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(novedades)
+                });
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // Pide al backend que el bot de Discord avise por MD a los usuarios con notificaciones activadas
+        async function notificarNovedad(n) {
+            try {
+                const r = await fetch('/api/novedades/notificar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(n)
+                });
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return await r.json(); // { destinatarios: N }
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function renderLista() {
+            const q = (document.getElementById('nvBuscar').value || '').toLowerCase().trim();
+            const box = document.getElementById('nvLista');
+            document.getElementById('tabCountBadge').textContent = novedades.length;
+
+            const items = [...novedades]
+                .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+                .filter(n => {
+                    const cumpleCat = (categoriaFiltroSeleccionada === 'Todas' || n.categoria === categoriaFiltroSeleccionada);
+                    const cumpleBusq = !q || (n.titulo + ' ' + n.descripcion + ' ' + n.categoria).toLowerCase().includes(q);
+                    return cumpleCat && cumpleBusq;
+                });
+
+            if (!items.length) {
+                box.innerHTML = '<div style="text-align:center; color:var(--nv-muted); padding:40px;"><i class="fa-solid fa-inbox" style="font-size:28px;display:block;margin-bottom:10px;"></i>No hay novedades publicadas en esta categoría.</div>';
+                return;
+            }
+
+            box.innerHTML = items.map(n => {
+                const fechaStr = formatTimeAgo(n.fecha);
+                const nJson = encodeURIComponent(JSON.stringify(n));
+                return `
+                <div class="nv-item-wide" onclick="abrirModalNovedad(JSON.parse(decodeURIComponent('${nJson}')))">
+                    <div style="flex: 1;">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                            <span class="custom-category-badge">
+                                <i class="fa-solid fa-circle-info"></i> ${esc(n.categoria).toUpperCase()}
+                            </span>
+                            ${n.destacada ? '<span style="color:#f472b6;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:4px;"><i class="fa-solid fa-star"></i> Destacada</span>' : ''}
+                        </div>
+                        <h4>${esc(n.titulo)}</h4>
+                        <p>${esc(n.descripcion)}</p>
+                        <div class="nv-meta-wide">
+                            <span><i class="fa-solid fa-user-pen"></i> ${esc(n.autor || 'Staff')}</span>
+                            <span>•</span>
+                            <span style="display:inline-flex; align-items:center; gap:8px;"><i class="fa-solid fa-clock"></i> ${esc(fechaStr)}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="nv-icon-btn-danger" title="Eliminar novedad" onclick="event.stopPropagation(); eliminar('${esc(n.id)}')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return "Hace un momento";
+            const diff = Date.now() - new Date(timestamp).getTime();
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (minutes < 1) return "Hace un momento";
+            if (minutes < 60) return `Hace ${minutes} min`;
+            if (hours < 24) return `Hace ${hours} hora${hours > 1 ? 's' : ''}`;
+            return `Hace ${days} día${days > 1 ? 's' : ''}`;
+        }
+
+        function resetForm() {
+            document.getElementById('nvTitulo').value = '';
+            document.getElementById('nvDescripcion').value = '';
+            document.getElementById('nvDestacada').checked = false;
+            categoriaFormSeleccionada = 'Comunicados';
+            document.getElementById('formDropdownLabel').textContent = 'Comunicados';
+        }
+
+        async function guardarNovedad() {
+            if (publicando) return; // evita dobles clics (y dobles avisos por MD)
+
+            const titulo = document.getElementById('nvTitulo').value.trim();
+            const descripcion = document.getElementById('nvDescripcion').value.trim();
+            if (!titulo || !descripcion) return toast('Por favor, rellena el título y la descripción.');
+
+            let autor = 'Staff';
+            let avatarUrl = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop';
+            try { 
+                const u = JSON.parse(localStorage.getItem('discord_user') || 'null'); 
+                if (u) {
+                    autor = u.displayName || u.username || 'Staff';
+                    if (u.avatarUrl) avatarUrl = u.avatarUrl;
+                } 
+            } catch {}
+
+            const nueva = { 
+                id: 'nov-' + Date.now(), 
+                titulo, 
+                descripcion, 
+                categoria: categoriaFormSeleccionada, 
+                destacada: document.getElementById('nvDestacada').checked, 
+                autor, 
+                avatarUrl,
+                fecha: new Date().toISOString() 
+            };
+
+            publicando = true;
+            const btn = document.getElementById('nvPublicarBtn');
+            btn.disabled = true;
+
+            try {
+                novedades.push(nueva);
+                const ok = await persistir();
+
+                if (!ok) {
+                    toast('Guardada localmente. Revisa el servidor.');
+                } else {
+                    // Novedad guardada en el servidor → avisar por MD desde el bot de Discord
+                    const res = await notificarNovedad(nueva);
+                    if (res) {
+                        toast(res.destinatarios > 0
+                            ? `¡Novedad publicada! El bot avisará por Discord a ${res.destinatarios} usuario(s).`
+                            : '¡Novedad publicada! Ningún usuario tiene las notificaciones activadas.');
+                    } else {
+                        toast('Novedad publicada, pero no se pudo avisar al bot de Discord.');
+                    }
+                }
+
+                resetForm();
+                switchTab('publicadas', document.querySelectorAll('.nv-tab-btn')[1]);
+            } finally {
+                publicando = false;
+                btn.disabled = false;
+            }
+        }
+
+        async function eliminar(id) {
+            if (!confirm('¿Estás seguro de que deseas eliminar esta novedad?')) return;
+            novedades = novedades.filter(x => x.id !== id);
+            await persistir();
+            toast('Novedad eliminada con éxito.');
+            renderLista();
+        }
+
+        // Modal de visualización exacto sin el rango
+        function abrirModalNovedad(n) {
+            const modal = document.getElementById('novedadModal');
+            const b = BADGES[n.categoria] || BADGES['Comunicados'];
+            
+            document.getElementById('modalBadge').className = `ann-badge ${b.cls}`;
+            document.getElementById('modalBadge').innerHTML = `<i class="fa-solid ${b.icon}"></i> ${esc(n.categoria).toUpperCase()}`;
+            document.getElementById('modalTitle').textContent = n.titulo;
+            document.getElementById('modalDescription').textContent = n.descripcion;
+            document.getElementById('modalTimeText').textContent = formatTimeAgo(n.fecha);
+
+            const starContainer = document.getElementById('modalStarContainer');
+            if (n.destacada) {
+                starContainer.style.display = 'inline-flex';
+            } else {
+                starContainer.style.display = 'none';
+            }
+
+            document.getElementById('modalAuthorName').textContent = n.autor || 'Staff';
+            const finalAvatar = n.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop';
+            document.getElementById('modalAuthorAvatar').src = finalAvatar;
+
+            document.getElementById('modalAuthorBox').onclick = () => {
+                window.location.href = `/admin/staff.html`;
+            };
+
+            modal.classList.add('active');
+        }
+
+        document.getElementById('modalCloseBtn')?.addEventListener('click', () => {
+            document.getElementById('novedadModal').classList.remove('active');
+        });
+
+        document.getElementById('novedadModal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('novedadModal')) {
+                document.getElementById('novedadModal').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario | ClickSense RP</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/src/assets/perfil.css">
+    <link rel="stylesheet" href="/src/assets/calendario.css">
+
+    <style>
+        /* QUITAR ANIMACIONES Y TRANSICIONES DEL MENÚ LATERAL IZQUIERDO */
+        #sidebar {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        /* Estilos específicos unificados para el banner de cabecera */
+        .calendar-header-card {
+            position: relative !important;
+            background: linear-gradient(90deg, rgba(28, 16, 38, 0.85) 0%, rgba(15, 12, 22, 0.95) 100%) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(139, 92, 246, 0.2) !important;
+            border-radius: 16px !important;
+            padding: 28px !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
+            margin-bottom: 24px !important;
+            overflow: hidden !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .calendar-header-card::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 5px !important;
+            height: 100% !important;
+            background: linear-gradient(to bottom, #ec4899, #8b5cf6) !important;
+        }
+        .calendar-nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .month-indicator {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            color: #fff;
+            font-size: 0.95rem;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        /* DISEÑO MODERNIZADO PARA LOS BOTONES DE CAMBIO DE MES
+           (limitado a los controles del calendario para que no cambie el botón de Soporte) */
+        .calendar-nav-controls .top-btn {
+            background: rgba(20, 24, 33, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+        }
+        .calendar-nav-controls .top-btn:hover {
+            background: rgba(30, 38, 52, 0.9);
+            border-color: rgba(236, 72, 153, 0.5);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(236, 72, 153, 0.25);
+        }
+
+        /* ===== Botón de Soporte en la barra superior (mismo diseño que en el resto de páginas) ===== */
+        /* Estilos de reserva: van dentro de :where() (prioridad cero), así que si perfil.css
+           ya da estilo a estas clases mandan los suyos y el botón se ve igual que en Home. */
+        :where(.top-action-bar) { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        :where(.top-buttons) { display: flex; align-items: center; gap: 10px; }
+        :where(.top-btn) {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+        :where(.top-btn.highlight-btn) {
+            background: rgba(168, 85, 247, 0.14);
+            border-color: rgba(168, 85, 247, 0.45);
+            color: #fff;
+        }
+        :where(.top-btn.highlight-btn:hover) {
+            border-color: #a855f7;
+            box-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
+        }
+
+        #prevMonthBtn, #nextMonthBtn {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        /* Animación para el icono de la campana */
+        @keyframes bellRingAnim {
+            0% { transform: rotate(0deg) scale(1); }
+            20% { transform: rotate(18deg) scale(1.2); }
+            40% { transform: rotate(-18deg) scale(1.2); }
+            60% { transform: rotate(12deg) scale(1.1); }
+            80% { transform: rotate(-12deg) scale(1.1); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+        .bell-animating {
+            animation: bellRingAnim 0.5s ease;
+        }
+
+        /* Botón de la campanita */
+        .restart-notification-bell {
+            background: rgba(219, 39, 119, 0.1);
+            border: 1px solid rgba(219, 39, 119, 0.3);
+            color: var(--accent-pink, #db2777);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .restart-notification-bell.active {
+            background: #db2777;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(219, 39, 119, 0.6);
+        }
+        .restart-notification-bell:hover {
+            transform: scale(1.05);
+            background: rgba(219, 39, 119, 0.2);
+        }
+
+        /* Notificación Global Superior */
+        .global-notification-banner {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 16, 30, 0.95);
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            padding: 12px 28px;
+            border-radius: 30px;
+            z-index: 100000;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 25px rgba(168, 85, 247, 0.3);
+            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.92rem;
+            max-width: 90%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(12px);
+        }
+        .global-notification-banner.show {
+            top: 25px;
+        }
+        .global-notification-icon {
+            width: 26px;
+            height: 26px;
+            background: #22c55e;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+        .global-notification-tag {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            color: #fff;
+            font-family: monospace;
+        }
+
+        /* ANIMACIÓN DE TRANSICIÓN PARA EL CALENDARIO */
+        @keyframes calendarChangeAnim {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.99);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .calendar-grid-animate {
+            animation: calendarChangeAnim 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* ===== Menú desplegable de Soporte (igual que en Home y Equipo) ===== */
+        .support-dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+        .support-dropdown-menu {
+            position: fixed;
+            width: 250px;
+            background: #13141f;
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            border-radius: 14px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(168, 85, 247, 0.4);
+            display: flex;
+            flex-direction: column;
+            z-index: 2147483647;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 6px 0;
+        }
+        .support-dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .support-menu-section {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .support-menu-section:last-child {
+            border-bottom: none;
+        }
+        .support-menu-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            padding: 6px 16px 4px 16px;
+            letter-spacing: 0.5px;
+        }
+        .support-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            font-size: 13px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+            font-weight: 500;
+        }
+        .support-dropdown-item:hover {
+            background: rgba(168, 85, 247, 0.2);
+            color: #fff;
+        }
+        .support-dropdown-item i {
+            color: #a855f7;
+            width: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-background"></div>
+
+    <div class="app-container">
+        
+        <!-- Menú Lateral -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+                    <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+                    <span class="server-main-title">ClickSense</span>
+                </div>
+                <button class="sidebar-toggle-icon" id="sidebarToggleBtn" title="Colapsar menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- El menú se completa automáticamente mediante guards.js -->
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-mini" id="userProfileMini">
+                    <div class="avatar-placeholder" id="userAvatarContainer">
+                        <span id="userAvatarFallback">?</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">Usuario</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@tag</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Botón flotante para mostrar menú colapsado -->
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <header class="top-action-bar animate-fade-down">
+                <div class="breadcrumb">Calendario</div>
+                <div class="top-buttons">
+                    <!-- Botón de Soporte -->
+                    <div class="support-dropdown-container" id="supportDropdownContainer">
+                        <button class="top-btn highlight-btn" id="supportDropdownBtn">
+                            <i class="fa-solid fa-circle-question"></i> Soporte
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Menú desplegable de Soporte (al abrirse se mueve al body para quedar por encima de todo) -->
+            <div class="support-dropdown-menu" id="supportDropdownMenu">
+                <!-- Sección Soporte -->
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Soporte</div>
+                    <a href="/tickets.html" class="support-dropdown-item"><i class="fa-solid fa-ticket"></i> Crear un ticket</a>
+                </div>
+                <!-- Sección Apoyo -->
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Apoyo</div>
+                    <a href="/sugerencias.html" class="support-dropdown-item"><i class="fa-solid fa-lightbulb"></i> Enviar una sugerencia</a>
+                    <a href="/feedback.html" class="support-dropdown-item"><i class="fa-solid fa-comment-dots"></i> Dar tu feedback</a>
+                    <a href="/perfil.html" class="support-dropdown-item"><i class="fa-solid fa-user"></i> Acceder al perfil</a>
+                    <a href="/index.html" class="support-dropdown-item"><i class="fa-solid fa-house-chimney"></i> Acceder al panel principal</a>
+                </div>
+                <!-- Sección Información -->
+                <div class="support-menu-section">
+                    <div class="support-menu-title">Información</div>
+                    <a href="/normativa.html" class="support-dropdown-item"><i class="fa-solid fa-book"></i> Normativa general</a>
+                    <a href="/pol-privacidad.html" class="support-dropdown-item"><i class="fa-solid fa-shield-halved"></i> Política de privacidad</a>
+                    <a href="/terminos.html" class="support-dropdown-item"><i class="fa-solid fa-file-contract"></i> Términos y condiciones</a>
+                </div>
+            </div>
+
+            <div class="calendar-header-card animate-fade-up">
+                <div class="calendar-title-area">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <span style="font-size: 0.75rem; font-weight: 700; color: #db2777; letter-spacing: 1px; text-transform: uppercase;">
+                            <i class="fa-solid fa-calendar-days"></i> CALENDARIO CLICKSENSE RP
+                        </span>
+                    </div>
+                    <h1 style="margin: 0 0 4px 0; font-size: 1.8rem; font-weight: 800; color: #fff;">Eventos</h1>
+                    <p style="color: #94a3b8; margin: 0; font-size: 0.95rem;">Consulta los eventos oficiales, aperturas y reuniones programadas para este mes.</p>
+                </div>
+                <div class="calendar-nav-controls">
+                    <button class="restart-notification-bell" id="bellButton" onclick="toggleNotificacionesCalendario()" title="Activar/Desactivar notificaciones de eventos">
+                        <i class="fa-solid fa-bell" id="bellIcon"></i>
+                    </button>
+                    <button id="prevMonthBtn" class="top-btn" title="Mes Anterior"><i class="fa-solid fa-angle-left"></i></button>
+                    <span id="currentMonthYearLabel" class="month-indicator">Agosto 2026</span>
+                    <button id="nextMonthBtn" class="top-btn" title="Mes Siguiente"><i class="fa-solid fa-angle-right"></i></button>
+                </div>
+            </div>
+
+            <section class="section-block animate-fade-up delay-1">
+                <div class="calendar-container">
+                    <div class="calendar-weekdays">
+                        <span>Lunes</span>
+                        <span>Martes</span>
+                        <span>Miércoles</span>
+                        <span>Jueves</span>
+                        <span>Viernes</span>
+                        <span>Sábado</span>
+                        <span>Domingo</span>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Generado por JavaScript -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal de Detalles del Evento -->
+    <div class="event-modal-overlay" id="eventModalOverlay">
+        <div class="event-modal-card" id="eventModalCard">
+            <div class="event-modal-header">
+                <h3 id="modalEventTitle">Titulo del Evento</h3>
+                <button class="event-modal-close" id="eventModalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="event-modal-body">
+                <div class="event-modal-info-group">
+                    <span class="event-info-label"><i class="fa-solid fa-calendar-day"></i> Fecha y Hora</span>
+                    <p id="modalEventDate">25 de Agosto, 2026</p>
+                </div>
+                <div class="event-modal-info-group">
+                    <span class="event-info-label"><i class="fa-solid fa-location-dot"></i> Ubicación</span>
+                    <p id="modalEventLocation">Ubicación del evento</p>
+                </div>
+                <div class="event-modal-info-group">
+                    <span class="event-info-label"><i class="fa-solid fa-align-left"></i> Descripción</span>
+                    <p id="modalEventDesc">Descripción detallada del evento programado en la ciudad.</p>
+                </div>
+                <div class="event-modal-info-group">
+                    <span class="event-info-label"><i class="fa-solid fa-store"></i> Negocios / Organizadores</span>
+                    <div class="event-businesses-tags" id="modalEventBusinesses"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const isSubscribed = localStorage.getItem('calendar_notifications_active') === 'true';
+        const bellBtn = document.getElementById('bellButton');
+        if (isSubscribed && bellBtn) {
+            bellBtn.classList.add('active');
+        }
+        loadSession();
+    });
+
+    async function toggleNotificacionesCalendario() {
+        const bellBtn = document.getElementById('bellButton');
+        const bellIcon = document.getElementById('bellIcon');
+        
+        bellIcon.classList.remove('bell-animating');
+        void bellIcon.offsetWidth; 
+        bellIcon.classList.add('bell-animating');
+
+        let currentState = localStorage.getItem('calendar_notifications_active') === 'true';
+        let newState = !currentState;
+
+        localStorage.setItem('calendar_notifications_active', newState);
+
+        const notificacionesKey = 'user_notifications_db';
+        let listaActual = JSON.parse(localStorage.getItem(notificacionesKey) || '[]');
+        const fechaStr = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        let discordId = null;
+        const storedUser = localStorage.getItem('discord_user');
+        if (storedUser) {
+            try {
+                const u = JSON.parse(storedUser);
+                discordId = u.id || u.discord_id;
+            } catch(e) {}
+        }
+
+        if (newState) {
+            bellBtn.classList.add('active');
+            showGlobalNotification('Las notificaciones sobre los eventos del calendario se encuentran', 'ACTIVADAS');
+
+            listaActual.unshift({
+                id: 'NOTIF-' + Date.now(),
+                titulo: 'Notificaciones de Eventos',
+                descripcion: 'Has activado las alertas automáticas para los eventos del calendario.',
+                fecha: fechaStr,
+                leida: false
+            });
+
+            if (discordId) {
+                try {
+                    await fetch('/api/notificar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            discord_id: discordId,
+                            tipo: "evento",
+                            titulo: "SISTEMA DE NOTIFICACIONES",
+                            descripcion: "¡Buenas!, se ha registrado una actualización en las notificaciones del sistema:",
+                            campos: [
+                                {
+                                    name: "**INFORMACIÓN**",
+                                    value: "- __**CATEGORÍA**__: Calendario",
+                                    inline: false
+                                },
+                                {
+                                    name: "\u200b",
+                                    value: "- __**ESTADO**__: Notificaciones activadas",
+                                    inline: false
+                                },
+                                {
+                                    name: "\u200b",
+                                    value: "-# ¡ATENCIÓN! Esto es un mensaje automático procedente del sistema de notificaciones de ClickSense. Puedes desactivar esta notificación en cualquier momento pulsando en el botón adjunto.",
+                                    inline: false
+                                }
+                            ]
+                        })
+                    });
+                } catch (err) {
+                    console.error("Error enviando DM de notificación (calendario activación):", err);
+                }
+            }
+        } else {
+            bellBtn.classList.remove('active');
+            showGlobalNotification('Las notificaciones sobre los eventos del calendario se encuentran', 'DESACTIVADAS');
+
+            listaActual.unshift({
+                id: 'NOTIF-' + Date.now(),
+                titulo: 'Notificaciones de Eventos',
+                descripcion: 'Has desactivado las alertas automáticas de los eventos del calendario.',
+                fecha: fechaStr,
+                leida: false
+            });
+
+            if (discordId) {
+                try {
+                    await fetch('/api/notificar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            discord_id: discordId,
+                            tipo: "evento",
+                            titulo: "SISTEMA DE NOTIFICACIONES",
+                            descripcion: "¡Buenas!, se ha registrado una actualización en las notificaciones del sistema:",
+                            campos: [
+                                {
+                                    name: "**INFORMACIÓN**",
+                                    value: "- __**CATEGORÍA**__: Calendario",
+                                    inline: false
+                                },
+                                {
+                                    name: "\u200b",
+                                    value: "- __**ESTADO**__: Notificaciones desactivadas",
+                                    inline: false
+                                },
+                                {
+                                    name: "\u200b",
+                                    value: "-# ¡ATENCIÓN! Esto es un mensaje automático procedente del sistema de notificaciones de ClickSense. Puedes desactivar esta notificación en cualquier momento pulsando en el botón adjunto.",
+                                    inline: false
+                                }
+                            ]
+                        })
+                    });
+                } catch (err) {
+                    console.error("Error enviando DM de notificación (calendario desactivación):", err);
+                }
+            }
+        }
+
+        localStorage.setItem(notificacionesKey, JSON.stringify(listaActual));
+    }
+
+    // FUNCIÓN PARA REGISTRAR Y NOTIFICAR UN NUEVO EVENTO CON TÍTULO, DESCRIPCIÓN, FECHA/HORA Y UBICACIÓN
+    window.registrarYNotificarNuevoEvento = async function(dateKey, eventoData) {
+        let mockEvents = getStoredEvents();
+        if (!mockEvents[dateKey]) {
+            mockEvents[dateKey] = [];
+        }
+        mockEvents[dateKey].push(eventoData);
+        localStorage.setItem('calendar_events', JSON.stringify(mockEvents));
+        renderCalendar();
+
+        // Verificar si las notificaciones de eventos están activas
+        const isSubscribed = localStorage.getItem('calendar_notifications_active') === 'true';
+        if (!isSubscribed) return;
+
+        let discordId = null;
+        const storedUser = localStorage.getItem('discord_user');
+        if (storedUser) {
+            try {
+                const u = JSON.parse(storedUser);
+                discordId = u.id || u.discord_id;
+            } catch(e) {}
+        }
+
+        if (discordId) {
+            const locationText = eventoData.location || (Array.isArray(eventoData.businesses) ? eventoData.businesses.join(', ') : (eventoData.businesses || 'No especificada'));
+            const fechaHoraText = eventoData.date || dateKey;
+
+            try {
+                await fetch('/api/notificar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        discord_id: discordId,
+                        tipo: "evento",
+                        titulo: "🎉 NUEVO EVENTO PROGRAMADO",
+                        descripcion: `Se ha registrado un nuevo evento en el calendario:\n\n**${eventoData.title}**`,
+                        campos: [
+                            {
+                                name: "📅 Fecha y Hora",
+                                value: `\`\`${fechaHoraText}\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "📍 Ubicación",
+                                value: `\`\`${locationText}\`\``,
+                                inline: true
+                            },
+                            {
+                                name: "📝 Descripción",
+                                value: eventoData.description || "Sin descripción",
+                                inline: false
+                            },
+                            {
+                                name: "🔔 Ver en el calendario",
+                                value: "[Pincha aquí para acceder](http://localhost:8000/calendario.html)",
+                                inline: false
+                            }
+                        ]
+                    })
+                });
+            } catch (err) {
+                console.error("Error enviando DM de nuevo evento:", err);
+            }
+        }
+    };
+
+    function showGlobalNotification(prefix, tagText, suffix = '') {
+        let banner = document.getElementById('globalTopNotificationBanner');
+        
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'globalTopNotificationBanner';
+            banner.className = 'global-notification-banner';
+            banner.innerHTML = `
+                <div class="global-notification-icon"><i class="fa-solid fa-check"></i></div>
+                <div>
+                    <span id="notifPrefix"></span> 
+                    <span class="global-notification-tag" id="notifTag"></span> 
+                    <span id="notifSuffix"></span>
+                </div>
+            `;
+            document.body.appendChild(banner);
+        }
+
+        document.getElementById('notifPrefix').textContent = prefix;
+        document.getElementById('notifTag').textContent = tagText;
+        document.getElementById('notifSuffix').textContent = suffix;
+
+        setTimeout(() => {
+            banner.classList.add('show');
+        }, 50);
+
+        setTimeout(() => {
+            banner.classList.remove('show');
+        }, 4000);
+    }
+
+    function loadSession() {
+        const storedUser = localStorage.getItem('discord_user');
+        if (storedUser) {
+            try {
+                const discordUser = JSON.parse(storedUser);
+                const name = discordUser.displayName || discordUser.username || "Usuario";
+                const handle = discordUser.username || "discord";
+                const avatarUrl = discordUser.avatarUrl;
+
+                document.getElementById('userNameDisplay').textContent = name;
+                document.getElementById('userHandleDisplay').textContent = `@${handle}`;
+                
+                if (avatarUrl) {
+                    document.getElementById('userAvatarContainer').innerHTML = `<img src="${avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+                }
+            } catch (e) {
+                console.error("Error cargando sesión:", e);
+            }
+        }
+    }
+
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const revealBtn = document.getElementById('sidebarRevealBtn');
+    const sidebar = document.getElementById('sidebar');
+
+    if (toggleBtn && revealBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.add('collapsed');
+        });
+        revealBtn.addEventListener('click', () => {
+            sidebar.classList.remove('collapsed');
+        });
+    }
+
+    // Menú desplegable de Soporte: se coloca justo debajo del botón y se cierra al pulsar fuera
+    const supportBtn = document.getElementById('supportDropdownBtn');
+    const supportMenu = document.getElementById('supportDropdownMenu');
+
+    if (supportBtn && supportMenu) {
+        supportBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = supportMenu.classList.contains('show');
+
+            if (!isOpen) {
+                if (supportMenu.parentElement !== document.body) {
+                    document.body.appendChild(supportMenu);
+                }
+                const rect = supportBtn.getBoundingClientRect();
+                supportMenu.style.top = (rect.bottom + 8) + 'px';
+                supportMenu.style.right = (window.innerWidth - rect.right) + 'px';
+                supportMenu.classList.add('show');
+            } else {
+                supportMenu.classList.remove('show');
+            }
+        });
+
+        window.addEventListener('click', () => {
+            supportMenu.classList.remove('show');
+        });
+
+        window.addEventListener('resize', () => {
+            supportMenu.classList.remove('show');
+        });
+    }
+
+    let currentDate = new Date();
+    const monthNames = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    function getStoredEvents() {
+        const defaultEvents = {
+            "2026-08-05": [
+                {
+                    title: "Reunión LSPD",
+                    type: "police",
+                    description: "Reunión ordinaria de mandos y oficiales para evaluar la seguridad ciudadana.",
+                    location: "Comisaría Central LSPD",
+                    businesses: ["Comisaría Central LSPD"]
+                }
+            ]
+        };
+        const saved = localStorage.getItem('calendar_events');
+        if (!saved) return defaultEvents;
+        try {
+            const parsed = JSON.parse(saved);
+            return (typeof parsed === 'object' && parsed !== null) ? parsed : defaultEvents;
+        } catch (e) {
+            return defaultEvents;
+        }
+    }
+
+    function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const mockEvents = getStoredEvents();
+
+        document.getElementById('currentMonthYearLabel').textContent = `${monthNames[month]} ${year}`;
+        const calendarGrid = document.getElementById('calendarGrid');
+        
+        calendarGrid.classList.remove('calendar-grid-animate');
+        void calendarGrid.offsetWidth; 
+        calendarGrid.classList.add('calendar-grid-animate');
+
+        calendarGrid.innerHTML = '';
+
+        const firstDayIndex = new Date(year, month, 1).getDay();
+        const adjustedFirstDay = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const prevTotalDays = new Date(year, month, 0).getDate();
+        const today = new Date();
+
+        for (let i = adjustedFirstDay; i > 0; i--) {
+            const dayBox = document.createElement('div');
+            dayBox.className = 'calendar-day muted';
+            dayBox.innerHTML = `<span class="day-number">${prevTotalDays - i + 1}</span>`;
+            calendarGrid.appendChild(dayBox);
+        }
+
+        for (let day = 1; day <= totalDays; day++) {
+            const dayBox = document.createElement('div');
+            dayBox.className = 'calendar-day';
+            const isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+            if (isToday) {
+                dayBox.classList.add('today');
+            }
+
+            const formattedMonth = String(month + 1).padStart(2, '0');
+            const formattedDay = String(day).padStart(2, '0');
+            const dateKey = `${year}-${formattedMonth}-${formattedDay}`;
+
+            let eventsHTML = '';
+            if (mockEvents[dateKey] && Array.isArray(mockEvents[dateKey])) {
+                mockEvents[dateKey].forEach((ev, index) => {
+                    eventsHTML += `<span class="calendar-event ${ev.type || 'event'}" data-date="${dateKey}" data-index="${index}">${ev.title}</span>`;
+                });
+            }
+
+            dayBox.innerHTML = `
+                <div class="day-header-number">
+                    <span class="day-number">${day}</span>
+                </div>
+                <div class="day-events-container">
+                    ${eventsHTML}
+                </div>
+            `;
+            calendarGrid.appendChild(dayBox);
+        }
+
+        const totalCellsSoFar = adjustedFirstDay + totalDays;
+        const remainingCells = (totalCellsSoFar % 7 === 0) ? 0 : (7 - (totalCellsSoFar % 7));
+        for (let i = 1; i <= remainingCells; i++) {
+            const dayBox = document.createElement('div');
+            dayBox.className = 'calendar-day muted';
+            dayBox.innerHTML = `<span class="day-number">${i}</span>`;
+            calendarGrid.appendChild(dayBox);
+        }
+
+        attachEventClickListeners();
+    }
+
+    document.getElementById('prevMonthBtn').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    document.getElementById('nextMonthBtn').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    const modalOverlay = document.getElementById('eventModalOverlay');
+    const modalCloseBtn = document.getElementById('eventModalCloseBtn');
+
+    function attachEventClickListeners() {
+        const eventElements = document.querySelectorAll('.calendar-event');
+        eventElements.forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dateKey = el.getAttribute('data-date');
+                const index = el.getAttribute('data-index');
+                const mockEvents = getStoredEvents();
+                
+                if (!mockEvents[dateKey] || !mockEvents[dateKey][index]) return;
+                
+                const eventData = mockEvents[dateKey][index];
+                document.getElementById('modalEventTitle').textContent = eventData.title;
+                
+                const monthIdx = parseInt(dateKey.split('-')[1]) - 1;
+                document.getElementById('modalEventDate').textContent = `${dateKey.split('-')[2]} de ${monthNames[monthIdx] || ''}, ${dateKey.split('-')[0]}`;
+                
+                const locationText = eventData.location || (Array.isArray(eventData.businesses) ? eventData.businesses.join(', ') : (eventData.businesses || 'No especificada'));
+                document.getElementById('modalEventLocation').textContent = locationText;
+                
+                document.getElementById('modalEventDesc').textContent = eventData.description || 'Sin descripción detallada.';
+                
+                const businessesContainer = document.getElementById('modalEventBusinesses');
+                businessesContainer.innerHTML = '';
+                const bizList = Array.isArray(eventData.businesses) ? eventData.businesses : (eventData.businesses ? [eventData.businesses] : []);
+                
+                if(bizList.length === 0) {
+                    businessesContainer.innerHTML = '<span style="font-size: 13px; color: var(--text-muted, #94a3b8);">Ninguno especificado</span>';
+                } else {
+                    bizList.forEach(biz => {
+                        const tag = document.createElement('span');
+                        tag.className = 'business-tag';
+                        tag.innerHTML = `<i class="fa-solid fa-store"></i> ${biz}`;
+                        businessesContainer.appendChild(tag);
+                    });
+                }
+                
+                modalOverlay.classList.add('active');
+            });
+        });
+    }
+
+    function closeModal() {
+        modalOverlay.classList.remove('active');
+    }
+
+    if(modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+    if(modalOverlay) {
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'calendar_events') {
+            renderCalendar();
+        }
+    });
+
+    renderCalendar();
+    </script>
+
+    <script src="/guards.js"></script>
+</body>
+</html>

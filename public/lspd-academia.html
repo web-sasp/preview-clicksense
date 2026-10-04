@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academia LSPD | ClickSense RP</title>
+<!-- Google Fonts & FontAwesome -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/src/assets/home.css">
+<link rel="stylesheet" href="/src/assets/perfil.css">
+<style>
+/* Estilos específicos unificados con el resto del diseño general */
+:root {
+  --primary-pink: #ec4899;
+  --primary-purple: #8b5cf6;
+  --lspd-blue: #3b82f6;
+  --bg-card: rgba(20, 24, 33, 0.85);
+  --border-glass: rgba(255, 255, 255, 0.08);
+
+  /* Un color por prioridad: se usa igual en la insignia, el borde de la tarjeta, el filtro y el modal */
+  --prio-informativo: #3b82f6;
+  --prio-importante: #eab308;
+  --prio-urgente: #ef4444;
+}
+
+/* Animaciones idénticas */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeInSidebar {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sidebar {
+  animation: fadeInSidebar 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-fade-down {
+  animation: fadeInDown 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-fade-up {
+  opacity: 0;
+  animation: fadeInUp 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.18s; }
+.delay-3 { animation-delay: 0.26s; }
+
+/* Foco visible al navegar con teclado */
+:where(a, button, [tabindex]):focus-visible {
+  outline: 2px solid var(--lspd-blue);
+  outline-offset: 3px;
+}
+
+/* Notificación flotante centrada arriba */
+.floating-toast-container {
+  position: fixed;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-30px);
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--primary-pink);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(236, 72, 153, 0.2);
+  padding: 15px 28px;
+  border-radius: 14px;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(10px);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.floating-toast-container.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.floating-toast-container i {
+  color: #ec4899;
+  font-size: 16px;
+}
+
+/* Estilos específicos para el muro de comunicados y academia LSPD */
+.lspd-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.25) 0%, rgba(20, 24, 33, 0.9) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 18px;
+  padding: 28px 28px 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  backdrop-filter: blur(10px);
+}
+
+/* Franja lateral, como en las cabeceras del resto de páginas, en el azul de la LSPD */
+.lspd-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(to bottom, #60a5fa, #1d4ed8);
+}
+
+.lspd-hero-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.3px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.lspd-hero-title i {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 20px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.lspd-hero p {
+  color: var(--text-muted, #94a3b8);
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 62ch;
+  font-family: 'Inter', sans-serif;
+}
+
+.lspd-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stats-badge-pill {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Aviso de cuántos comunicados urgentes hay (solo aparece si hay alguno) */
+.stats-badge-pill.is-urgent {
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+/* Tarjeta contenedora de contenido principal */
+.admin-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+}
+
+/* Cabecera del Tablón con buscador, menú desplegable y botón de notificaciones */
+.tablon-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.tablon-title-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Botón de la campanita de notificaciones */
+.notif-bell-btn {
+  background: rgba(13, 18, 29, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notif-bell-btn:hover {
+  background: rgba(25, 32, 48, 0.95);
+  border-color: rgba(236, 72, 153, 0.5);
+  color: #ec4899;
+  transform: scale(1.05);
+}
+
+.notif-bell-btn.active {
+  background: rgba(236, 72, 153, 0.15);
+  border-color: rgba(236, 72, 153, 0.4);
+  color: #ec4899;
+}
+
+.tablon-filters-area {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  position: relative;
+}
+
+/* Buscador Estilo Panel General */
+.custom-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.custom-search-box i {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.custom-search-input {
+  background: rgba(13, 18, 29, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 14px 10px 38px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s;
+  min-width: 260px;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+.custom-search-input::placeholder { color: #64748b; }
+
+.custom-search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Botón de Filtro Desplegable */
+.custom-dropdown-container {
+  position: relative;
+}
+
+.filter-dropdown-btn {
+  background: rgba(13, 18, 29, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+  user-select: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.filter-dropdown-btn:hover,
+.custom-dropdown-container.open .filter-dropdown-btn {
+  border-color: rgba(59, 130, 246, 0.5);
+  background: rgba(20, 26, 40, 0.9);
+}
+
+.filter-dropdown-btn i.fa-filter {
+  color: #8b5cf6;
+}
+
+.filter-dropdown-btn i.fa-chevron-down {
+  font-size: 11px;
+  color: var(--text-muted, #94a3b8);
+  transition: transform 0.2s;
+}
+
+.custom-dropdown-container.open .filter-dropdown-btn i.fa-chevron-down {
+  transform: rotate(180deg);
+}
+
+/* Menú Desplegable */
+.custom-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: #111827;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: 14px;
+  padding: 8px;
+  min-width: 190px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.custom-dropdown-container.open .custom-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.custom-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+
+.custom-dropdown-item:hover {
+  background: rgba(139, 92, 246, 0.15);
+  color: #fff;
+}
+
+.custom-dropdown-item.active {
+  background: rgba(139, 92, 246, 0.25);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Los puntos del filtro usan el mismo color que la insignia de cada prioridad */
+.custom-dropdown-item i { width: 14px; text-align: center; }
+.custom-dropdown-item .icon-todos { color: #8b5cf6; }
+.custom-dropdown-item .icon-informativo { color: var(--prio-informativo); font-size: 10px; }
+.custom-dropdown-item .icon-importante { color: var(--prio-importante); font-size: 10px; }
+.custom-dropdown-item .icon-urgente { color: var(--prio-urgente); font-size: 10px; }
+
+/* Línea de ayuda bajo la cabecera + cuántos comunicados se están mostrando */
+.tablon-hint-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+}
+
+.tablon-hint-row p { margin: 0; }
+
+.tablon-result-info { font-weight: 600; color: #cbd5e1; }
+
+/* Grid de comunicados recibidos */
+.comunicados-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.comunicado-card {
+  --prio: var(--prio-informativo);
+  background: rgba(13, 18, 29, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 18px 22px 16px 26px;
+  transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Franja de color a la izquierda: de un vistazo se ve la prioridad de cada comunicado */
+.comunicado-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--prio);
+}
+
+.comunicado-card.prio-importante { --prio: var(--prio-importante); }
+.comunicado-card.prio-urgente { --prio: var(--prio-urgente); }
+
+.comunicado-card:hover,
+.comunicado-card:focus-visible {
+  border-color: rgba(59, 130, 246, 0.4);
+  border-color: color-mix(in srgb, var(--prio) 45%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  background: rgba(18, 24, 38, 0.85);
+}
+
+.comunicado-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+
+.comunicado-title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #fff;
+  overflow-wrap: anywhere;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.priority-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.priority-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.priority-badge.informativo { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+.priority-badge.importante { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.3); }
+.priority-badge.urgente { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+/* Vista previa: como mucho tres líneas; el texto completo se lee en el modal */
+.comunicado-body {
+  font-size: 14px;
+  color: #cbd5e1;
+  line-height: 1.55;
+  margin-bottom: 14px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-family: 'Inter', sans-serif;
+}
+
+.comunicado-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-muted, #94a3b8);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 12px;
+  font-family: 'Inter', sans-serif;
+}
+
+.comunicado-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: color 0.2s ease;
+}
+
+.comunicado-read-more i { font-size: 9px; }
+
+.comunicado-card:hover .comunicado-read-more,
+.comunicado-card:focus-visible .comunicado-read-more {
+  color: #fff;
+}
+
+.empty-feed {
+  text-align: center;
+  padding: 46px 20px;
+  background: rgba(0,0,0,0.2);
+  border: 1px dashed rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 14px;
+  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+}
+
+.empty-feed i {
+  font-size: 34px;
+  margin-bottom: 12px;
+  color: rgba(96, 165, 250, 0.45);
+  display: block;
+}
+
+.empty-feed strong {
+  display: block;
+  color: #fff;
+  font-size: 15px;
+  margin-bottom: 2px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.empty-feed p { margin: 0; }
+
+.empty-feed-btn {
+  margin-top: 16px;
+  background: rgba(59, 130, 246, 0.14);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #bfdbfe;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.empty-feed-btn:hover {
+  background: rgba(59, 130, 246, 0.28);
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+/* Modal Expandido para leer comunicado completo */
+.custom-modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100000; padding: 20px; opacity: 0; visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.custom-modal-overlay.open { opacity: 1; visibility: visible; }
+
+/* El borde del modal toma el color de la prioridad del comunicado que se está leyendo */
+.modal-card-expanded {
+  --prio: var(--prio-informativo);
+  background: #111827;
+  border: 1px solid rgba(59, 130, 246, 0.45);
+  border-color: color-mix(in srgb, var(--prio) 50%, transparent);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 700px;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 30px color-mix(in srgb, var(--prio) 18%, transparent);
+  color: #fff;
+  transform: translateY(20px) scale(0.97);
+  transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-card-expanded.prio-importante { --prio: var(--prio-importante); }
+.modal-card-expanded.prio-urgente { --prio: var(--prio-urgente); }
+
+.custom-modal-overlay.open .modal-card-expanded { 
+  transform: translateY(0) scale(1); 
+}
+
+.modal-header-exp {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-header-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.modal-title-exp { 
+  font-size: 20px; font-weight: 800; color: #fff; line-height: 1.3;
+  letter-spacing: -0.2px; overflow-wrap: anywhere;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.close-btn-exp {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  width: 36px; height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: all 0.2s;
+}
+
+.close-btn-exp:hover { color: #fff; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); }
+
+.modal-body-exp {
+  font-size: 15px;
+  color: #cbd5e1;
+  line-height: 1.7;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 24px;
+  white-space: pre-line;
+  word-break: break-word;
+  font-family: 'Inter', sans-serif;
+}
+
+.modal-footer-exp {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 16px;
+}
+
+.modal-meta-exp {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 12px;
+  color: var(--text-muted, #94a3b8);
+  font-family: 'Inter', sans-serif;
+}
+
+.modal-meta-exp i { margin-right: 5px; }
+.modal-meta-exp strong { color: #e2e8f0; font-weight: 600; }
+
+@media (max-width: 720px) {
+  .lspd-hero { padding: 22px 20px 22px 24px; }
+  .lspd-hero-title { font-size: 20px; }
+  .admin-card { padding: 18px; }
+  .tablon-filters-area { width: 100%; }
+  .custom-search-box { flex: 1 1 200px; }
+  .custom-search-input { min-width: 0; width: 100%; }
+  .comunicado-header { flex-direction: column-reverse; align-items: flex-start; gap: 8px; }
+  .modal-card-expanded { padding: 22px 20px; }
+}
+
+/* ===== Menú desplegable de Soporte (igual que en Home y Equipo) ===== */
+.support-dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+.support-dropdown-menu {
+    position: fixed;
+    width: 250px;
+    background: #13141f;
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    border-radius: 14px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(168, 85, 247, 0.4);
+    display: flex;
+    flex-direction: column;
+    z-index: 2147483647;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 6px 0;
+}
+.support-dropdown-menu.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+.support-menu-section {
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.support-menu-section:last-child {
+    border-bottom: none;
+}
+.support-menu-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94a3b8;
+    padding: 6px 16px 4px 16px;
+    letter-spacing: 0.5px;
+}
+.support-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    font-size: 13px;
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    font-weight: 500;
+}
+.support-dropdown-item:hover {
+    background: rgba(168, 85, 247, 0.2);
+    color: #fff;
+}
+.support-dropdown-item i {
+    color: #a855f7;
+    width: 16px;
+    text-align: center;
+}
+
+/* Quien prefiera menos movimiento: sin animaciones de entrada ni desplazamientos */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<!-- Fondo de cuadrícula 3D unificado -->
+<div class="grid-background"></div>
+
+<!-- Notificación flotante centrada arriba -->
+<div class="floating-toast-container" id="floatingToast" role="status" aria-live="polite">
+  <i class="fa-solid fa-bell" id="toastIcon"></i>
+  <span id="toastMessage">Mensaje de notificación</span>
+</div>
+
+<!-- Modal Expandido de Comunicado -->
+<div class="custom-modal-overlay" id="comunicadoModal">
+  <div class="modal-card-expanded" id="comunicadoModalCard" role="dialog" aria-modal="true">
+    <div class="modal-header-exp">
+      <div class="modal-header-info" id="modalExpHeaderInfo">
+        <!-- Insignia y título inyectados dinámicamente -->
+      </div>
+      <button class="close-btn-exp" onclick="closeComunicadoModal()" title="Cerrar (Esc)" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body-exp" id="modalExpBody">
+      <!-- Cuerpo completo -->
+    </div>
+    <div class="modal-footer-exp">
+      <div class="modal-meta-exp" id="modalExpMeta">
+        <!-- Destino y fecha -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app-container">
+  <!-- Menú Lateral Completo (Sidebar) con estilo unificado -->
+  <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+          <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 10px;">
+              <img src="/src/assets/logowipe.png" alt="ClickSense Logo" class="sidebar-logo" style="width: 32px; height: 32px; object-fit: contain;">
+              <span class="server-main-title">ClickSense</span>
+          </div>
+          <button class="sidebar-toggle-icon" id="sidebarToggleBtn" title="Colapsar menú">
+              <i class="fa-solid fa-bars"></i>
+          </button>
+      </div>
+
+      <nav class="sidebar-nav">
+          <div class="nav-category">General</div>
+          <a href="/home.html" class="nav-item"><i class="fa-solid fa-house"></i> <span>Home</span></a>
+          <a href="/equipo.html" class="nav-item"><i class="fa-solid fa-users"></i> <span>Equipo</span></a>
+          <a href="/calendario.html" class="nav-item"><i class="fa-solid fa-calendar-days"></i> <span>Calendario</span></a>
+          <a href="/comercios.html" class="nav-item"><i class="fa-solid fa-store"></i> <span>Comercios</span></a>
+          <a href="/postulaciones-ilegales.html" class="nav-item"><i class="fa-solid fa-skull"></i> <span>Postulaciones ilegales</span></a>
+
+          <div class="nav-category">Espacio de trabajo</div>
+          <a href="/grupos.html" class="nav-item"><i class="fa-solid fa-people-group"></i> <span>Grupos</span></a>
+          <a href="/documentos.html" class="nav-item"><i class="fa-solid fa-book"></i> <span>Documentos</span></a>
+          <a href="/whitelist.html" class="nav-item"><i class="fa-solid fa-clipboard-list"></i> <span>Whitelist</span></a>
+
+          <div class="nav-category">Mi Cuenta</div>
+          <a href="/perfil.html" class="nav-item"><i class="fa-solid fa-user"></i> <span>Mi Perfil</span></a>
+          <a href="/historias.html" class="nav-item"><i class="fa-solid fa-feather-pointed"></i> <span>Historias personaje</span></a>
+          <a href="/tickets.html" class="nav-item"><i class="fa-solid fa-ticket"></i> <span>Tickets</span></a>
+
+          <div class="nav-category">SASP</div>
+          <a href="/lspd-academia.html" class="nav-item active"><i class="fa-solid fa-shield-halved"></i> <span>Academia LSPD</span></a>
+          <a href="/lssd-academia.html" class="nav-item"><i class="fa-solid fa-star-badge"></i> <span>Academia LSSD</span></a>
+          <a href="/defcon.html" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i> <span>Defcon</span></a>
+          <a href="/codigo-penal.html" class="nav-item"><i class="fa-solid fa-scale-balanced"></i> <span>Código penal</span></a>
+          <a href="/organigrama.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> <span>Organigrama</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+          <div class="user-profile-mini" id="userProfileMini">
+              <div class="avatar-placeholder" id="userAvatarContainer">
+                  <span id="userAvatarFallback">?</span>
+              </div>
+              <div class="user-info">
+                  <span class="username" id="userNameDisplay">Usuario</span>
+                  <span class="user-handle" id="userHandleDisplay" style="font-size: 11px; color: var(--text-muted, #94a3b8); display: block;">@tag</span>
+              </div>
+          </div>
+      </div>
+  </aside>
+
+  <!-- Botón flotante para revelar el sidebar si está colapsado -->
+  <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+      <i class="fa-solid fa-chevron-right"></i>
+  </button>
+
+  <main class="main-content">
+    <header class="top-action-bar animate-fade-down">
+      <div class="breadcrumb">Academia de la LSPD</div>
+      <div class="top-buttons">
+        <!-- Botón de Soporte -->
+        <div class="support-dropdown-container" id="supportDropdownContainer">
+          <button class="top-btn highlight-btn" id="supportDropdownBtn">
+            <i class="fa-solid fa-circle-question"></i> Soporte
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Menú desplegable de Soporte (al abrirse se mueve al body para quedar por encima de todo) -->
+    <div class="support-dropdown-menu" id="supportDropdownMenu">
+        <!-- Sección Soporte -->
+        <div class="support-menu-section">
+            <div class="support-menu-title">Soporte</div>
+            <a href="/tickets.html" class="support-dropdown-item"><i class="fa-solid fa-ticket"></i> Crear un ticket</a>
+        </div>
+        <!-- Sección Apoyo -->
+        <div class="support-menu-section">
+            <div class="support-menu-title">Apoyo</div>
+            <a href="/sugerencias.html" class="support-dropdown-item"><i class="fa-solid fa-lightbulb"></i> Enviar una sugerencia</a>
+            <a href="/feedback.html" class="support-dropdown-item"><i class="fa-solid fa-comment-dots"></i> Dar tu feedback</a>
+            <a href="/perfil.html" class="support-dropdown-item"><i class="fa-solid fa-user"></i> Acceder al perfil</a>
+            <a href="/index.html" class="support-dropdown-item"><i class="fa-solid fa-house-chimney"></i> Acceder al panel principal</a>
+        </div>
+        <!-- Sección Información -->
+        <div class="support-menu-section">
+            <div class="support-menu-title">Información</div>
+            <a href="/normativa.html" class="support-dropdown-item"><i class="fa-solid fa-book"></i> Normativa general</a>
+            <a href="/pol-privacidad.html" class="support-dropdown-item"><i class="fa-solid fa-shield-halved"></i> Política de privacidad</a>
+            <a href="/terminos.html" class="support-dropdown-item"><i class="fa-solid fa-file-contract"></i> Términos y condiciones</a>
+        </div>
+    </div>
+
+    <!-- Hero Section LSPD -->
+    <div class="lspd-hero animate-fade-down delay-1">
+      <div>
+        <div class="lspd-hero-title">
+          <i class="fa-solid fa-shield-halved"></i> Academia y Tablón LSPD
+        </div>
+        <p>Centro de avisos oficiales, directrices de altos mandos y comunicados generales para el departamento.</p>
+      </div>
+      <div class="lspd-hero-stats">
+        <div class="stats-badge-pill" id="comunicadosCountBadge">
+          <i class="fa-solid fa-bullhorn"></i> <span id="countText">0 comunicados activos</span>
+        </div>
+        <!-- Solo se muestra cuando hay comunicados urgentes -->
+        <div class="stats-badge-pill is-urgent" id="urgentCountBadge" style="display: none;">
+          <i class="fa-solid fa-triangle-exclamation"></i> <span id="urgentCountText">0 urgentes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor del Feed de Comunicados -->
+    <div class="admin-card animate-fade-up delay-2">
+      <!-- Barra superior del tablón con título, botón de campanita, buscador y menú de filtro -->
+      <div class="tablon-header-bar">
+        <div class="tablon-title-area">
+          <i class="fa-solid fa-tower-broadcast" style="color: #3b82f6;"></i> Tablón de Comunicados Oficiales
+          <!-- Botón de campanita interactivo -->
+          <button class="notif-bell-btn" id="bellNotifBtn" title="Gestionar notificaciones de comunicados" onclick="toggleComunicadosNotification()">
+            <i class="fa-solid fa-bell"></i>
+          </button>
+        </div>
+        <div class="tablon-filters-area">
+          <!-- Buscador -->
+          <div class="custom-search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" class="custom-search-input" placeholder="Buscar por título..." aria-label="Buscar comunicados por título" oninput="filterComunicados()">
+          </div>
+          <!-- Botón y Menú Desplegable de Filtro -->
+          <div class="custom-dropdown-container" id="filterDropdownContainer">
+            <div class="filter-dropdown-btn" role="button" tabindex="0" onclick="toggleFilterDropdown(event)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleFilterDropdown(event); }">
+              <i class="fa-solid fa-filter"></i>
+              <span id="selectedFilterLabel">Filtrar</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="custom-dropdown-menu">
+              <div class="custom-dropdown-item active" data-cat="todos" onclick="selectCategory('todos', 'Filtrar')">
+                <i class="fa-solid fa-list-ul icon-todos"></i> Todos
+              </div>
+              <div class="custom-dropdown-item" data-cat="informativo" onclick="selectCategory('informativo', 'Informativo')">
+                <i class="fa-solid fa-circle icon-informativo"></i> Informativo
+              </div>
+              <div class="custom-dropdown-item" data-cat="importante" onclick="selectCategory('importante', 'Importante')">
+                <i class="fa-solid fa-circle icon-importante"></i> Importante
+              </div>
+              <div class="custom-dropdown-item" data-cat="urgente" onclick="selectCategory('urgente', 'Urgente')">
+                <i class="fa-solid fa-circle icon-urgente"></i> Urgente
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tablon-hint-row">
+        <p>Haz clic en cualquier tarjeta para ver el comunicado completo en detalle.</p>
+        <!-- "3 de 8 comunicados": solo aparece cuando hay una búsqueda o un filtro aplicado -->
+        <span class="tablon-result-info" id="resultInfo"></span>
+      </div>
+      
+      <div id="lspdComunicadosFeed" class="comunicados-feed">
+        <!-- Se cargará dinámicamente mediante JavaScript -->
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Scripts de sesión, menú lateral y notificaciones de campanita -->
+<script>
+async function loadDiscordSessionData() {
+    const storedUser = localStorage.getItem('discord_user');
+    const avatarContainer = document.getElementById('userAvatarContainer');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const userHandleDisplay = document.getElementById('userHandleDisplay');
+    if (!storedUser) return;
+    try {
+        const discordUser = JSON.parse(storedUser);
+        if (userNameDisplay) userNameDisplay.textContent = discordUser.displayName || discordUser.username || "Usuario";
+        if (userHandleDisplay) userHandleDisplay.textContent = "@" + (discordUser.username || "discord");
+        if (avatarContainer && discordUser.avatarUrl) {
+            avatarContainer.innerHTML = `<img src="${discordUser.avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    } catch (e) {
+        console.error("Error al cargar la sesión de Discord", e);
+    }
+}
+loadDiscordSessionData();
+
+// Control del menú lateral (Colapsar y Expandir)
+const toggleBtn = document.getElementById('sidebarToggleBtn');
+const revealBtn = document.getElementById('sidebarRevealBtn');
+const sidebar = document.getElementById('sidebar');
+if (toggleBtn && revealBtn && sidebar) {
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.add('collapsed');
+    });
+    revealBtn.addEventListener('click', () => {
+        sidebar.classList.remove('collapsed');
+    });
+}
+
+// Menú desplegable de Soporte: se coloca justo debajo del botón y se cierra al pulsar fuera
+const supportBtn = document.getElementById('supportDropdownBtn');
+const supportMenu = document.getElementById('supportDropdownMenu');
+
+if (supportBtn && supportMenu) {
+    supportBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = supportMenu.classList.contains('show');
+
+        // Si el filtro de prioridad está abierto, se cierra al abrir Soporte
+        document.getElementById('filterDropdownContainer')?.classList.remove('open');
+
+        if (!isOpen) {
+            if (supportMenu.parentElement !== document.body) {
+                document.body.appendChild(supportMenu);
+            }
+            const rect = supportBtn.getBoundingClientRect();
+            supportMenu.style.top = (rect.bottom + 8) + 'px';
+            supportMenu.style.right = (window.innerWidth - rect.right) + 'px';
+            supportMenu.classList.add('show');
+        } else {
+            supportMenu.classList.remove('show');
+        }
+    });
+
+    window.addEventListener('click', () => {
+        supportMenu.classList.remove('show');
+    });
+
+    window.addEventListener('resize', () => {
+        supportMenu.classList.remove('show');
+    });
+}
+
+// Lógica del botón de la campanita y notificaciones flotantes superiores
+let isSubscribedToComunicados = localStorage.getItem('lspd_comunicados_sub') === 'true';
+
+function updateBellUI() {
+    const bellBtn = document.getElementById('bellNotifBtn');
+    if (!bellBtn) return;
+    if (isSubscribedToComunicados) {
+        bellBtn.classList.add('active');
+        bellBtn.title = "Desvincularte de las notificaciones de comunicados";
+    } else {
+        bellBtn.classList.remove('active');
+        bellBtn.title = "Recibir notificaciones de comunicados";
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateBellUI();
+});
+
+let toastTimeout = null;
+
+function showTopToast(message, isSubscribing) {
+    const toast = document.getElementById('floatingToast');
+    const toastMsg = document.getElementById('toastMessage');
+    const toastIcon = document.getElementById('toastIcon');
+    if (!toast || !toastMsg || !toastIcon) return;
+
+    toastMsg.textContent = message;
+    toastIcon.className = isSubscribing ? "fa-solid fa-bell" : "fa-solid fa-bell-slash";
+    
+    toast.classList.add('show');
+    
+    if (toastTimeout) clearTimeout(toastTimeout);
+    
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 5500);
+}
+
+function toggleComunicadosNotification() {
+    isSubscribedToComunicados = !isSubscribedToComunicados;
+    localStorage.setItem('lspd_comunicados_sub', isSubscribedToComunicados);
+    updateBellUI();
+
+    if (isSubscribedToComunicados) {
+        showTopToast("Has activado las notificaciones en este apartado, podrás revisarlas desde el apartado Mi perfil.", true);
+    } else {
+        showTopToast("Te has desvinculado de las notificaciones en este apartado.", false);
+    }
+}
+
+// Lógica para abrir/cerrar el desplegable de filtros personalizado
+function toggleFilterDropdown(e) {
+    e.stopPropagation();
+    // Si el menú de Soporte está abierto, se cierra al abrir el filtro
+    if (supportMenu) supportMenu.classList.remove('show');
+    document.getElementById('filterDropdownContainer').classList.toggle('open');
+}
+
+window.addEventListener('click', () => {
+    const container = document.getElementById('filterDropdownContainer');
+    if (container) container.classList.remove('open');
+});
+
+let currentCategoryValue = 'todos';
+function selectCategory(categoryKey, labelText) {
+    currentCategoryValue = categoryKey;
+    document.getElementById('selectedFilterLabel').textContent = labelText;
+    // Se marca como activa la opción elegida (por su data-cat, sin depender del evento del clic)
+    document.querySelectorAll('.custom-dropdown-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.cat === categoryKey);
+    });
+    filterComunicados();
+}
+
+// Quita la búsqueda y el filtro de prioridad (botón del estado "sin resultados")
+function resetComunicadosFilters() {
+    const searchInputEl = document.getElementById('searchInput');
+    if (searchInputEl) searchInputEl.value = '';
+    selectCategory('todos', 'Filtrar');
+}
+</script>
+
+<!-- Script para la recepción, renderizado, filtrado y modal interactivo de comunicados -->
+<script>
+let activeComunicadosList = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadLspdComunicados();
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'lspd_comunicados' || e.key === 'comunicados_database_admin') {
+            loadLspdComunicados();
+        }
+    });
+});
+
+// Clase de prioridad de un comunicado: 'informativo' (por defecto), 'importante' o 'urgente'
+function prioridadDe(c) {
+    const p = String((c && c.priority) || '').toLowerCase().trim();
+    return (p === 'importante' || p === 'urgente') ? p : 'informativo';
+}
+
+function loadLspdComunicados() {
+    const rawData = localStorage.getItem('lspd_comunicados') || localStorage.getItem('comunicados_database_admin');
+    let comunicados = [];
+    if (rawData) {
+        try {
+            comunicados = JSON.parse(rawData);
+        } catch (e) {
+            console.error("Error al parsear los comunicados:", e);
+        }
+    }
+    if (!Array.isArray(comunicados)) comunicados = [];
+    activeComunicadosList = comunicados.filter(c => c && (c.dest === 'Todas' || c.dest === 'LSPD' || c.dest === 'Lideres'));
+    filterComunicados();
+}
+
+function filterComunicados() {
+    const searchInputEl = document.getElementById('searchInput');
+    const searchText = searchInputEl ? searchInputEl.value.toLowerCase().trim() : '';
+    const countText = document.getElementById('countText');
+    const feedContainer = document.getElementById('lspdComunicadosFeed');
+    if (!feedContainer) return;
+
+    const filteredList = activeComunicadosList.filter(c => {
+        const matchesTitle = c.title ? String(c.title).toLowerCase().includes(searchText) : true;
+        const matchesCategory = currentCategoryValue === 'todos' || prioridadDe(c) === currentCategoryValue;
+        return matchesTitle && matchesCategory;
+    });
+
+    const total = activeComunicadosList.length;
+    if (countText) {
+        countText.textContent = `${total} comunicado${total === 1 ? '' : 's'} activo${total === 1 ? '' : 's'}`;
+    }
+
+    // Aviso de urgentes en la cabecera
+    const urgentes = activeComunicadosList.filter(c => prioridadDe(c) === 'urgente').length;
+    const urgentBadge = document.getElementById('urgentCountBadge');
+    if (urgentBadge) {
+        urgentBadge.style.display = urgentes > 0 ? 'flex' : 'none';
+        document.getElementById('urgentCountText').textContent = `${urgentes} urgente${urgentes === 1 ? '' : 's'}`;
+    }
+
+    // "3 de 8 comunicados" cuando hay búsqueda o filtro aplicado
+    const hayFiltro = searchText !== '' || currentCategoryValue !== 'todos';
+    const resultInfo = document.getElementById('resultInfo');
+    if (resultInfo) {
+        resultInfo.textContent = (hayFiltro && total > 0) ? `${filteredList.length} de ${total} comunicado${total === 1 ? '' : 's'}` : '';
+    }
+
+    if (filteredList.length === 0) {
+        // No es lo mismo que el tablón esté vacío que no encontrar nada con el filtro
+        feedContainer.innerHTML = total === 0
+            ? `
+            <div class="empty-feed">
+                <i class="fa-solid fa-inbox"></i>
+                <strong>El tablón está vacío</strong>
+                <p>Cuando los mandos publiquen un comunicado para la LSPD aparecerá aquí. Activa la campana para enterarte.</p>
+            </div>`
+            : `
+            <div class="empty-feed">
+                <i class="fa-solid fa-folder-open"></i>
+                <strong>Ningún comunicado coincide con la búsqueda</strong>
+                <p>Prueba con otro título o quita el filtro de prioridad.</p>
+                <button type="button" class="empty-feed-btn" onclick="resetComunicadosFilters()">Quitar filtros</button>
+            </div>`;
+        return;
+    }
+
+    let html = '';
+    filteredList.forEach((c) => {
+        const priorityClass = prioridadDe(c);
+        const realIndex = activeComunicadosList.indexOf(c);
+        html += `
+            <div class="comunicado-card prio-${priorityClass}" data-index="${realIndex}" tabindex="0">
+                <div class="comunicado-header">
+                    <span class="comunicado-title">${escapeHtml(c.title)}</span>
+                    <span class="priority-badge ${priorityClass}">${escapeHtml(c.priority || 'Informativo')}</span>
+                </div>
+                <div class="comunicado-body">${escapeHtml(c.body)}</div>
+                <div class="comunicado-footer">
+                    <span><i class="fa-regular fa-clock" style="margin-right: 4px;"></i> ${escapeHtml(c.date || 'Reciente')}</span>
+                    <span class="comunicado-read-more">Leer completo <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </div>`;
+    });
+    feedContainer.innerHTML = html;
+}
+
+// Abrir un comunicado con clic o con el teclado (delegación: sigue funcionando al volver a pintar la lista)
+const feedEl = document.getElementById('lspdComunicadosFeed');
+feedEl.addEventListener('click', (e) => {
+    const card = e.target.closest('.comunicado-card');
+    if (card) openComunicadoModal(Number(card.dataset.index));
+});
+feedEl.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('comunicado-card')) {
+        e.preventDefault();
+        openComunicadoModal(Number(e.target.dataset.index));
+    }
+});
+
+function openComunicadoModal(index) {
+    const c = activeComunicadosList[index];
+    if (!c) return;
+    const priorityClass = prioridadDe(c);
+
+    // El borde del modal toma el color de la prioridad
+    const card = document.getElementById('comunicadoModalCard');
+    card.classList.remove('prio-informativo', 'prio-importante', 'prio-urgente');
+    card.classList.add('prio-' + priorityClass);
+
+    document.getElementById('modalExpHeaderInfo').innerHTML = `
+        <span class="priority-badge ${priorityClass}">${escapeHtml(c.priority || 'Informativo')}</span>
+        <span class="modal-title-exp">${escapeHtml(c.title)}</span>`;
+    document.getElementById('modalExpBody').textContent = c.body == null ? '' : String(c.body);
+    document.getElementById('modalExpMeta').innerHTML = `
+        <span><i class="fa-solid fa-users"></i>Destino: <strong>${escapeHtml(c.dest)}</strong></span>
+        <span><i class="fa-regular fa-clock"></i>Emitido: <strong>${escapeHtml(c.date || 'Reciente')}</strong></span>`;
+    document.getElementById('modalExpBody').scrollTop = 0;
+    document.getElementById('comunicadoModal').classList.add('open');
+}
+
+function closeComunicadoModal() {
+    document.getElementById('comunicadoModal').classList.remove('open');
+}
+
+// Cerrar el comunicado pulsando fuera de él o con la tecla Esc
+document.getElementById('comunicadoModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeComunicadoModal();
+});
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    closeComunicadoModal();
+    document.getElementById('filterDropdownContainer')?.classList.remove('open');
+    if (supportMenu) supportMenu.classList.remove('show');
+});
+
+function escapeHtml(text) {
+    if (text === null || text === undefined || text === '') return '';
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+</script>
+
+<script src="/guards.js"></script>
+</body>
+</html>
