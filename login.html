@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inicio de sesión | ClickSense RP</title>
+<!-- Google Fonts & FontAwesome -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --bg-base: #06040c;
+    --card-bg: rgba(14, 10, 26, 0.96);
+    --border-color: rgba(236, 72, 153, 0.25);
+    --pink-accent: #ec4899;
+    --purple-accent: #a855f7;
+    --discord-blurple: #5865F2;
+    --discord-hover: #4752C4;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+@keyframes globalPageEntrance {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(6px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+body {
+    background-color: var(--bg-base);
+    background-image: 
+        radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+    animation: globalPageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tech-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 48px 48px;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.main-layout-wrapper {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    width: 100%;
+    max-width: 1100px;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 540px;
+}
+
+.login-card-main {
+    background: var(--card-bg);
+    border-radius: 36px;
+    padding: 45px 40px;
+    text-align: left;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 2px solid rgba(236, 72, 153, 0.2);
+    box-shadow: 0 35px 100px rgba(0, 0, 0, 0.85), 0 0 40px rgba(236, 72, 153, 0.1);
+    position: relative;
+    overflow: visible;
+    transition: border-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+.login-card-main.progress-1 {
+    border-color: rgba(236, 72, 153, 0.4);
+    box-shadow: 0 35px 100px rgba(0, 0, 0, 0.85), 0 0 25px rgba(236, 72, 153, 0.2);
+}
+.login-card-main.progress-2 {
+    border-color: rgba(168, 85, 247, 0.7);
+    box-shadow: 0 35px 100px rgba(0, 0, 0, 0.85), 0 0 35px rgba(168, 85, 247, 0.3);
+}
+.login-card-main.progress-3 {
+    border-color: #10b981;
+    box-shadow: 0 35px 100px rgba(0, 0, 0, 0.85), 0 0 45px rgba(168, 85, 247, 0.4);
+}
+
+.login-card-main::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pink-accent), var(--purple-accent), #10b981);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 0 20px var(--pink-accent);
+}
+
+.portal-badge-wrapper {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.portal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(236, 72, 153, 0.12);
+    border: 1px solid rgba(236, 72, 153, 0.3);
+    padding: 7px 18px;
+    border-radius: 30px;
+    color: #f472b6;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+p.subtitle {
+    color: #94a3b8;
+    font-size: 14.5px;
+    line-height: 1.5;
+    margin-bottom: 26px;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+}
+
+/* ===== Pasos: 1) botón de Discord  2) cargando  3) datos (solo la primera vez) ===== */
+.step { display: none; }
+.step.active { display: block; animation: stepIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes stepIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+.step-title {
+    font-size: 22px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+    line-height: 1.25;
+}
+.step-note {
+    margin-top: 16px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #64748b;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+}
+.step-note a { color: #c084fc; text-decoration: none; }
+.step-note a:hover { text-decoration: underline; }
+
+.form-error {
+    display: none;
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+    font-size: 12.5px;
+    line-height: 1.5;
+    font-family: 'Inter', sans-serif;
+}
+.form-error.show { display: block; animation: stepIn 0.35s ease both; }
+
+/* Cargando */
+.loading-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+    padding: 26px 0 16px;
+}
+.loading-logo {
+    position: relative;
+    width: 128px;
+    height: 128px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+.loading-logo img { width: 76px; height: 76px; object-fit: contain; animation: loadPulse 1.2s ease-in-out infinite; }
+.loading-logo::before, .loading-logo::after { content: ''; position: absolute; border-radius: 50%; }
+.loading-logo::before { inset: 0; border: 3px solid rgba(168, 85, 247, 0.15); border-top-color: var(--purple-accent); border-right-color: var(--pink-accent); animation: loadSpin 1s linear infinite; }
+.loading-logo::after { inset: 12px; border: 2px dashed rgba(236, 72, 153, 0.35); animation: loadSpin 3s linear infinite reverse; }
+@keyframes loadSpin { to { transform: rotate(360deg); } }
+@keyframes loadPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+.loading-box h2 { font-size: 20px; font-weight: 800; }
+.loading-box p { color: #94a3b8; font-size: 13.5px; font-family: 'Inter', sans-serif; }
+.loading-bar { width: min(300px, 85%); height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.07); overflow: hidden; margin-top: 8px; }
+.loading-bar span { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--pink-accent), var(--purple-accent)); }
+.loading-bar.run span { animation: loadFill 2.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+@keyframes loadFill { to { width: 100%; } }
+
+.form-group {
+    margin-bottom: 18px;
+    position: relative;
+}
+.form-group label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #f3f4f6;
+    margin-bottom: 6px;
+}
+.form-control {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #fff;
+    font-size: 13.5px;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.form-control:focus {
+    border-color: var(--pink-accent);
+    background: rgba(236, 72, 153, 0.05);
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.2);
+    transform: translateY(-1px);
+}
+
+.input-check-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-2px);
+    color: #10b981;
+    font-size: 15px;
+    display: none;
+    filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.5));
+    animation: fadeInCheck 0.3s ease forwards;
+    pointer-events: none;
+}
+@keyframes fadeInCheck {
+    from { opacity: 0; transform: translateY(-2px) scale(0.5); }
+    to { opacity: 1; transform: translateY(-2px) scale(1); }
+}
+
+/* Calendario Customizado */
+.custom-date-trigger {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.custom-calendar-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: #0c0716;
+    border: 1px solid rgba(236, 72, 153, 0.4);
+    border-radius: 20px;
+    width: 320px;
+    max-width: 100%;
+    padding: 20px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 30px rgba(168, 85, 247, 0.15);
+    z-index: 99999;
+    display: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    animation: calendarPop 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes calendarPop {
+    from { opacity: 0; transform: translateY(-12px) scale(0.95); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes fadeInMonth {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+}
+.cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+}
+.cal-header button {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.cal-header button:hover { background: var(--pink-accent); border-color: var(--pink-accent); transform: scale(1.05); }
+
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+    font-size: 13px;
+}
+.cal-day-name { color: #a855f7; font-weight: 700; padding-bottom: 8px; font-size: 12px; }
+.cal-day {
+    padding: 9px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #e2e8f0;
+    transition: all 0.2s ease;
+}
+.cal-day:hover { background: rgba(236, 72, 153, 0.25); color: #fff; transform: scale(1.05); }
+.cal-day.selected { background: var(--pink-accent); color: #fff; font-weight: 700; box-shadow: 0 0 15px rgba(236,72,153,0.5); }
+.cal-day.other-month { color: #475569; }
+
+.cal-footer-selectors {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 16px;
+}
+.cal-footer-selectors select {
+    flex: 1;
+    background: linear-gradient(135deg, #140d24 0%, #1c1233 100%);
+    border: 1px solid rgba(236, 72, 153, 0.35);
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+.cal-footer-selectors select:hover {
+    border-color: var(--pink-accent);
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.2), inset 0 2px 5px rgba(0,0,0,0.5);
+}
+.cal-footer-selectors select::-webkit-scrollbar {
+    width: 6px;
+}
+.cal-footer-selectors select::-webkit-scrollbar-track {
+    background: #0c0716;
+    border-radius: 10px;
+}
+.cal-footer-selectors select::-webkit-scrollbar-thumb {
+    background: var(--pink-accent);
+    border-radius: 10px;
+}
+
+/* Buscador de países con scrollbar lateral estilizado y animado */
+.custom-select-container {
+    position: relative;
+}
+.country-dropdown-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #100b1c;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.country-dropdown-list::-webkit-scrollbar {
+    width: 6px;
+}
+.country-dropdown-list::-webkit-scrollbar-track {
+    background: rgba(16, 11, 28, 0.9);
+    border-radius: 10px;
+}
+.country-dropdown-list::-webkit-scrollbar-thumb {
+    background: rgba(236, 72, 153, 0.5);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+.country-dropdown-list::-webkit-scrollbar-thumb:hover {
+    background: var(--pink-accent);
+}
+
+.country-dropdown-list.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+.country-dropdown-list.hide {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+.country-option {
+    padding: 9px 14px;
+    font-size: 13.5px;
+    color: #e2e8f0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+.country-option:hover {
+    background: rgba(236, 72, 153, 0.2);
+    color: #fff;
+    padding-left: 18px;
+}
+
+/* Bandera de cada país dentro de un círculo */
+.flag-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #1c1233;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease;
+}
+.country-option:hover .flag-circle { transform: scale(1.12); }
+/* Bandera del país elegido, dentro del propio campo */
+.country-flag-selected {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-2px);
+    display: none;
+    pointer-events: none;
+    animation: fadeInCheck 0.3s ease forwards;
+}
+.custom-select-container.has-flag .country-flag-selected { display: block; }
+.custom-select-container.has-flag #regCountryInput { padding-left: 46px; }
+
+.form-hint {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Tarjeta de Privacidad */
+.privacy-card {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(236, 72, 153, 0.05));
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin: 20px 0;
+    text-align: center;
+}
+.privacy-title-important {
+    font-size: 13px;
+    font-weight: 800;
+    color: #e879f9;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    display: block;
+    text-shadow: 0 0 10px rgba(232, 121, 249, 0.4);
+}
+.privacy-card p {
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.5;
+    font-family: 'Inter', sans-serif;
+    text-align: left;
+}
+
+/* Botón Discord Dinámico */
+.discord-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 15px 24px;
+    background: rgba(88, 101, 242, 0.3);
+    color: rgba(255, 255, 255, 0.35);
+    text-decoration: none;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 14.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    pointer-events: none;
+    cursor: not-allowed;
+    transition: all 0.3s ease;
+}
+.discord-login-btn.disabled-locked {
+    cursor: not-allowed !important;
+}
+.discord-login-btn.active {
+    background: var(--discord-blurple);
+    color: #fff;
+    pointer-events: auto;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(88, 101, 242, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.discord-login-btn.active:hover {
+    background: var(--discord-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(88, 101, 242, 0.6);
+}
+.discord-login-btn.active:active { transform: translateY(0) scale(0.98); }
+/* Botón "Guardar y entrar" del formulario: mismo comportamiento, con los colores del servidor */
+.discord-login-btn.save-btn.active {
+    background: linear-gradient(135deg, var(--pink-accent), var(--purple-accent));
+    box-shadow: 0 10px 30px rgba(236, 72, 153, 0.35);
+}
+.discord-login-btn.save-btn.active:hover {
+    background: linear-gradient(135deg, var(--pink-accent), var(--purple-accent));
+    filter: brightness(1.1);
+    box-shadow: 0 15px 40px rgba(236, 72, 153, 0.5);
+}
+.discord-login-btn:focus-visible, .form-control:focus-visible { outline: 2px solid #c084fc; outline-offset: 2px; }
+
+.server-hero-img-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: floatImage 4s ease-in-out infinite;
+}
+@keyframes floatImage {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.server-hero-img-container img {
+    max-width: 360px;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(236, 72, 153, 0.25));
+}
+
+@media(max-width: 900px) {
+    .main-layout-wrapper { flex-direction: column; gap: 30px; }
+    .server-hero-img-container img { max-width: 260px; }
+    .login-card-main { padding: 36px 24px; border-radius: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    body, .step.active, .server-hero-img-container, .loading-logo img, .loading-logo::after { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="tech-grid-bg"></div>
+
+<div class="main-layout-wrapper">
+    <!-- Tarjeta a la izquierda -->
+    <div class="login-wrapper">
+        <div class="login-card-main" id="mainCardContainer">
+            <div class="portal-badge-wrapper">
+                <div class="portal-badge">
+                    SISTEMA DE INICIO DE SESIÓN
+                </div>
+            </div>
+
+            <!-- PASO 1: solo el botón de Discord -->
+            <div class="step active" id="stepLogin">
+                <h1 class="step-title">Bienvenido a ClickSense RP</h1>
+                <p class="subtitle">Accede de forma segura con tu cuenta de Discord.</p>
+
+                <p class="form-error" id="loginError" role="alert"></p>
+
+                <button type="button" id="discordBtn" class="discord-login-btn active" onclick="iniciarConDiscord()">
+                    <i class="fa-brands fa-discord" style="font-size: 18px;"></i> Iniciar sesión con Discord
+                </button>
+
+                <p class="step-note">Al continuar aceptas la <a href="/pol-privacidad.html">política de privacidad</a> y los <a href="/terminos.html">términos y condiciones</a>.</p>
+            </div>
+
+            <!-- PASO 2: cargando (2,4 s) mientras se comprueba la cuenta -->
+            <div class="step" id="stepLoading" aria-live="polite">
+                <div class="loading-box">
+                    <div class="loading-logo"><img src="https://i.imgur.com/ibt9508.png" alt=""></div>
+                    <h2>Comprobando tu cuenta</h2>
+                    <p>Estamos verificando tu sesión de Discord. Solo será un momento.</p>
+                    <div class="loading-bar" id="loadingBar"><span></span></div>
+                </div>
+            </div>
+
+            <!-- PASO 3: datos del perfil (solo la primera vez que se inicia sesión) -->
+            <div class="step" id="stepForm">
+                <h1 class="step-title" id="formTitle">Completa tu registro</h1>
+                <p class="subtitle">Es tu primera vez aquí. Adjunta estos tres datos para terminar; solo te los pediremos una vez.</p>
+
+                <form id="registrationForm" onsubmit="guardarDatos(event)" novalidate>
+                    <div class="form-group" style="height: 74px;">
+                        <label for="regSteam">Perfil de Steam</label>
+                        <input type="url" id="regSteam" class="form-control" placeholder="https://steamcommunity.com/id/tuperfil" oninput="validateForm()" required>
+                        <i class="fa-solid fa-circle-check input-check-icon" id="checkSteam"></i>
+                        <span class="form-hint">Enlace válido de tu perfil público de Steam.</span>
+                    </div>
+
+                    <!-- Calendario -->
+                    <div class="form-group" style="position: relative; height: 74px;">
+                        <label>Fecha de nacimiento</label>
+                        <div class="form-control custom-date-trigger" id="dateTrigger" onclick="toggleCalendar(event)" role="button" tabindex="0">
+                            <span id="dateTriggerText" style="color: #94a3b8;">Seleccione su fecha de nacimiento</span>
+                        </div>
+                        <input type="hidden" id="regBirthVal" onchange="validateForm()">
+                        <i class="fa-solid fa-circle-check input-check-icon" id="checkBirth" style="right: 18px;"></i>
+
+                        <!-- Popup del Calendario -->
+                        <div class="custom-calendar-popup" id="customCalendarPopup" onclick="event.stopPropagation()">
+                            <div class="cal-header">
+                                <button type="button" onclick="changeMonth(-1)" aria-label="Mes anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                                <span id="calMonthYearLabel" style="text-transform: capitalize;">Septiembre 2009</span>
+                                <button type="button" onclick="changeMonth(1)" aria-label="Mes siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                            <div class="cal-grid">
+                                <div class="cal-day-name">Lu</div><div class="cal-day-name">Ma</div><div class="cal-day-name">Mi</div>
+                                <div class="cal-day-name">Ju</div><div class="cal-day-name">Vi</div><div class="cal-day-name">Sá</div><div class="cal-day-name">Do</div>
+                            </div>
+                            <div class="cal-grid" id="calDaysGridContainer" style="animation: fadeInMonth 0.3s ease;"></div>
+                            <div class="cal-footer-selectors">
+                                <select id="calMonthSelect" onchange="onMonthOrYearSelectChange()" aria-label="Mes">
+                                    <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+                                    <option value="3">Abril</option><option value="4">Mayo</option><option value="5">Junio</option>
+                                    <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+                                    <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
+                                </select>
+                                <select id="calYearSelect" onchange="onMonthOrYearSelectChange()" aria-label="Año">
+                                    <!-- Generado de 1950 a 2009 -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nacionalidad -->
+                    <div class="form-group custom-select-container" id="countryContainer" style="height: 74px;">
+                        <label for="regCountryInput">Nacionalidad</label>
+                        <img class="flag-circle country-flag-selected" id="countryFlagSelected" src="" alt="">
+                        <input type="text" id="regCountryInput" class="form-control" placeholder="Escribe o selecciona tu país..." autocomplete="off" onfocus="toggleCountryList(true)" oninput="filterCountries()" required>
+                        <input type="hidden" id="regCountryVal" onchange="validateForm()">
+                        <i class="fa-solid fa-circle-check input-check-icon" id="checkCountry"></i>
+                        
+                        <!-- Las opciones (con su bandera en un círculo) se generan desde la lista PAISES del script -->
+                        <div class="country-dropdown-list" id="countryDropdownList"></div>
+                    </div>
+
+                    <!-- Tarjeta de Privacidad -->
+                    <div class="privacy-card">
+                        <span class="privacy-title-important">IMPORTANTE</span>
+                        <p>La información adjuntada en este apartado es totalmente confidencial. No es visible para el resto de usuarios ni para los miembros del staff general, estando restringida exclusivamente para el dueño del servidor y tu propia cuenta.</p>
+                    </div>
+
+                    <p class="form-error" id="formError" role="alert"></p>
+
+                    <!-- Botón para guardar y entrar -->
+                    <button type="submit" id="saveBtn" class="discord-login-btn save-btn disabled-locked">
+                        <i class="fa-solid fa-right-to-bracket" style="font-size: 16px;"></i> <span id="saveBtnText">Guardar y entrar</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Imagen grande del servidor a la derecha -->
+    <div class="server-hero-img-container">
+        <img src="https://i.imgur.com/pu4qqYe.png" alt="Server Illustration">
+    </div>
+</div>
+
+<script>
+/* =====================================================================
+   FLUJO DE INICIO DE SESIÓN
+   1) Solo el botón de Discord.
+   2) Al volver de Discord (el servidor redirige a /login.html?auth=1) se
+      muestra la animación de carga durante 2,4 s y se consulta el perfil.
+   3) Si la cuenta ya tiene Steam, nacionalidad y fecha de nacimiento
+      -> /home.html. Si no (primera vez) -> se piden esos tres datos.
+   ===================================================================== */
+const DISCORD_OAUTH_URL = "https://discord.com/api/oauth2/authorize?client_id=1541119489758859315&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fauth%2Fdiscord%2Fcallback&response_type=code&scope=identify%20guilds";
+const TIEMPO_CARGA = 2400;   // milisegundos de la animación de carga
+
+// Países y su bandera (cada bandera se muestra dentro de un círculo)
+const PAISES = [
+    { nombre: 'España',         bandera: 'https://i.imgur.com/Jw13ot8.png' },
+    { nombre: 'Francia',        bandera: 'https://i.imgur.com/Uwe9xFa.png' },
+    { nombre: 'Alemania',       bandera: 'https://i.imgur.com/ZBfgFF7.png' },
+    { nombre: 'Italia',         bandera: 'https://i.imgur.com/E5pBR65.png' },
+    { nombre: 'Reino Unido',    bandera: 'https://i.imgur.com/2B7I9vK.png' },
+    { nombre: 'Portugal',       bandera: 'https://i.imgur.com/ClhpoAo.png' },
+    { nombre: 'Países Bajos',   bandera: 'https://i.imgur.com/vUiCBKO.png' },
+    { nombre: 'Suecia',         bandera: 'https://i.imgur.com/fEHcqEP.png' },
+    { nombre: 'México',         bandera: 'https://i.imgur.com/X9bLW3d.png' },
+    { nombre: 'Argentina',      bandera: 'https://i.imgur.com/tbDQ6Xt.png' },
+    { nombre: 'Colombia',       bandera: 'https://i.imgur.com/1bMmbLG.png' },
+    { nombre: 'Chile',          bandera: 'https://i.imgur.com/KaYpiHt.png' },
+    { nombre: 'Perú',           bandera: 'https://i.imgur.com/fsdurER.png' },
+    { nombre: 'Estados Unidos', bandera: 'https://i.imgur.com/EDuJ15t.png' },
+    { nombre: 'Uruguay',        bandera: 'https://i.imgur.com/eeLAbXj.png' },
+    { nombre: 'Venezuela',      bandera: 'https://i.imgur.com/eXwoXgM.png' }
+];
+
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+const sinTildes = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+function mostrarPaso(id) {
+    document.querySelectorAll('.step').forEach(s => s.classList.toggle('active', s.id === id));
+    if (id !== 'stepForm') document.getElementById('mainCardContainer').className = 'login-card-main';
+    if (id === 'stepLoading') {
+        const barra = document.getElementById('loadingBar');
+        barra.classList.remove('run');
+        void barra.offsetWidth;          // reinicia la animación de la barra
+        barra.classList.add('run');
+    }
+}
+
+function mostrarError(idElemento, texto) {
+    const el = document.getElementById(idElemento);
+    el.textContent = texto || '';
+    el.classList.toggle('show', !!texto);
+}
+
+/* ---------- Paso 1: Discord ---------- */
+function iniciarConDiscord() {
+    const btn = document.getElementById('discordBtn');
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" style="font-size: 16px;"></i> Conectando con Discord...';
+    window.location.href = DISCORD_OAUTH_URL;
+}
+
+/* ---------- Paso 2: comprobar la cuenta ---------- */
+// conAnimacion = true al volver de Discord: la carga dura como mínimo 2,4 s
+async function comprobarCuenta(conAnimacion) {
+    mostrarPaso('stepLoading');
+
+    let res = null;
+    try {
+        const resultados = await Promise.all([
+            fetch('/api/user-profile-data', { cache: 'no-store', credentials: 'same-origin' }),
+            conAnimacion ? esperar(TIEMPO_CARGA) : Promise.resolve()
+        ]);
+        res = resultados[0];
+    } catch (e) {
+        if (conAnimacion) await esperar(0);
+        mostrarPaso('stepLogin');
+        if (conAnimacion) mostrarError('loginError', 'No se ha podido conectar con el servidor. Inténtalo de nuevo.');
+        return;
+    }
+
+    if (res.status === 401) {            // no hay sesión
+        mostrarPaso('stepLogin');
+        if (conAnimacion) mostrarError('loginError', 'No se ha podido iniciar sesión con Discord. Inténtalo de nuevo.');
+        return;
+    }
+    if (!res.ok) {
+        mostrarPaso('stepLogin');
+        if (conAnimacion) mostrarError('loginError', 'El servidor ha respondido con un error (' + res.status + '). Inténtalo de nuevo.');
+        return;
+    }
+
+    let datos = null;
+    try { datos = await res.json(); } catch (e) {}
+    const completo = !!(datos && datos.steam && datos.country && datos.birth);
+
+    if (completo) {
+        window.location.replace('/home.html');   // ya registrado: directo a Home
+        return;
+    }
+
+    // Primera vez: se piden los tres datos
+    try {
+        const u = JSON.parse(localStorage.getItem('discord_user') || '{}') || {};
+        const nombre = u.displayName || u.username;
+        if (nombre) document.getElementById('formTitle').textContent = 'Hola, ' + nombre;
+    } catch (e) {}
+    mostrarPaso('stepForm');
+    validateForm();
+}
+
+/* ---------- Paso 3: calendario ---------- */
+let currentCalDate = new Date(2009, 0, 1);
+let selectedDateObj = null;
+
+function toggleCalendar(e) {
+    e.stopPropagation();
+    const popup = document.getElementById('customCalendarPopup');
+    popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    if(popup.style.display === 'block') {
+        toggleCountryList(false);
+        initCalendarSelectors();
+        renderCalendarGrid();
+    }
+}
+document.getElementById('dateTrigger').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCalendar(e); }
+});
+
+function initCalendarSelectors() {
+    const monthSel = document.getElementById('calMonthSelect');
+    monthSel.value = currentCalDate.getMonth();
+
+    const yearSel = document.getElementById('calYearSelect');
+    yearSel.innerHTML = '';
+    for(let y = 1950; y <= 2009; y++) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        if(y === currentCalDate.getFullYear()) opt.selected = true;
+        yearSel.appendChild(opt);
+    }
+}
+
+function renderCalendarGrid() {
+    const grid = document.getElementById('calDaysGridContainer');
+    grid.style.animation = 'none';
+    grid.offsetHeight; 
+    grid.style.animation = 'fadeInMonth 0.3s ease';
+
+    grid.innerHTML = '';
+    const year = currentCalDate.getFullYear();
+    const month = currentCalDate.getMonth();
+
+    const monthNames = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+    document.getElementById('calMonthYearLabel').textContent = `${monthNames[month]} ${year}`;
+
+    document.getElementById('calMonthSelect').value = month;
+    document.getElementById('calYearSelect').value = year;
+
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    let startIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const prevTotalDays = new Date(year, month, 0).getDate();
+
+    for(let i = startIndex - 1; i >= 0; i--) {
+        const dayNum = prevTotalDays - i;
+        const cell = document.createElement('div');
+        cell.className = 'cal-day other-month';
+        cell.textContent = dayNum;
+        grid.appendChild(cell);
+    }
+
+    for(let i = 1; i <= totalDays; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cal-day';
+        cell.textContent = i;
+
+        if(selectedDateObj && selectedDateObj.getFullYear() === year && selectedDateObj.getMonth() === month && selectedDateObj.getDate() === i) {
+            cell.classList.add('selected');
+        }
+
+        cell.onclick = () => {
+            selectedDateObj = new Date(year, month, i);
+            const formattedDate = `${String(i).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+            document.getElementById('dateTriggerText').textContent = formattedDate;
+            document.getElementById('dateTriggerText').style.color = '#fff';
+            document.getElementById('regBirthVal').value = formattedDate;
+            document.getElementById('customCalendarPopup').style.display = 'none';
+            validateForm();
+        };
+        grid.appendChild(cell);
+    }
+
+    const totalCells = startIndex + totalDays;
+    const nextDaysCount = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+    for(let i = 1; i <= nextDaysCount; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cal-day other-month';
+        cell.textContent = i;
+        grid.appendChild(cell);
+    }
+}
+
+function changeMonth(direction) {
+    let newMonth = currentCalDate.getMonth() + direction;
+    let newYear = currentCalDate.getFullYear();
+
+    if(newMonth > 11) { newMonth = 0; newYear++; }
+    if(newMonth < 0) { newMonth = 11; newYear--; }
+
+    if(newYear <= 2009 && newYear >= 1950) {
+        currentCalDate = new Date(newYear, newMonth, 1);
+        renderCalendarGrid();
+    }
+}
+
+function onMonthOrYearSelectChange() {
+    const m = parseInt(document.getElementById('calMonthSelect').value);
+    const y = parseInt(document.getElementById('calYearSelect').value);
+    currentCalDate = new Date(y, m, 1);
+    renderCalendarGrid();
+}
+
+window.addEventListener('click', () => {
+    const popup = document.getElementById('customCalendarPopup');
+    if(popup) popup.style.display = 'none';
+});
+
+/* ---------- Paso 3: nacionalidad (banderas en círculo) ---------- */
+function pintarPaises() {
+    const list = document.getElementById('countryDropdownList');
+    list.innerHTML = '';
+    PAISES.forEach(p => {
+        const opt = document.createElement('div');
+        opt.className = 'country-option';
+        opt.dataset.nombre = p.nombre;
+
+        const img = document.createElement('img');
+        img.className = 'flag-circle';
+        img.src = p.bandera;
+        img.alt = '';
+        img.loading = 'lazy';
+
+        const txt = document.createElement('span');
+        txt.textContent = p.nombre;
+
+        opt.appendChild(img);
+        opt.appendChild(txt);
+        opt.addEventListener('click', () => selectCountry(p.nombre));
+        list.appendChild(opt);
+    });
+}
+
+function toggleCountryList(show) {
+    const list = document.getElementById('countryDropdownList');
+    if (show) {
+        list.classList.remove('hide');
+        list.classList.add('show');
+    } else {
+        list.classList.remove('show');
+        list.classList.add('hide');
+    }
+}
+
+function selectCountry(countryName) {
+    const pais = PAISES.find(p => p.nombre === countryName);
+    if (!pais) return;
+    document.getElementById('regCountryInput').value = pais.nombre;
+    document.getElementById('regCountryVal').value = pais.nombre;
+    document.getElementById('countryFlagSelected').src = pais.bandera;
+    document.getElementById('countryContainer').classList.add('has-flag');
+    toggleCountryList(false);
+    validateForm();
+}
+
+function filterCountries() {
+    const query = sinTildes(document.getElementById('regCountryInput').value.trim());
+    const list = document.getElementById('countryDropdownList');
+    const options = list.querySelectorAll('.country-option');
+    let matches = 0;
+
+    options.forEach(opt => {
+        if (sinTildes(opt.dataset.nombre).includes(query)) {
+            opt.style.display = 'flex';
+            matches++;
+        } else {
+            opt.style.display = 'none';
+        }
+    });
+
+    toggleCountryList(matches > 0);
+
+    // Al escribir se anula la selección hasta que se elija un país de la lista
+    document.getElementById('regCountryVal').value = '';
+    document.getElementById('countryContainer').classList.remove('has-flag');
+
+    // Si lo escrito coincide exactamente con un país, se selecciona solo
+    const exacto = PAISES.find(p => sinTildes(p.nombre) === query);
+    if (exacto) { selectCountry(exacto.nombre); return; }
+    validateForm();
+}
+
+window.addEventListener('click', (e) => {
+    if (!e.target.closest('.custom-select-container')) {
+        toggleCountryList(false);
+    }
+});
+
+/* ---------- Paso 3: validación y guardado ---------- */
+const STEAM_REGEX = /^https?:\/\/(www\.)?steamcommunity\.com\/(id\/[a-zA-Z0-9_-]+|profiles\/\d+)(\/)?$/;
+
+function validateForm() {
+    const steamInput = document.getElementById('regSteam').value.trim();
+    const birth = document.getElementById('regBirthVal').value;
+    const country = document.getElementById('regCountryVal').value;
+    const saveBtn = document.getElementById('saveBtn');
+    const mainCard = document.getElementById('mainCardContainer');
+
+    const isSteamValid = STEAM_REGEX.test(steamInput);
+
+    let completedCount = 0;
+
+    if (isSteamValid) {
+        document.getElementById('checkSteam').style.display = 'block';
+        completedCount++;
+    } else {
+        document.getElementById('checkSteam').style.display = 'none';
+    }
+
+    if (birth !== '') {
+        document.getElementById('checkBirth').style.display = 'block';
+        completedCount++;
+    } else {
+        document.getElementById('checkBirth').style.display = 'none';
+    }
+
+    if (country !== '') {
+        document.getElementById('checkCountry').style.display = 'block';
+        completedCount++;
+    } else {
+        document.getElementById('checkCountry').style.display = 'none';
+    }
+
+    mainCard.className = 'login-card-main';
+    if (completedCount === 1) mainCard.classList.add('progress-1');
+    else if (completedCount === 2) mainCard.classList.add('progress-2');
+    else if (completedCount === 3) mainCard.classList.add('progress-3');
+
+    if (completedCount === 3) {
+        saveBtn.classList.add('active');
+        saveBtn.classList.remove('disabled-locked');
+    } else {
+        saveBtn.classList.remove('active');
+        saveBtn.classList.add('disabled-locked');
+    }
+    return completedCount === 3;
+}
+
+// Guarda los tres datos en la cuenta de Discord con la que se ha iniciado sesión y entra a Home
+let guardando = false;
+async function guardarDatos(event) {
+    event.preventDefault();
+    if (guardando || !validateForm()) return;
+
+    const steam = document.getElementById('regSteam').value.trim();
+    const birth = document.getElementById('regBirthVal').value;
+    const country = document.getElementById('regCountryVal').value;
+
+    const saveBtn = document.getElementById('saveBtn');
+    const saveText = document.getElementById('saveBtnText');
+    guardando = true;
+    mostrarError('formError', '');
+    saveText.textContent = 'Guardando...';
+    saveBtn.style.pointerEvents = 'none';
+
+    try {
+        const r = await fetch('/api/user-profile-data', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ steam, birth, country })
+        });
+
+        let cuerpo = null;
+        try { cuerpo = await r.json(); } catch (e) {}
+
+        if (r.status === 401 || (r.ok && cuerpo && cuerpo.saved === false)) {
+            // La sesión se ha perdido: hay que volver a entrar con Discord
+            mostrarPaso('stepLogin');
+            mostrarError('loginError', 'Tu sesión ha caducado. Vuelve a iniciar sesión con Discord.');
+            return;
+        }
+        if (!r.ok) {
+            throw new Error((cuerpo && typeof cuerpo.detail === 'string') ? cuerpo.detail : 'El servidor ha respondido con un error (' + r.status + ').');
+        }
+
+        window.location.replace('/home.html');
+    } catch (e) {
+        mostrarError('formError', e.message === 'Failed to fetch' ? 'No se ha podido conectar con el servidor. Inténtalo de nuevo.' : (e.message || 'No se han podido guardar los datos.'));
+    } finally {
+        guardando = false;
+        saveText.textContent = 'Guardar y entrar';
+        saveBtn.style.pointerEvents = '';
+    }
+}
+
+/* ---------- Arranque ---------- */
+pintarPaises();
+
+(function () {
+    const params = new URLSearchParams(window.location.search);
+    const vieneDeDiscord = params.get('auth') === '1';
+    if (vieneDeDiscord) {
+        // Se limpia la dirección para que al recargar no se repita la animación
+        try { history.replaceState(null, '', window.location.pathname); } catch (e) {}
+        comprobarCuenta(true);
+    } else {
+        // Entrada normal: si ya había una sesión iniciada se comprueba sin esperar; si no, queda el botón de Discord
+        fetch('/api/auth/session', { cache: 'no-store', credentials: 'same-origin' })
+            .then(r => { if (r.ok) comprobarCuenta(false); })
+            .catch(() => {});
+    }
+})();
+</script>
+</body>
+</html>

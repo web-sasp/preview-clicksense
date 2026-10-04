@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Clandestina | ClickSense RP</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Share+Tech+Mono&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/src/assets/perfil.css">
+
+    <style>
+        /* ==========================================================
+           TEMA HACKER / CIBERSEGURIDAD CLANDESTINA (ILEGALES)
+           ================================================---------- */
+        :root {
+            --hacker-bg: #05080e;
+            --hacker-panel: #0a1118;
+            --hacker-border: rgba(16, 185, 129, 0.2);
+            --hacker-green: #10b981;
+            --hacker-glow: rgba(16, 185, 129, 0.25);
+            --hacker-danger: #ef4444;
+            --hacker-text: #e2e8f0;
+            --hacker-muted: #64748b;
+        }
+
+        body {
+            background-color: var(--hacker-bg) !important;
+            color: var(--hacker-text) !important;
+            font-family: 'Inter', sans-serif !important;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Efecto de líneas de escaneo de monitor antiguo (Scanlines) */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 99999;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Sidebar Hacker */
+        #sidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            background: var(--hacker-panel) !important;
+            border-right: 1px solid var(--hacker-border) !important;
+        }
+        .sidebar .server-main-title {
+            color: var(--hacker-green);
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 1px;
+        }
+        .sidebar-category-header {
+            color: var(--hacker-muted);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+        }
+        .sidebar-category-header:hover {
+            color: var(--hacker-green);
+            background: rgba(16, 185, 129, 0.05);
+        }
+        .sidebar-nav a {
+            color: var(--hacker-muted);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+        }
+        .sidebar-nav a:hover {
+            color: var(--hacker-green);
+            background: rgba(16, 185, 129, 0.08);
+        }
+        .sidebar-nav a.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--hacker-green);
+            border-left: 2px solid var(--hacker-green);
+        }
+
+        /* Animación Glitch para Títulos */
+        .glitch-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 10px var(--hacker-glow);
+            position: relative;
+            animation: textFlicker 3s infinite;
+        }
+        @keyframes textFlicker {
+            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+                opacity: 0.99;
+                text-shadow: 0 0 10px var(--hacker-green), 0 0 20px rgba(16,185,129,0.4);
+            }
+            20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+                opacity: 0.4;
+                text-shadow: none;
+            }
+        }
+
+        /* Contenedor Terminal Hero */
+        .terminal-hero {
+            background: var(--hacker-panel);
+            border: 1px solid var(--hacker-border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(16, 185, 129, 0.05);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .terminal-hero::before {
+            content: "SECURE_CONNECTION // ENCRYPTED_TUNNEL";
+            position: absolute;
+            top: 8px;
+            right: 16px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--hacker-green);
+            opacity: 0.6;
+            letter-spacing: 1px;
+        }
+
+        /* Consola de Comandos Interactiva */
+        .console-box {
+            background: #020408;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--hacker-green);
+            min-height: 150px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.9);
+        }
+        .console-input-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            border-top: 1px dashed rgba(16, 185, 129, 0.2);
+            padding-top: 10px;
+        }
+        .console-input-line input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            flex: 1;
+        }
+
+        /* Grid de Canales Infiltrados */
+        .channels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .channel-card {
+            background: var(--hacker-panel);
+            border: 1px solid var(--hacker-border);
+            border-radius: 10px;
+            padding: 18px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .channel-card:hover {
+            border-color: var(--hacker-green);
+            box-shadow: 0 0 15px var(--hacker-glow);
+            transform: translateY(-2px);
+        }
+        .channel-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 12px;
+            filter: grayscale(40%) contrast(120%);
+            transition: filter 0.3s;
+        }
+        .channel-card:hover img {
+            filter: grayscale(0%) contrast(100%);
+        }
+        .channel-status {
+            display: inline-block;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--hacker-green);
+            margin-bottom: 8px;
+        }
+        .channel-status.danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--hacker-danger);
+        }
+
+        /* Buscador superior */
+        .sidebar-top-actions-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--hacker-border);
+            border-radius: 8px;
+            padding: 4px;
+        }
+        .sidebar-action-icon-btn {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid var(--hacker-border);
+            color: var(--hacker-green);
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .sidebar-action-icon-btn:hover {
+            background: var(--hacker-green);
+            color: #000;
+        }
+
+        /* Modal Spotlight */
+        .spotlight-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 4, 8, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 100000;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 12vh;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        .spotlight-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .spotlight-modal-card {
+            background: var(--hacker-panel);
+            border: 1px solid var(--hacker-green);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 580px;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+            overflow: hidden;
+        }
+        .spotlight-search-bar {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--hacker-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .spotlight-search-bar i { color: var(--hacker-green); }
+        .spotlight-search-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .spotlight-modal-body {
+            padding: 14px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .spotlight-section-heading {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--hacker-muted);
+            letter-spacing: 1px;
+            padding: 6px 10px;
+        }
+        .spotlight-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            transition: background 0.15s;
+        }
+        .spotlight-item:hover {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--hacker-green);
+        }
+        .spotlight-item i { color: var(--hacker-green); width: 16px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- MENÚ LATERAL HACKER -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-logo-title" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-terminal" style="color: var(--hacker-green);"></i>
+                    <span class="server-main-title">CLICK_SYS // 04</span>
+                </div>
+                <div class="sidebar-top-actions-box">
+                    <button class="sidebar-action-icon-btn" id="openQuickNavBtn" title="Filtro de canales">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    <button class="sidebar-action-icon-btn" id="sidebarToggleBtn" title="Colapsar menú">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav" id="sidebarNavContainer">
+                <div class="sidebar-category-group" data-category="general">
+                    <div class="sidebar-category-header" onclick="toggleSidebarCategory('general')">
+                        <span>GENERAL</span>
+                        <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                    </div>
+                    <div class="sidebar-category-content" id="cat-content-general">
+                        <a href="/home.html"><i class="fa-solid fa-house"></i> Inicio</a>
+                        <a href="/servidor.html"><i class="fa-solid fa-server"></i> Servidor</a>
+                        <a href="/equipo.html"><i class="fa-solid fa-users"></i> Equipo</a>
+                        <a href="/calendario.html"><i class="fa-solid fa-calendar-days"></i> Calendario</a>
+                        <a href="/sugerencias.html"><i class="fa-solid fa-lightbulb"></i> Sugerencias</a>
+                        <a href="/comercios.html"><i class="fa-solid fa-store"></i> Comercios</a>
+                    </div>
+                </div>
+
+                <div class="sidebar-category-group" data-category="postulaciones">
+                    <div class="sidebar-category-header" onclick="toggleSidebarCategory('postulaciones')">
+                        <span>POSTULACIONES</span>
+                        <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                    </div>
+                    <div class="sidebar-category-content" id="cat-content-postulaciones">
+                        <a href="/postulaciones-ilegales.html" class="active"><i class="fa-solid fa-skull"></i> Postulaciones ilegales</a>
+                        <a href="/postulaciones-playmaker.html"><i class="fa-solid fa-trophy"></i> Postulaciones playmaker</a>
+                        <a href="/postulaciones-staff.html"><i class="fa-solid fa-user-gear"></i> Postulaciones staff</a>
+                    </div>
+                </div>
+
+                <div class="sidebar-category-group" data-category="mi-cuenta">
+                    <div class="sidebar-category-header" onclick="toggleSidebarCategory('mi-cuenta')">
+                        <span>MI CUENTA</span>
+                        <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                    </div>
+                    <div class="sidebar-category-content" id="cat-content-mi-cuenta">
+                        <a href="/home.html#perfil"><i class="fa-solid fa-user"></i> Mi perfil</a>
+                        <a href="/tickets.html"><i class="fa-solid fa-ticket"></i> Tickets</a>
+                    </div>
+                </div>
+
+                <div class="sidebar-category-group" data-category="sajd">
+                    <div class="sidebar-category-header" onclick="toggleSidebarCategory('sajd')">
+                        <span>SAJD</span>
+                        <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                    </div>
+                    <div class="sidebar-category-content" id="cat-content-sajd">
+                        <a href="/decretos.html"><i class="fa-solid fa-file-lines"></i> Decretos</a>
+                        <a href="/comunicados.html"><i class="fa-solid fa-bullhorn"></i> Comunicados</a>
+                    </div>
+                </div>
+
+                <div class="sidebar-category-group" data-category="sasp">
+                    <div class="sidebar-category-header" onclick="toggleSidebarCategory('sasp')">
+                        <span>SASP</span>
+                        <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                    </div>
+                    <div class="sidebar-category-content" id="cat-content-sasp">
+                        <a href="/lspd.html"><i class="fa-solid fa-shield-halved"></i> LSPD</a>
+                        <a href="/lssd.html"><i class="fa-solid fa-shield"></i> LSSD</a>
+                        <a href="/defcon.html"><i class="fa-solid fa-triangle-exclamation"></i> Defcon</a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-mini" id="userProfileMini">
+                    <div class="avatar-placeholder" id="userAvatarContainer">
+                        <span id="userAvatarFallback">?</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="username" id="userNameDisplay">Hacker</span>
+                        <span class="user-handle" id="userHandleDisplay" style="font-size: 10px; color: var(--hacker-green); display: block;">@encrypted</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Botón flotante menú colapsado -->
+        <button class="sidebar-reveal-trigger" id="sidebarRevealBtn" title="Abrir menú">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            <header class="top-action-bar">
+                <div class="breadcrumb" style="font-family: 'Share Tech Mono', monospace; color: var(--hacker-green);">root@clicksense:~# ./run_underground_hub.sh</div>
+            </header>
+
+            <div class="terminal-hero">
+                <h1 class="glitch-title">POSTULACIONES ILEGALES // RED OCULTA</h1>
+                <p style="color: #94a3b8; font-family: 'Fira Code', monospace; font-size: 0.9rem; margin-top: 8px;">
+                    Canal de transmisión directa con facciones subterráneas. Toda interacción en este nodo está cifrada de extremo a extremo. Ingrese comandos o seleccione un canal operativo abajo.
+                </p>
+
+                <!-- Consola Interactiva -->
+                <div class="console-box" id="consoleOutput">
+                    > Conexión establecida con nodo central [CLICK_NET v4.2.1]...<br>
+                    > Escribe "help" para ver los comandos disponibles del sistema o "scan" para buscar vulnerabilidades.
+                </div>
+                <div class="console-input-line">
+                    <span style="color: var(--hacker-green); font-family: 'Fira Code', monospace;">root@system:~$</span>
+                    <input type="text" id="consoleInput" placeholder="Escribe un comando aquí..." onkeypress="handleConsoleCommand(event)">
+                </div>
+            </div>
+
+            <div style="font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; color: var(--hacker-green); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-satellite-dish"></i> CANALES DE INFILTRACIÓN ACTIVOS
+            </div>
+
+            <!-- Canales Clandestinos (Grid de imágenes) -->
+            <div class="channels-grid">
+                <div class="channel-card" onclick="alert('Accediendo al canal cifrado de Bandas del Este...')">
+                    <span class="channel-status">SECURE // 01</span>
+                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500&auto=format&fit=crop" alt="Bandas del Este">
+                    <h3 style="font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; margin-bottom: 6px; color: #fff;">Sindicato del Este</h3>
+                    <p style="font-size: 0.8rem; color: #94a3b8; font-family: 'Fira Code', monospace;">Operaciones de contrabando pesado y control de muelles.</p>
+                </div>
+
+                <div class="channel-card" onclick="alert('Iniciando handshake con Cartel Nocturno...')">
+                    <span class="channel-status danger">ALERTA // ROJO</span>
+                    <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=500&auto=format&fit=crop" alt="Cartel Nocturno">
+                    <h3 style="font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; margin-bottom: 6px; color: #fff;">Cartel Nocturno</h3>
+                    <p style="font-size: 0.8rem; color: #94a3b8; font-family: 'Fira Code', monospace;">Red de distribución de sustancias y seguridad privada ilegal.</p>
+                </div>
+
+                <div class="channel-card" onclick="alert('Abriendo expediente de Carreras Clandestinas...')">
+                    <span class="channel-status">SECURE // 03</span>
+                    <img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=500&auto=format&fit=crop" alt="Street Racing">
+                    <h3 style="font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; margin-bottom: 6px; color: #fff;">Midnight Syndicate</h3>
+                    <p style="font-size: 0.8rem; color: #94a3b8; font-family: 'Fira Code', monospace;">Apuestas ilegales, modificaciones vehiculares y carreras urbanas.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL SPOTLIGHT DE CANALES -->
+    <div class="spotlight-modal-overlay" id="spotlightModal">
+        <div class="spotlight-modal-card">
+            <div class="spotlight-search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="spotlightSearchInput" class="spotlight-search-input" placeholder="Buscar canal, comando o nodo..." onkeyup="filterSpotlightModal()">
+            </div>
+            <div class="spotlight-modal-body" id="spotlightModalBody">
+                <div class="spotlight-section-heading">CANALES Y NODOS DISPONIBLES</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funcionalidad de colapsar categorías del sidebar
+        function toggleSidebarCategory(categoryKey) {
+            const group = document.querySelector(`.sidebar-category-group[data-category="${categoryKey}"]`);
+            if (!group) return;
+            const header = group.querySelector('.sidebar-category-header');
+            const content = group.querySelector('.sidebar-category-content');
+            
+            header.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+        }
+
+        // Consola interactiva de comandos
+        function handleConsoleCommand(event) {
+            if (event.key === 'Enter') {
+                const input = document.getElementById('consoleInput');
+                const output = document.getElementById('consoleOutput');
+                const cmd = input.value.trim().toLowerCase();
+                
+                output.innerHTML += `<br>> root@system:~$ ${input.value}`;
+
+                if (cmd === 'help') {
+                    output.innerHTML += `<br>&nbsp;&nbsp;<b>scan</b> - Escanea nodos de red en busca de vulnerabilidades.<br>&nbsp;&nbsp;<b>status</b> - Muestra el estado del túnel cifrado.<br>&nbsp;&nbsp;<b>clear</b> - Limpia la consola.<br>&nbsp;&nbsp;<b>bypass</b> - Inicia secuencia de elusión de cortafuegos.`;
+                } else if (cmd === 'scan') {
+                    output.innerHTML += `<br>&nbsp;&nbsp;[+] Escaneando puertos... 3 nodos ilegales detectados y activos en la red principal.`;
+                } else if (cmd === 'status') {
+                    output.innerHTML += `<br>&nbsp;&nbsp;[INFO] Encriptación AES-256 activa. IP oculta mediante proxy dinámico. Latencia: 14ms.`;
+                } else if (cmd === 'clear') {
+                    output.innerHTML = `> Consola reiniciada...`;
+                } else if (cmd === 'bypass') {
+                    output.innerHTML += `<br>&nbsp;&nbsp;<span style="color:var(--hacker-danger)">[!] ALERTA: Acceso root concedido temporalmente a postulaciones ilegales.</span>`;
+                } else if (cmd !== '') {
+                    output.innerHTML += `<br>&nbsp;&nbsp;Comando no reconocido: "${input.value}". Escribe "help" para obtener ayuda.`;
+                }
+
+                input.value = '';
+                output.scrollTop = output.scrollHeight;
+            }
+        }
+
+        // Modal Spotlight de búsqueda rápida
+        const spotlightModal = document.getElementById('spotlightModal');
+        const openQuickNavBtn = document.getElementById('openQuickNavBtn');
+        const spotlightSearchInput = document.getElementById('spotlightSearchInput');
+
+        function buildSpotlightContent() {
+            const bodyContainer = document.getElementById('spotlightModalBody');
+            let htmlContent = '<div class="spotlight-section-heading">NODOS / CANALES</div>';
+
+            const links = document.querySelectorAll('.sidebar-nav .sidebar-category-content a');
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                const text = link.textContent.trim();
+                const iconHTML = link.querySelector('i') ? link.querySelector('i').outerHTML : '<i class="fa-solid fa-link"></i>';
+
+                htmlContent += `<a href="${href}" class="spotlight-item" data-name="${text.toLowerCase()}">${iconHTML} <span>${text}</span></a>`;
+            });
+
+            bodyContainer.innerHTML = htmlContent;
+        }
+
+        if (openQuickNavBtn && spotlightModal) {
+            openQuickNavBtn.addEventListener('click', () => {
+                buildSpotlightContent();
+                spotlightModal.classList.add('active');
+                spotlightSearchInput.value = '';
+                spotlightSearchInput.focus();
+            });
+
+            spotlightModal.addEventListener('click', (e) => {
+                if (e.target === spotlightModal) {
+                    spotlightModal.classList.remove('active');
+                }
+            });
+        }
+
+        function filterSpotlightModal() {
+            const query = spotlightSearchInput.value.toLowerCase().trim();
+            const items = document.querySelectorAll('.spotlight-item');
+
+            items.forEach(item => {
+                const name = item.getAttribute('data-name');
+                if (name.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Cargar datos de usuario simulados
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedUser = localStorage.getItem('discord_user');
+            if (storedUser) {
+                try {
+                    const user = JSON.parse(storedUser);
+                    document.getElementById('userNameDisplay').textContent = user.displayName || user.username;
+                    document.getElementById('userHandleDisplay').textContent = `@${user.username}`;
+                    if (user.avatarUrl) {
+                        document.getElementById('userAvatarContainer').innerHTML = `<img src="${user.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                    }
+                } catch(e) {}
+            }
+        });
+
+        // Control del menú lateral colapsable
+        const toggleBtn = document.getElementById('sidebarToggleBtn');
+        const revealBtn = document.getElementById('sidebarRevealBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        if (toggleBtn && revealBtn && sidebar) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.add('collapsed');
+            });
+            revealBtn.addEventListener('click', () => {
+                sidebar.classList.remove('collapsed');
+            });
+        }
+    </script>
+</body>
+</html>

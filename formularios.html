@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen de Whitelist | ClickSense RP</title>
+<!-- Google Fonts & FontAwesome -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --bg-main: #0c0812;
+    --bg-card: #140d24;
+    --bg-card-hover: #1c1333;
+    --border-color: rgba(236, 72, 153, 0.25);
+    --text-primary: #f3f4f6;
+    --text-muted: #9ca3af;
+    --pink-accent: #ec4899;
+    --purple-accent: #a855f7;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(12, 8, 18, 0.9); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: rgba(236, 72, 153, 0.4); border-radius: 10px; border: 1px solid rgba(236, 72, 153, 0.2); }
+::-webkit-scrollbar-thumb:hover { background: var(--pink-accent); }
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+    perspective: 1200px;
+}
+
+.grid-background {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: linear-gradient(to right, rgba(236, 72, 153, 0.03) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(168, 85, 247, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px; z-index: 0; pointer-events: none;
+}
+
+/* Contenedor Principal con Tarjetas de Normativa */
+.portal-wrapper {
+    width: 100%; max-width: 900px;
+    z-index: 10;
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.welcome-view { display: block; }
+.welcome-view.hidden { display: none; }
+
+.portal-hero {
+    text-align: center; margin-bottom: 40px;
+}
+.portal-hero h1 {
+    font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 15%, #f472b6 50%, #c084fc 85%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.portal-hero p { font-size: 15px; color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+/* 3 Tarjetas de Normativa (General, Locales, Ilegal) */
+.norm-cards-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; margin-bottom: 35px;
+}
+.norm-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 28px 24px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+    overflow: hidden;
+}
+.norm-card::before {
+    content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(236,72,153,0.05), rgba(168,85,247,0.05)); opacity: 0; transition: 0.3s;
+}
+.norm-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--pink-accent);
+    box-shadow: 0 15px 35px rgba(236, 72, 153, 0.15);
+}
+.norm-card:hover::before { opacity: 1; }
+.norm-icon {
+    width: 60px; height: 60px; background: rgba(236, 72, 153, 0.12); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; color: var(--pink-accent); font-size: 24px; margin: 0 auto 18px;
+}
+.norm-card h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+.norm-card p { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
+
+.start-action-container { text-align: center; }
+
+.btn-neon {
+    background: linear-gradient(135deg, var(--pink-accent) 0%, var(--purple-accent) 100%);
+    border: none; color: #fff; padding: 16px 42px; border-radius: 14px;
+    font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(236, 72, 153, 0.4); display: inline-flex; align-items: center; gap: 10px;
+    text-decoration: none;
+}
+.btn-neon:hover {
+    transform: scale(1.03);
+    box-shadow: 0 15px 40px rgba(236, 72, 153, 0.6);
+}
+
+/* Vista del Formulario de Examen */
+.exam-view { display: none; }
+.exam-view.active { display: block; animation: fadeInView 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+
+@keyframes fadeInView {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 35px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    position: relative;
+}
+
+.progress-bar-container {
+    width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 30px; overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%; background: linear-gradient(90deg, var(--pink-accent), var(--purple-accent)); width: 0%; transition: width 0.4s ease;
+}
+
+.question-box { margin-bottom: 25px; display: none; }
+.question-box.active { display: block; animation: fadeInView 0.4s ease forwards; }
+
+.question-subtitle {
+    font-size: 12px; color: var(--pink-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block;
+}
+.question-title {
+    font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 20px; line-height: 1.5;
+}
+
+.options-grid { display: flex; flex-direction: column; gap: 12px; }
+.option-label {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px 18px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 14px;
+    font-size: 14px; color: var(--text-primary);
+    transition: all 0.25s ease;
+}
+.option-label:hover {
+    background: rgba(236, 72, 153, 0.08);
+    border-color: var(--pink-accent);
+    color: #fff;
+}
+.option-label.selected {
+    background: rgba(236, 72, 153, 0.18);
+    border-color: var(--pink-accent);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.2);
+}
+.option-label input { accent-color: var(--pink-accent); width: 18px; height: 18px; }
+
+.form-nav-btns {
+    display: flex; justify-content: space-between; align-items: center; margin-top: 35px; border-top: 1px solid var(--border-color); padding-top: 22px;
+}
+.btn-action {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    color: #fff; padding: 11px 24px; border-radius: 12px; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; transition: 0.25s; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-action:hover {
+    background: rgba(236, 72, 153, 0.2); border-color: var(--pink-accent);
+}
+.btn-action.primary {
+    background: linear-gradient(135deg, var(--pink-accent), var(--purple-accent));
+    border: none; box-shadow: 0 5px 20px rgba(236, 72, 153, 0.3);
+}
+
+/* Animación 3D Futurista de 5 segundos al finalizar */
+#loading3DOverlay {
+    position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #07030e 90%);
+    display: none; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; text-align: center;
+    perspective: 1400px;
+}
+.cube-3d-scene {
+    width: 120px; height: 120px; position: relative; transform-style: preserve-3d;
+    animation: rotate3dScene 2.5s infinite linear; margin-bottom: 30px;
+}
+@keyframes rotate3dScene {
+    0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+    100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+}
+.cube-face {
+    position: absolute; width: 120px; height: 120px; border: 2px solid var(--pink-accent);
+    background: rgba(236, 72, 153, 0.12); backdrop-filter: blur(4px); border-radius: 12px;
+    box-shadow: inset 0 0 20px rgba(236, 72, 153, 0.4), 0 0 25px rgba(168, 85, 247, 0.3);
+}
+.cube-face.front  { transform: translateZ(60px); }
+.cube-face.back   { transform: rotateY(180deg) translateZ(60px); }
+.cube-face.right  { transform: rotateY(90deg) translateZ(60px); }
+.cube-face.left   { transform: rotateY(-90deg) translateZ(60px); }
+.cube-face.top    { transform: rotateX(90deg) translateZ(60px); }
+.cube-face.bottom { transform: rotateX(-90deg) translateZ(60px); }
+
+.loading-3d-title { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 8px; letter-spacing: 1px; }
+.loading-3d-sub { font-size: 14px; color: var(--text-muted); }
+
+/* Pantalla de Resultados */
+#resultContainer { display: none; text-align: center; }
+.result-icon { font-size: 65px; margin-bottom: 20px; }
+.result-icon.accepted { color: #10b981; text-shadow: 0 0 30px rgba(16,185,129,0.5); }
+.result-icon.rejected { color: var(--pink-accent); text-shadow: 0 0 30px rgba(236,72,153,0.5); }
+.result-title { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 12px; }
+.result-desc { font-size: 15px; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; max-width: 550px; margin-left: auto; margin-right: auto; }
+</style>
+</head>
+<body>
+<div class="grid-background"></div>
+
+<!-- Animación 3D de 5 segundos de Análisis -->
+<div id="loading3DOverlay">
+    <div class="cube-3d-scene">
+        <div class="cube-face front"></div>
+        <div class="cube-face back"></div>
+        <div class="cube-face right"></div>
+        <div class="cube-face left"></div>
+        <div class="cube-face top"></div>
+        <div class="cube-face bottom"></div>
+    </div>
+    <div class="loading-3d-title">ANALIZANDO EXAMEN...</div>
+    <div class="loading-3d-sub">Procesando registros biométricos y validando respuestas en la base de datos central.</div>
+</div>
+
+<!-- CONTENEDOR PRINCIPAL -->
+<div class="portal-wrapper">
+
+    <!-- APARTADO 1: VISTA DE BIENVENIDA CON LAS 3 TARJETAS -->
+    <div class="welcome-view" id="welcomeView">
+        <div class="portal-hero">
+            <h1>Evaluación de Whitelist & Normativa</h1>
+            <p>Para acceder al servidor de ClickSense RP y conservar tus privilegios, debes superar con éxito el examen oficial basado en nuestra normativa central.</p>
+        </div>
+
+        <div class="norm-cards-grid">
+            <div class="norm-card">
+                <div class="norm-icon"><i class="fa-solid fa-book-open"></i></div>
+                <h3>Normativa General</h3>
+                <p>Conceptos clave de rol, definiciones de Metagaming (MG), Powergaming (PG), valor de vida y normas de entorno obligatorias.</p>
+            </div>
+            <div class="norm-card">
+                <div class="norm-icon"><i class="fa-solid fa-store"></i></div>
+                <h3>Locales & Zonas</h3>
+                <p>Reglas específicas de interacción en negocios, interacciones seguras, zonas verdes y gestión de establecimientos comerciales.</p>
+            </div>
+            <div class="norm-card">
+                <div class="norm-icon"><i class="fa-solid fa-skull-crossbones"></i></div>
+                <h3>Facción Ilegal</h3>
+                <p>Normas de bandas, atracos, secuestros, uso de armamento restringido, treguas y directrices sobre Character Kills (CK).</p>
+            </div>
+        </div>
+
+        <div class="start-action-container">
+            <button class="btn-neon" onclick="startExam()"><i class="fa-solid fa-play"></i> Comenzar Examen (15 Preguntas)</button>
+        </div>
+    </div>
+
+    <!-- APARTADO 2: VISTA DEL FORMULARIO DE EXAMEN -->
+    <div class="exam-view" id="examView">
+        <div class="form-container">
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progressBarFill"></div>
+            </div>
+
+            <form id="whitelistForm" onsubmit="submitForm(event)">
+                <div id="questionsWrapper"></div>
+
+                <div class="form-nav-btns" id="navButtonsArea">
+                    <button type="button" class="btn-action" id="prevBtn" onclick="changeQuestion(-1)" style="display:none;"><i class="fa-solid fa-arrow-left"></i> Anterior</button>
+                    <div style="font-size: 13.5px; color: var(--text-muted); font-weight: 600;" id="questionCounterText">Pregunta 1 de 15</div>
+                    <button type="button" class="btn-action primary" id="nextBtn" onclick="changeQuestion(1)">Siguiente <i class="fa-solid fa-arrow-right"></i></button>
+                    <button type="submit" class="btn-action primary" id="submitBtn" style="display:none; background: #10b981; box-shadow: 0 5px 20px rgba(16,185,129,0.4);"><i class="fa-solid fa-check"></i> Finalizar Examen</button>
+                </div>
+            </form>
+
+            <!-- Contenedor de Resultado -->
+            <div id="resultContainer">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-desc" id="resultDesc"></div>
+                <a href="/home.html" class="btn-neon" style="display: inline-flex;"><i class="fa-solid fa-house"></i> Volver al Inicio</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Scripts interactivos conectados con database.py y sin localStorage para resultados -->
+<script>
+const questionsPool = [
+    { q: "¿Qué significa el término MG (Metagaming)?", type: "single", options: ["Usar información OOC (Out of Character) dentro del juego (IC)", "Desconectar para evitar una situación de rol", "Atropellar intencionadamente a otro usuario", "Insultar a un jugador por el chat de voz"], correct: 0 },
+    { q: "¿Qué es el concepto de IC (In Character)?", type: "single", options: ["Todo lo relacionado estrictamente con tu personaje dentro del servidor", "Hablar por Discord mientras juegas", "Las reglas generales de la normativa de la comunidad", "Reclamar un reporte a un administrador"], correct: 0 },
+    { q: "¿Cuál de las siguientes acciones infringe la norma de Valor de Vida (PG - Powergaming)?", type: "single", options: ["Conducir un superdeportivo a gran velocidad tras haber volcado gravemente", "Ir armado por la vía pública con licencia", "Negociar con la policía durante un atraco", "Trabajar en el taller mecánico"], correct: 0 },
+    { q: "¿Qué debes hacer si presencias un bug crítico o exploit en el servidor?", type: "single", options: ["Reportarlo inmediatamente mediante un ticket al staff", "Aprovecharlo para conseguir dinero o ventajas", "Compartirlo con tus amigos en secreto", "Ignorarlo y continuar jugando"], correct: 0 },
+    { q: "¿Qué está permitido realizar bajo el concepto de VDM (Vehicle Deathmatch)?", type: "single", options: ["Nada, está totalmente prohibido usar un vehículo como arma letal sin rol previo", "Atropellar atracadores si te roban el coche", "Empujar coches mal aparcados", "Conducir rápido por autopista"], correct: 0 },
+    { q: "Selecciona las prácticas consideradas estrictamente prohibidas en el servidor (Selección Múltiple):", type: "multi", options: ["Uso de hacks o modificaciones externas", "Desconectar en medio de un rol activo (Combat Logging)", "Respetar los semáforos en rojo", "Insultar la vida OOC de los usuarios"], correct: [0, 1, 3] },
+    { q: "¿Qué se entiende por Venganza post-muerte (RK - Revenge Killing)?", type: "single", options: ["Volver a buscar o atacar a quien te mató recordando los hechos de tu vida anterior", "Denunciar a la policía tras un robo", "Defenderse de un tiroteo en curso", "Cambiar de personaje tras un CK"], correct: 0 },
+    { q: "¿Cuándo es obligatorio tener activada la grabación o sombra (clip)?", type: "single", options: ["Durante situaciones de rol complejo, normativas especiales, atracos y reportes", "Únicamente cuando patrullas en la policía", "Nunca es necesario", "Solo si eres miembro del Staff"], correct: 0 },
+    { q: "¿Qué es el entorno (Entorno / /do)?", type: "single", options: ["Las acciones del mundo que te rodea y cómo reaccionarían las personas ajenas al servidor", "El clima actual de la ciudad", "La cantidad de dinero en tu cuenta bancaria", "El menú de opciones gráficos del juego"], correct: 0 },
+    { q: "¿Cómo se debe proceder ante un cacheo por parte de las fuerzas de seguridad?", type: "single", options: ["Colaborar mediante comandos de entorno y mostrar los objetos permitidos", "Salir del juego rápidamente", "Mentir por el chat de voz sobre lo que llevas", "Gritar insultos OOC a los agentes"], correct: 0 },
+    { q: "¿Qué significa OOC?", type: "single", options: ["Fuera del personaje", "Dentro del personaje", "Organización oficial de criminales", "Oficial de policía"], correct: 0 },
+    { q: "¿Qué es el Fast-Punch? ¿Está permitido?", type: "single", options: ["Dar golpes rápidos con animaciones bug; está prohibido", "Correr muy rápido por la calle", "Atacar con un bate de béisbol de forma reglamentaria", "Comer rápidamente un snack"], correct: 0 },
+    { q: "¿Qué es un CK (Character Kill)?", type: "single", options: ["La muerte definitiva y borrado de la memoria o identidad del personaje", "Un desmayo temporal en el hospital", "Una multa de tráfico grave", "Cambiar de ropa en la tienda"], correct: 0 },
+    { q: "¿Qué significa NIP (Norma de Interpretación de Personaje)?", type: "single", options: ["Actuar y tomar decisiones coherentes con la psicología y trasfondo de tu personaje", "Tener un nivel alto de disparos", "Conducir vehículos de alta gama", "Trabajar en el ayuntamiento"], correct: 0 },
+    { q: "Selecciona las opciones que forman parte de los servicios públicos oficiales (Selección Múltiple):", type: "multi", options: ["LSPD / Policía", "LSSD / Sheriff", "Bandas ilegales de barrio", "EMS / Hospital"], correct: [0, 1, 3] }
+];
+
+while (questionsPool.length < 50) {
+    questionsPool.push({
+        q: `Pregunta normativa de rolplay número ${questionsPool.length + 1}: ¿Cuál es la conducta correcta?`,
+        type: "single",
+        options: ["Actuar siempre con coherencia y respetando la normativa general", "Incumplir las reglas si nadie te ve", "Hacer uso de canales OOC en situaciones IC", "Desconectar al recibir un disparo"],
+        correct: 0
+    });
+}
+
+let activeQuestions = [];
+let currentQuestionIndex = 0;
+
+function startExam() {
+    activeQuestions = [...questionsPool].sort(() => 0.5 - Math.random()).slice(0, 15);
+    renderQuestions();
+    updateQuestionView();
+
+    document.getElementById('welcomeView').classList.add('hidden');
+    document.getElementById('examView').classList.add('active');
+}
+
+function renderQuestions() {
+    const wrapper = document.getElementById('questionsWrapper');
+    wrapper.innerHTML = '';
+
+    activeQuestions.forEach((item, index) => {
+        const box = document.createElement('div');
+        box.className = `question-box ${index === 0 ? 'active' : ''}`;
+        box.setAttribute('data-index', index);
+
+        let subtitle = item.type === 'multi' ? 'Selección Múltiple (Elige todas las correctas)' : 'Pregunta Tipo Test (1 respuesta)';
+        
+        let html = `
+            <span class="question-subtitle"><i class="fa-solid fa-circle-question"></i> ${subtitle}</span>
+            <div class="question-title">${index + 1}. ${item.q}</div>
+            <div class="options-grid">
+        `;
+
+        item.options.forEach((opt, optIdx) => {
+            let inputType = item.type === 'multi' ? 'checkbox' : 'radio';
+            let nameAttr = `question_${index}`;
+            html += `
+                <label class="option-label" onclick="handleOptionClick(this, '${inputType}')">
+                    <input type="${inputType}" name="${nameAttr}" value="${optIdx}">
+                    <span>${opt}</span>
+                </label>
+            `;
+        });
+
+        html += `</div>`;
+        box.innerHTML = html;
+        wrapper.appendChild(box);
+    });
+}
+
+function handleOptionClick(labelElement, inputType) {
+    const input = labelElement.querySelector('input');
+    if (inputType === 'radio') {
+        const parentGrid = labelElement.closest('.options-grid');
+        parentGrid.querySelectorAll('.option-label').forEach(lbl => lbl.classList.remove('selected'));
+        labelElement.classList.add('selected');
+        input.checked = true;
+    } else {
+        input.checked = !input.checked;
+        if (input.checked) {
+            labelElement.classList.add('selected');
+        } else {
+            labelElement.classList.remove('selected');
+        }
+    }
+}
+
+function changeQuestion(direction) {
+    const boxes = document.querySelectorAll('.question-box');
+    boxes[currentQuestionIndex].classList.remove('active');
+    
+    currentQuestionIndex += direction;
+    
+    if (currentQuestionIndex < 0) currentQuestionIndex = 0;
+    if (currentQuestionIndex >= boxes.length) currentQuestionIndex = boxes.length - 1;
+
+    boxes[currentQuestionIndex].classList.add('active');
+    updateQuestionView();
+}
+
+function updateQuestionView() {
+    const total = activeQuestions.length;
+    document.getElementById('questionCounterText').textContent = `Pregunta ${currentQuestionIndex + 1} de ${total}`;
+    document.getElementById('progressBarFill').style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+
+    prevBtn.style.display = currentQuestionIndex === 0 ? 'none' : 'inline-flex';
+
+    if (currentQuestionIndex === total - 1) {
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'inline-flex';
+    } else {
+        nextBtn.style.display = 'inline-flex';
+        submitBtn.style.display = 'none';
+    }
+}
+
+async function submitForm(event) {
+    event.preventDefault();
+
+    // Validar obligatoriamente que TODAS las preguntas tengan al menos una respuesta seleccionada
+    for (let i = 0; i < activeQuestions.length; i++) {
+        const checked = document.querySelectorAll(`input[name="question_${i}"]:checked`);
+        if (checked.length === 0) {
+            alert(`Debes responder la pregunta número ${i + 1} antes de finalizar el examen.`);
+            // Ir directamente a la pregunta sin responder
+            const boxes = document.querySelectorAll('.question-box');
+            boxes[currentQuestionIndex].classList.remove('active');
+            currentQuestionIndex = i;
+            boxes[currentQuestionIndex].classList.add('active');
+            updateQuestionView();
+            return;
+        }
+    }
+
+    // Calcular aciertos
+    let correctCount = 0;
+    activeQuestions.forEach((item, index) => {
+        const selectedInputs = document.querySelectorAll(`input[name="question_${index}"]:checked`);
+        let userSelection = Array.from(selectedInputs).map(inp => parseInt(inp.value));
+
+        if (item.type === 'single') {
+            if (userSelection.length === 1 && userSelection[0] === item.correct) {
+                correctCount++;
+            }
+        } else if (item.type === 'multi') {
+            let correctArr = item.correct.slice().sort();
+            let userArr = userSelection.sort();
+            if (JSON.stringify(correctArr) === JSON.stringify(userArr)) {
+                correctCount++;
+            }
+        }
+    });
+
+    let scorePercentage = (correctCount / activeQuestions.length) * 100;
+    let isPassed = scorePercentage >= 60;
+
+    // Mostrar animación 3D flotante de 5 segundos
+    const loading3DOverlay = document.getElementById('loading3DOverlay');
+    loading3DOverlay.style.display = 'flex';
+
+    // Enviar resultado al backend para que se guarde en database.py (sin usar localStorage)
+    try {
+        const sessionUser = JSON.parse(localStorage.getItem('discord_user') || '{}');
+        await fetch('/api/whitelist-results', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: sessionUser.id || 'N/A',
+                username: sessionUser.username || sessionUser.displayName || 'Desconocido',
+                score: scorePercentage.toFixed(1),
+                status: isPassed ? 'Aceptada' : 'Rechazada',
+                date: new Date().toISOString()
+            })
+        });
+    } catch (e) {
+        console.error("Error al registrar el resultado en la base de datos:", e);
+    }
+
+    // Esperar exactamente 5 segundos de animación 3D
+    setTimeout(() => {
+        loading3DOverlay.style.display = 'none';
+        
+        document.getElementById('questionsWrapper').style.display = 'none';
+        document.getElementById('navButtonsArea').style.display = 'none';
+        
+        const resultContainer = document.getElementById('resultContainer');
+        resultContainer.style.display = 'block';
+
+        const resultIcon = document.getElementById('resultIcon');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultDesc = document.getElementById('resultDesc');
+
+        if (isPassed) {
+            resultIcon.className = 'result-icon accepted';
+            resultIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            resultTitle.textContent = '¡Whitelist Aceptada!';
+            resultDesc.innerHTML = `Has obtenido un <strong>${scorePercentage.toFixed(1)}%</strong> de aciertos (${correctCount}/${activeQuestions.length}). Has superado satisfactoriamente el examen de normativa central. ¡Bienvenido a ClickSense RP!`;
+        } else {
+            resultIcon.className = 'result-icon rejected';
+            resultIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+            resultTitle.textContent = 'Whitelist Rechazada';
+            resultDesc.innerHTML = `Has obtenido un <strong>${scorePercentage.toFixed(1)}%</strong> de aciertos (${correctCount}/${activeQuestions.length}). No has alcanzado el mínimo requerido del 60%. Te invitamos a repasar la normativa e intentarlo de nuevo.`;
+        }
+    }, 5000);
+}
+</script>
+</body>
+</html>
