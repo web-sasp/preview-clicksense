@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickSense RP | Servidor de RolePlay serio en español</title>
+    <meta name="description" content="Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.">
+    <meta name="theme-color" content="#07040c">
+    <meta property="og:title" content="ClickSense RP | Roleplay Serio en Español">
+    <meta property="og:description" content="Servidor FiveM de roleplay serio en español.">
+    <meta property="og:image" content="https://i.imgur.com/ibt9508.png">
+
+    <!-- Pantalla de carga: se marca antes de pintar nada -->
+    <script>document.documentElement.classList.add('is-loading', 'js');</script>
+    <noscript><style>#siteLoader{display:none !important}html.is-loading body>*{opacity:1 !important}</style></noscript>
+    <link rel="preload" as="image" href="https://i.imgur.com/ibt9508.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://i.imgur.com">
+    <link rel="preconnect" href="https://images.unsplash.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="src/assets/main.css">
+
+    <style>
+        :root {
+            /* Paleta original */
+            --bg-main: #07040c;
+            --bg-card: rgba(18, 12, 28, 0.75);
+            --border-glow: rgba(168, 85, 247, 0.25);
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --text-primary: #f3f4f6;
+            --text-muted: #94a3b8;
+
+            /* Añadidos */
+            --bg-raised: #0c0812;
+            --bg-panel: #130c1e;
+            --accent-hot: #e11d5c;
+            --line: rgba(255, 255, 255, 0.08);
+            --line-strong: rgba(168, 85, 247, 0.32);
+            --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+            --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --radius-lg: 22px;
+            --radius-md: 14px;
+            --wrap: 1200px;
+            --nav-h: 72px;
+        }
+
+        /* =========================================================
+           PANTALLA DE CARGA
+           ========================================================= */
+        html.is-loading, html.is-loading body { overflow: hidden !important; height: 100%; }
+        html.is-loading body > *:not(#siteLoader) { opacity: 0; }
+
+        #siteLoader {
+            position: fixed; inset: 0; z-index: 2147483646;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
+            background: radial-gradient(ellipse at center, #240513 0%, #0d0414 45%, #06030c 100%);
+            transition: opacity .6s ease, visibility 0s linear .6s;
+        }
+        #siteLoader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+        #siteLoader img {
+            width: min(300px, 60vw); height: auto; display: block;
+            filter: drop-shadow(0 0 22px rgba(225, 29, 92, .55));
+            animation: ldLogoIn .9s cubic-bezier(.16, 1, .3, 1) both, ldGlow 2.4s ease-in-out .9s infinite;
+        }
+        .ld-bar {
+            width: 200px; height: 2px; border-radius: 2px; overflow: hidden;
+            background: rgba(255, 255, 255, .08);
+            animation: ldFade .6s ease .2s both;
+        }
+        .ld-bar i {
+            display: block; height: 100%; width: 100%;
+            transform-origin: left; transform: scaleX(0);
+            background: #e11d5c; box-shadow: 0 0 12px #e11d5c;
+        }
+        #siteLoader.go .ld-bar i { animation: ldFill 1.8s cubic-bezier(.45, .05, .35, 1) forwards; } /* 1,8 segundos */
+        @keyframes ldFill { to { transform: scaleX(1); } }
+        @keyframes ldFade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes ldLogoIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
+        @keyframes ldGlow {
+            0%, 100% { filter: drop-shadow(0 0 18px rgba(225, 29, 92, .45)); }
+            50%      { filter: drop-shadow(0 0 34px rgba(225, 29, 92, .8)); }
+        }
+
+        /* =========================================================
+           ENTRADA DE LA PÁGINA (una sola secuencia al terminar la carga)
+           ========================================================= */
+        @keyframes navEntrance {
+            from { opacity: 0; transform: translateY(-14px); }
+            to   { opacity: 1; transform: none; }
+        }
+        @keyframes csRise {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: none; }
+        }
+        @keyframes csHeroIn {
+            from { transform: scale(1.12); filter: blur(8px) brightness(.55); }
+            to   { transform: none; filter: none; }
+        }
+        @keyframes csFade { from { opacity: 0; } to { opacity: 1; } }
+
+        html.page-in .landing-navbar { animation: navEntrance .8s var(--ease-out) backwards; }
+        html.page-in .cs-hero__track { animation: csHeroIn 1.8s var(--ease-out) backwards; }
+        html.page-in .cs-hero__content > * {
+            animation: csRise 1s var(--ease-out) backwards;
+            animation-delay: calc(var(--i, 0) * 110ms + 200ms);
+        }
+        html.page-in .cs-hero__controls { animation: csRise 1s var(--ease-out) .65s backwards; }
+
+        /* Aparición al hacer scroll (una vez por bloque) */
+        .js .cs-reveal { opacity: 0; }
+        .js .cs-reveal.is-visible {
+            opacity: 1;
+            animation: csRise .9s var(--ease-out) var(--d, 0ms) backwards;
+        }
+
+        /* Vibración de los iconos de los menús */
+        @keyframes iconWiggle {
+            0% { transform: rotate(0deg) scale(1); }
+            20% { transform: rotate(-15deg) scale(1.1); }
+            40% { transform: rotate(15deg) scale(1.1); }
+            60% { transform: rotate(-10deg) scale(1.05); }
+            80% { transform: rotate(5deg) scale(1.02); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
+        /* =========================================================
+           BASE
+           ========================================================= */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #07040c; }
+        ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.6); }
+
+        html { scroll-behavior: smooth; }
+        html.cs-no-scroll { overflow: hidden; }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            overflow-y: auto;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        img { max-width: 100%; }
+
+        :focus-visible {
+            outline: 2px solid var(--accent-purple);
+            outline-offset: 3px;
+        }
+
+        .grid-background {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                radial-gradient(60% 50% at 88% 0%, rgba(168, 85, 247, 0.10), transparent 70%),
+                radial-gradient(50% 45% at 0% 100%, rgba(225, 29, 92, 0.07), transparent 70%),
+                linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: auto, auto, 50px 50px, 50px 50px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* =========================================================
+           BARRA DE NAVEGACIÓN
+           ========================================================= */
+        .landing-navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            background: linear-gradient(to bottom, rgba(7, 4, 12, 0.8), rgba(7, 4, 12, 0));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5%;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        /* Fondo sólido que aparece al bajar */
+        .landing-navbar::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: rgba(7, 4, 12, 0.9);
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(168, 85, 247, 0.15);
+            opacity: 0;
+            transition: opacity .35s ease;
+            z-index: -1;
+        }
+        .landing-navbar.is-scrolled::before,
+        .landing-navbar.menu-open::before { opacity: 1; }
+
+        .nav-left-group { display: flex; align-items: center; gap: 35px; }
+        .nav-brand { display: flex; align-items: center; text-decoration: none; }
+        .nav-brand img {
+            height: 48px;
+            object-fit: contain;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .nav-brand img:hover { transform: scale(1.04); }
+
+        .nav-links { display: flex; gap: 14px; align-items: center; }
+        .nav-links > a, .dropdown-trigger {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+            cursor: pointer;
+            font-family: var(--font-body);
+            display: inline-flex;
+            align-items: center;
+        }
+        .nav-links > a.active, .dropdown-trigger.active {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent-purple);
+        }
+        .nav-links > a:hover, .dropdown-trigger:hover { color: var(--accent-purple); }
+        .dropdown-trigger .fa-chevron-down { transition: transform .3s var(--ease-out); }
+        .dropdown-trigger[aria-expanded="true"] .fa-chevron-down { transform: rotate(180deg); }
+
+        /* Menú desplegable de facciones */
+        .dropdown-container { position: relative; display: inline-block; }
+        .dropdown-menu {
+            position: absolute;
+            top: 120%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px) scale(0.95);
+            background: rgba(14, 9, 22, 0.96);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            border-radius: 12px;
+            padding: 8px 0;
+            width: 175px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.85), 0 0 30px rgba(168, 85, 247, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s var(--ease-out);
+            z-index: 1001;
+        }
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            color: #ffffff;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .dropdown-menu a i {
+            color: var(--accent-purple);
+            font-size: 0.8rem;
+            display: inline-block;
+            transform-origin: center;
+            width: 16px;
+            text-align: center;
+        }
+        .dropdown-menu a:hover i { animation: iconWiggle 1s ease; }
+        .dropdown-menu a:hover { background: rgba(168, 85, 247, 0.2); padding-left: 20px; }
+
+        /* Acciones de la derecha */
+        .nav-right-actions { display: flex; align-items: center; gap: 14px; }
+
+        .nav-cart-icon, .nav-toggle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            text-decoration: none;
+            transition: color 0.2s, transform 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        .nav-cart-icon:hover, .nav-toggle:hover {
+            color: var(--accent-purple);
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+        .nav-toggle { display: none; cursor: pointer; padding: 0; color: #fff; }
+
+        /* Selector de idioma */
+        .custom-lang-dropdown { position: relative; user-select: none; }
+        .lang-selected {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            height: 36px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            min-width: 95px;
+            justify-content: space-between;
+        }
+        .lang-selected:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            background: rgba(168, 85, 247, 0.1);
+        }
+        .lang-current { display: flex; align-items: center; gap: 6px; }
+        .lang-flag { width: 16px; height: 12px; object-fit: cover; border-radius: 2px; }
+        .lang-options {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background: rgba(14, 9, 22, 0.96);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            border-radius: 12px;
+            overflow: hidden;
+            width: 125px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.85), 0 0 30px rgba(168, 85, 247, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.3s var(--ease-out);
+            z-index: 1001;
+        }
+        .lang-options.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .lang-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 9px 12px;
+            color: #ffffff;
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            border: 0;
+            text-align: left;
+            transition: background 0.2s ease;
+        }
+        .lang-option:hover { background: rgba(168, 85, 247, 0.2); }
+
+        /* Menú de perfil */
+        .profile-dropdown-container { position: relative; display: inline-block; }
+        .user-avatar-circle {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #120c1c;
+            cursor: pointer;
+            transition: border-color 0.2s, transform 0.2s;
+            box-sizing: border-box;
+        }
+        .user-avatar-circle:hover { border-color: var(--accent-purple); transform: scale(1.05); }
+        .default-avatar-silhouette {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a0710;
+            color: #4b5563;
+            font-size: 0.9rem;
+        }
+        .default-avatar-silhouette img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .profile-dropdown-menu {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background: rgba(14, 9, 22, 0.96);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            border-radius: 14px;
+            padding: 8px 0;
+            width: 195px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.85), 0 0 30px rgba(168, 85, 247, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.3s var(--ease-out);
+            z-index: 1001;
+        }
+        .profile-dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .profile-dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .profile-dropdown-menu a i {
+            color: var(--accent-purple);
+            font-size: 0.8rem;
+            display: inline-block;
+            transform-origin: center;
+            width: 16px;
+            text-align: center;
+        }
+        .profile-dropdown-menu a:hover i { animation: iconWiggle 1s ease; }
+        .profile-dropdown-menu a:hover { background: rgba(168, 85, 247, 0.2); padding-left: 20px; }
+
+        /* Navegación en móvil */
+        @media (max-width: 960px) {
+            .nav-toggle { display: flex; }
+            .nav-left-group { gap: 0; }
+            .nav-links {
+                position: absolute;
+                top: 100%; left: 0; right: 0;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 4px;
+                padding: 10px 5% 18px;
+                background: rgba(7, 4, 12, 0.97);
+                border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-8px);
+                transition: opacity .3s ease, transform .3s var(--ease-out), visibility 0s linear .3s;
+            }
+            .landing-navbar.menu-open .nav-links {
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                transition: opacity .3s ease, transform .3s var(--ease-out), visibility 0s;
+            }
+            .nav-links > a, .dropdown-trigger {
+                width: 100%;
+                box-sizing: border-box;
+                justify-content: space-between;
+                padding: 13px 14px;
+                font-size: 0.85rem;
+            }
+            .dropdown-container { display: block; }
+            .dropdown-menu, .dropdown-menu.show {
+                position: static;
+                transform: none;
+                width: auto;
+                opacity: 1;
+                visibility: visible;
+                box-shadow: none;
+                border: 0;
+                background: transparent;
+                padding: 2px 0 6px 10px;
+                transition: none;
+            }
+            .dropdown-menu { display: none; }
+            .dropdown-menu.show { display: block; }
+            .dropdown-menu a { padding: 11px 14px; font-size: 0.8rem; }
+        }
+        @media (max-width: 520px) {
+            .landing-navbar { padding: 10px 16px; }
+            .nav-right-actions { gap: 8px; }
+            .nav-brand img { height: 40px; }
+            .lang-selected { min-width: 0; padding: 6px 9px; }
+            #currentLangText { display: none; }
+        }
+
+        /* =========================================================
+           BOTONES Y TÍTULOS
+           ========================================================= */
+        .cs-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 26px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            font-family: var(--font-body);
+            font-size: 0.92rem;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: 0.01em;
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: transform .25s var(--ease-out), box-shadow .3s ease, background-color .3s ease, border-color .3s ease, filter .3s ease;
+        }
+        .cs-btn--primary {
+            color: #fff;
+            background: linear-gradient(135deg, #9333ea, #db2777);
+            box-shadow: 0 12px 30px -8px rgba(168, 85, 247, 0.65);
+        }
+        .cs-btn--primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.12);
+            box-shadow: 0 18px 38px -8px rgba(236, 72, 153, 0.65);
+        }
+        .cs-btn--ghost {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.18);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+        .cs-btn--ghost:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.13);
+            border-color: rgba(255, 255, 255, 0.34);
+        }
+
+        .cs-title {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: clamp(2.3rem, 4.8vw, 3.6rem);
+            line-height: 0.98;
+            letter-spacing: 0.005em;
+            text-transform: uppercase;
+            color: #fff;
+            margin: 0 0 14px;
+            text-wrap: balance;
+        }
+        .cs-lead {
+            color: var(--text-muted);
+            font-size: 1.02rem;
+            line-height: 1.65;
+            margin: 0;
+            max-width: 58ch;
+        }
+        .cs-head { margin-bottom: 36px; }
+
+        /* Flechas de carrusel */
+        .cs-arrows { display: flex; gap: 10px; }
+        .cs-arrow {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(14, 9, 22, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 0;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            transition: background .25s ease, border-color .25s ease, transform .25s var(--ease-out);
+        }
+        .cs-arrow:hover {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            transform: scale(1.08);
+        }
+        .cs-arrow:active { transform: scale(0.96); }
+
+        /* Indicadores: el activo se rellena con el tiempo que queda de la imagen */
+        .carousel-indicators { display: flex; align-items: center; gap: 8px; }
+        .indicator-dot {
+            position: relative;
+            width: 18px; height: 4px;
+            padding: 0; border: 0;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.28);
+            cursor: pointer;
+            transition: width .5s var(--ease-out), background .3s ease;
+        }
+        .indicator-dot::before { content: ''; position: absolute; inset: -12px -2px; } /* zona de toque */
+        .indicator-dot:hover:not(.active) { background: rgba(255, 255, 255, 0.55); }
+        .indicator-dot.active { width: 54px; }
+        .indicator-dot i {
+            position: absolute; inset: 0;
+            border-radius: inherit;
+            background: #fff;
+            transform: scaleX(0);
+            transform-origin: left;
+        }
+        .indicator-dot.active i { animation: csProgress var(--carousel-time, 5s) linear forwards; }
+        [data-carousel].is-paused .indicator-dot.active i,
+        html.is-loading .indicator-dot.active i { animation-play-state: paused; }
+        @keyframes csProgress { to { transform: scaleX(1); } }
+
+        /* =========================================================
+           1. BIENVENIDA — carrusel principal a pantalla completa
+           ========================================================= */
+        .cs-hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: min(100svh, 900px);
+            min-height: 600px;
+            overflow: hidden;
+            isolation: isolate;
+            flex-shrink: 0;
+        }
+        .cs-hero__track { position: absolute; inset: 0; z-index: 0; }
+        .cs-hero__slide {
+            position: absolute; inset: 0;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+        }
+        .cs-hero__slide.is-active { opacity: 1; }
+        .cs-hero__slide img {
+            display: block;
+            width: 100%; height: 100%;
+            max-width: none;
+            object-fit: cover;
+            transform: scale(1.1);
+            transition: transform 7s ease-out;
+        }
+        .cs-hero__slide.is-active img { transform: scale(1); }
+
+        /* Velo para que el texto se lea sobre cualquier captura */
+        .cs-hero::after {
+            content: '';
+            position: absolute; inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                linear-gradient(to top, var(--bg-main) 0%, rgba(7, 4, 12, 0.82) 24%, rgba(7, 4, 12, 0.25) 58%, rgba(7, 4, 12, 0.5) 100%),
+                linear-gradient(90deg, rgba(7, 4, 12, 0.78) 0%, rgba(7, 4, 12, 0.2) 60%, transparent 100%),
+                radial-gradient(70% 60% at 0% 100%, rgba(168, 85, 247, 0.22), transparent 70%);
+        }
+
+        .cs-hero__inner {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            max-width: var(--wrap);
+            margin: 0 auto;
+            padding: calc(var(--nav-h) + 24px) 24px 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 44px;
+        }
+        .cs-hero__title {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: clamp(2.8rem, 12vw, 7.5rem);
+            line-height: 0.88;
+            letter-spacing: -0.005em;
+            text-transform: uppercase;
+            margin: 0 0 22px;
+            background: linear-gradient(180deg, #ffffff 50%, #dcbcff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #fff;
+            filter: drop-shadow(0 6px 30px rgba(0, 0, 0, 0.55));
+        }
+        .cs-hero__title span { display: block; }
+        .cs-hero__lead {
+            font-size: clamp(1rem, 1.5vw, 1.15rem);
+            color: #d8dce6;
+            max-width: 46ch;
+            margin: 0 0 30px;
+            line-height: 1.6;
+        }
+        .cs-hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+        .cs-hero__controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        @media (max-width: 600px) {
+            .cs-hero { min-height: 560px; }
+            .cs-hero__inner { padding-left: 18px; padding-right: 18px; gap: 30px; }
+            .cs-hero__actions .cs-btn { flex: 1 1 100%; }
+            .cs-arrow { width: 40px; height: 40px; }
+            .indicator-dot.active { width: 40px; }
+            .indicator-dot { width: 12px; }
+        }
+
+        /* =========================================================
+           CONTENEDOR GENERAL
+           ========================================================= */
+        .scratch-container {
+            max-width: var(--wrap);
+            margin: 0 auto;
+            padding: 110px 24px 130px;
+            display: flex;
+            flex-direction: column;
+            gap: 150px;
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        @media (max-width: 900px) {
+            .scratch-container { padding: 80px 18px 90px; gap: 100px; }
+        }
+
+        /* =========================================================
+           2. TIENDA OFICIAL
+           ========================================================= */
+        .cs-store {
+            display: grid;
+            grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+            gap: 60px;
+            align-items: center;
+        }
+        .cs-perks {
+            list-style: none;
+            margin: 26px 0 32px;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .cs-perks li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #e5e7eb;
+        }
+        .cs-perks i {
+            color: var(--accent-purple);
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .cs-shot__viewport {
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--line-strong);
+            background: var(--bg-raised);
+            aspect-ratio: 16 / 10;
+            box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.9), 0 0 60px -20px rgba(168, 85, 247, 0.35);
+        }
+        .cs-shot__track {
+            display: flex;
+            width: 100%; height: 100%;
+            transition: transform .8s var(--ease-out);
+        }
+        .cs-shot__slide { min-width: 100%; height: 100%; }
+        .cs-shot__slide img {
+            display: block;
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .cs-shot__bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        @media (max-width: 900px) {
+            .cs-store { grid-template-columns: 1fr; gap: 40px; }
+        }
+        @media (max-width: 420px) {
+            .cs-perks { grid-template-columns: 1fr; }
+        }
+
+        /* =========================================================
+           3. WHITELIST
+           ========================================================= */
+        .cs-whitelist {
+            display: grid;
+            grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+            gap: 70px;
+            align-items: center;
+        }
+        .cs-whitelist__media {
+            position: relative;
+            border-radius: var(--radius-lg);
+            isolation: isolate;
+        }
+        .cs-whitelist__media::before {
+            content: '';
+            position: absolute;
+            inset: 18px -18px -18px 18px;
+            border: 1px solid var(--line-strong);
+            border-radius: inherit;
+            z-index: -1;
+        }
+        .cs-whitelist__media img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-radius: inherit;
+            border: 1px solid var(--line);
+            box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.9);
+            box-sizing: border-box;
+        }
+        .cs-whitelist__icon {
+            width: 58px; height: 58px;
+            object-fit: contain;
+            display: block;
+            margin-bottom: 18px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+        }
+        .cs-whitelist__body p {
+            color: var(--text-muted);
+            font-size: 0.98rem;
+            line-height: 1.7;
+            margin: 0 0 14px;
+            max-width: 52ch;
+        }
+        .cs-whitelist__body .cs-btn { margin-top: 14px; }
+
+        @media (max-width: 900px) {
+            .cs-whitelist { grid-template-columns: 1fr; gap: 44px; }
+            .cs-whitelist__media::before { inset: 10px -8px -10px 8px; }
+        }
+
+        /* =========================================================
+           4. DIRECTORIO DE FACCIONES
+           ========================================================= */
+        .cs-factions {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 18px;
+        }
+        .cs-faction {
+            --fx: var(--accent-purple);
+            grid-column: span 2;
+            position: relative;
+            min-height: 430px;
+            padding: 26px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--line);
+            background: var(--bg-raised);
+            overflow: hidden;
+            isolation: isolate;
+            transition: border-color .35s ease, box-shadow .45s ease;
+        }
+        .cs-faction:nth-child(-n+2) { grid-column: span 3; min-height: 470px; }
+
+        .cs-faction__bg {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            max-width: none;
+            object-fit: cover;
+            z-index: -2;
+            filter: saturate(0.85) brightness(0.82);
+            transition: transform 1s var(--ease-out), filter .5s ease;
+        }
+        .cs-faction::before {
+            content: '';
+            position: absolute; inset: 0;
+            z-index: -1;
+            background: linear-gradient(to top,
+                rgba(7, 4, 12, 0.97) 0%,
+                rgba(7, 4, 12, 0.84) 42%,
+                rgba(7, 4, 12, 0.2) 78%,
+                rgba(7, 4, 12, 0.38) 100%);
+        }
+        /* Línea del color de la facción */
+        .cs-faction::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--fx);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .6s var(--ease-out);
+        }
+        .cs-faction__icon {
+            position: absolute;
+            top: 22px; left: 22px;
+            width: 46px; height: 46px;
+            border-radius: 13px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.05rem;
+            color: var(--fx);
+            background: rgba(7, 4, 12, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-color: color-mix(in srgb, var(--fx) 55%, transparent);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+        .cs-faction__title {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: clamp(1.9rem, 2.6vw, 2.4rem);
+            line-height: 1;
+            letter-spacing: 0.01em;
+            color: #fff;
+            margin: 0 0 10px;
+        }
+        .cs-faction__text {
+            color: #cdd3df;
+            font-size: 0.93rem;
+            line-height: 1.6;
+            margin: 0 0 20px;
+            max-width: 46ch;
+        }
+        .cs-faction__btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: fit-content;
+            padding: 11px 18px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-decoration: none;
+            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+            transition: background-color .3s ease, border-color .3s ease, color .3s ease, gap .3s var(--ease-out);
+        }
+        /* Toda la tarjeta lleva al mismo sitio que el botón */
+        .cs-faction__btn::after { content: ''; position: absolute; inset: 0; z-index: 1; }
+
+        .cs-faction:hover,
+        .cs-faction:focus-within {
+            border-color: rgba(255, 255, 255, 0.28);
+            border-color: color-mix(in srgb, var(--fx) 60%, transparent);
+            box-shadow: 0 30px 60px -30px var(--fx);
+        }
+        .cs-faction:hover::after,
+        .cs-faction:focus-within::after { transform: scaleX(1); }
+        .cs-faction:hover .cs-faction__bg,
+        .cs-faction:focus-within .cs-faction__bg {
+            transform: scale(1.06);
+            filter: saturate(1.05) brightness(0.95);
+        }
+        .cs-faction:hover .cs-faction__btn,
+        .cs-faction:focus-within .cs-faction__btn {
+            background: var(--fx);
+            border-color: var(--fx);
+            color: #0b0612;
+            gap: 14px;
+        }
+
+        @media (max-width: 1000px) {
+            .cs-factions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .cs-faction,
+            .cs-faction:nth-child(-n+2) { grid-column: span 1; min-height: 390px; }
+            .cs-faction:first-child { grid-column: span 2; }
+        }
+        @media (max-width: 640px) {
+            .cs-factions { grid-template-columns: 1fr; }
+            .cs-faction,
+            .cs-faction:nth-child(-n+2),
+            .cs-faction:first-child { grid-column: span 1; min-height: 360px; padding: 22px; }
+        }
+
+        /* =========================================================
+           5. NUESTRA COMUNIDAD
+           ========================================================= */
+        .cs-gallery {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-auto-rows: 170px;
+            grid-auto-flow: dense;
+            gap: 14px;
+        }
+        .cs-gallery__item {
+            position: relative;
+            padding: 0;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: var(--bg-raised);
+            cursor: zoom-in;
+            transition: border-color .3s ease;
+        }
+        .cs-gallery__item:nth-child(1),
+        .cs-gallery__item:nth-child(7) { grid-column: span 2; grid-row: span 2; }
+        .cs-gallery__item:nth-child(4),
+        .cs-gallery__item:nth-child(8),
+        .cs-gallery__item:nth-child(9),
+        .cs-gallery__item:nth-child(10) { grid-column: span 2; }
+        .cs-gallery__item img {
+            display: block;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform .8s var(--ease-out), filter .4s ease;
+        }
+        .cs-gallery__item i {
+            position: absolute;
+            right: 12px; bottom: 12px;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(7, 4, 12, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 0.75rem;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity .3s ease, transform .3s var(--ease-out);
+        }
+        .cs-gallery__item:hover,
+        .cs-gallery__item:focus-visible { border-color: var(--accent-purple); }
+        .cs-gallery__item:hover img,
+        .cs-gallery__item:focus-visible img { transform: scale(1.07); filter: brightness(1.08); }
+        .cs-gallery__item:hover i,
+        .cs-gallery__item:focus-visible i { opacity: 1; transform: none; }
+
+        @media (max-width: 760px) {
+            .cs-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 130px; gap: 10px; }
+            .cs-gallery__item:nth-child(9),
+            .cs-gallery__item:nth-child(10) { grid-column: span 1; }
+        }
+
+        /* Tarjetas de enlace: normativa, staff y Discord */
+        .cs-links {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 18px;
+        }
+        .cs-link {
+            position: relative;
+            min-height: 210px;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--line);
+            background: var(--bg-raised);
+            overflow: hidden;
+            isolation: isolate;
+            text-decoration: none;
+            transition: border-color .35s ease;
+        }
+        .cs-link__bg {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            max-width: none;
+            object-fit: cover;
+            z-index: -2;
+            filter: saturate(0.7) brightness(0.7);
+            transition: transform 1s var(--ease-out), filter .5s ease;
+        }
+        .cs-link::before {
+            content: '';
+            position: absolute; inset: 0;
+            z-index: -1;
+            background: linear-gradient(to top, rgba(7, 4, 12, 0.95) 0%, rgba(7, 4, 12, 0.5) 60%, rgba(7, 4, 12, 0.35) 100%);
+        }
+        .cs-link__title {
+            display: block;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 2rem;
+            line-height: 1;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .cs-link__sub {
+            display: block;
+            color: #cdd3df;
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+        .cs-link__go {
+            flex-shrink: 0;
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 0.85rem;
+            transition: background .3s ease, border-color .3s ease, transform .4s var(--ease-out);
+        }
+        .cs-link:hover { border-color: var(--accent-purple); }
+        .cs-link:hover .cs-link__bg { transform: scale(1.06); filter: saturate(0.9) brightness(0.8); }
+        .cs-link:hover .cs-link__go {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            transform: translateX(4px);
+        }
+        @media (max-width: 900px) {
+            .cs-links { grid-template-columns: 1fr; }
+            .cs-link { min-height: 160px; }
+        }
+
+        /* Visor de imágenes de la galería */
+        .cs-lightbox {
+            border: 0; padding: 0; margin: 0;
+            width: 100vw; height: 100vh; height: 100dvh;
+            max-width: none; max-height: none;
+            background: rgba(4, 2, 8, 0.95);
+            color: #fff;
+        }
+        .cs-lightbox[open] {
+            display: grid;
+            place-items: center;
+            animation: csFade .25s ease;
+        }
+        .cs-lightbox::backdrop { background: rgba(4, 2, 8, 0.6); }
+        .cs-lightbox__img {
+            max-width: min(92vw, 1400px);
+            max-height: 82vh;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+        }
+        .cs-lightbox__close,
+        .cs-lightbox__nav {
+            position: absolute;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0;
+            transition: background .25s ease, border-color .25s ease;
+        }
+        .cs-lightbox__close:hover,
+        .cs-lightbox__nav:hover { background: var(--accent-purple); border-color: var(--accent-purple); }
+        .cs-lightbox__close { top: 20px; right: 20px; }
+        .cs-lightbox__nav { top: 50%; margin-top: -23px; }
+        .cs-lightbox__nav--prev { left: 20px; }
+        .cs-lightbox__nav--next { right: 20px; }
+        .cs-lightbox__count {
+            position: absolute;
+            bottom: 22px; left: 0; right: 0;
+            margin: 0;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        @media (max-width: 600px) {
+            .cs-lightbox__nav { top: auto; bottom: 16px; margin-top: 0; }
+        }
+
+        /* =========================================================
+           FOOTER
+           ========================================================= */
+        .landing-footer {
+            position: relative;
+            background: url('https://i.imgur.com/IHEed1p.jpeg') no-repeat center center/cover;
+            color: var(--text-muted);
+            padding: 60px 24px 30px;
+            border-top: 1px solid rgba(168, 85, 247, 0.2);
+            box-sizing: border-box;
+            width: 100%;
+            margin-top: auto;
+        }
+        .landing-footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(7, 4, 12, 0.92);
+            z-index: 1;
+        }
+        .footer-content {
+            position: relative;
+            z-index: 2;
+            max-width: var(--wrap);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: center;
+        }
+        .footer-brand-col {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 25px;
+            margin-left: -25px;
+        }
+        .footer-brand-logo { height: 175px; object-fit: contain; flex-shrink: 0; }
+        .footer-brand-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0;
+            text-align: left;
+            max-width: 38ch;
+        }
+        .footer-links-col { display: flex; flex-direction: column; gap: 10px; align-self: start; }
+        .footer-links-col h4 {
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+            letter-spacing: 0.5px;
+        }
+        .footer-links-col a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.82rem;
+            width: fit-content;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .footer-links-col a:hover { color: var(--accent-purple); transform: translateX(3px); }
+        .footer-bottom {
+            position: relative;
+            z-index: 2;
+            max-width: var(--wrap);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 25px;
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+        .footer-bottom span { margin: 0; }
+        @media (max-width: 768px) {
+            .footer-content { grid-template-columns: 1fr; gap: 30px; }
+            .footer-brand-col {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                margin-left: 0;
+            }
+            .footer-brand-logo { height: 120px; margin-left: -18px; }
+            .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+        }
+
+        /* =========================================================
+           MOVIMIENTO REDUCIDO
+           ========================================================= */
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            html.page-in .landing-navbar,
+            html.page-in .cs-hero__track,
+            html.page-in .cs-hero__content > *,
+            html.page-in .cs-hero__controls,
+            .js .cs-reveal.is-visible { animation: none; }
+            .js .cs-reveal { opacity: 1; }
+            .cs-hero__slide img { transition: none; transform: none; }
+            .cs-shot__track { transition: none; }
+            .cs-faction__bg, .cs-link__bg, .cs-gallery__item img { transition: none; }
+            /* Sin avance automático: el indicador activo se queda lleno */
+            .indicator-dot.active i { animation: none; transform: scaleX(1); }
+            .dropdown-menu a:hover i, .profile-dropdown-menu a:hover i { animation: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de carga: logo + línea que se rellena en 1,8 s -->
+    <div id="siteLoader">
+        <img src="https://i.imgur.com/ibt9508.png" alt="ClickSense RP">
+        <div class="ld-bar"><i></i></div>
+    </div>
+    <script>
+        (function () {
+            var loader = document.getElementById('siteLoader');
+            var root = document.documentElement;
+            if (!loader) { root.classList.remove('is-loading'); return; }
+            var img = loader.querySelector('img');
+            var fill = loader.querySelector('.ld-bar i');
+            var started = false, done = false;
+
+            // La línea empieza cuando el logo ya se ve (o a más tardar a los 1,5 s)
+            function start() { if (started) return; started = true; loader.classList.add('go'); }
+            function finish() {
+                if (done) return; done = true;
+                loader.classList.add('hide');
+                root.classList.remove('is-loading');
+                root.classList.add('page-in');          // aquí empieza a aparecer la página
+                window.scrollTo(0, 0);
+                setTimeout(function () { loader.remove(); }, 700);
+            }
+
+            if (img.complete) start();
+            else {
+                img.addEventListener('load', start);
+                img.addEventListener('error', start);
+                setTimeout(start, 1500);
+            }
+            fill.addEventListener('animationend', finish);
+            setTimeout(finish, 5000);                    // seguridad por si algo falla
+        })();
+    </script>
+
+    <div class="grid-background"></div>
+
+    <!-- Barra de Navegación -->
+    <header class="landing-navbar" id="landingNavbar">
+        <div class="nav-left-group">
+            <a href="index.html" class="nav-brand">
+                <img src="https://i.imgur.com/ibt9508.png" alt="ClickSense Logo">
+            </a>
+
+            <!-- Botones centrales -->
+            <nav class="nav-links" id="navLinks" aria-label="Principal">
+                <a href="index.html" class="active" aria-current="page">INICIO</a>
+                <a href="tienda.html">TIENDA</a>
+
+                <!-- Menú Facciones por Click -->
+                <div class="dropdown-container" id="factionsDropdownContainer">
+                    <button type="button" class="dropdown-trigger" id="factionsTrigger" aria-haspopup="true" aria-expanded="false" aria-controls="factionsDropdownMenu">FACCIONES <i class="fa-solid fa-chevron-down" style="font-size: 0.55rem; margin-left: 6px;" aria-hidden="true"></i></button>
+                    <div class="dropdown-menu" id="factionsDropdownMenu">
+                        <a href="facciones/ems.html"><i class="fa-solid fa-kit-medical"></i> EMS</a>
+                        <a href="facciones/sasp.html"><i class="fa-solid fa-shield-halved"></i> SASP</a>
+                        <a href="facciones/crews.html"><i class="fa-solid fa-users"></i> CREWS</a>
+                        <a href="facciones/ilegales.html"><i class="fa-solid fa-skull"></i> ILEGALES</a>
+                        <a href="facciones/weazelnews.html"><i class="fa-solid fa-newspaper"></i> WEAZELNEWS</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <div class="nav-right-actions">
+            <a href="tienda.html" class="nav-cart-icon" title="Carrito de Tienda" aria-label="Carrito de la tienda">
+                <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+            </a>
+
+            <!-- Selector de Idioma -->
+            <div class="custom-lang-dropdown" id="langDropdownContainer">
+                <button type="button" class="lang-selected" id="langSelectedTrigger" aria-haspopup="true" aria-expanded="false" aria-label="Cambiar idioma">
+                    <span class="lang-current">
+                        <img src="https://i.imgur.com/eabCZDo.png" alt="" class="lang-flag" id="currentLangFlag">
+                        <span id="currentLangText">Español</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.55rem; color: var(--accent-purple);" aria-hidden="true"></i>
+                </button>
+                <div class="lang-options" id="langOptionsDropdown">
+                    <button type="button" class="lang-option" data-lang="es" data-text="Español" data-flag="https://i.imgur.com/eabCZDo.png">
+                        <img src="https://i.imgur.com/eabCZDo.png" alt="" class="lang-flag">
+                        <span>Español</span>
+                    </button>
+                    <button type="button" class="lang-option" data-lang="en" data-text="English" data-flag="https://i.imgur.com/04qe14v.png">
+                        <img src="https://i.imgur.com/04qe14v.png" alt="" class="lang-flag">
+                        <span>English</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Menú de Perfil -->
+            <div class="profile-dropdown-container" id="profileDropdownContainer">
+                <button type="button" id="userProfileTrigger" class="user-avatar-circle" title="Perfil de usuario" aria-label="Perfil de usuario">
+                    <span id="avatarContainer" class="default-avatar-silhouette">
+                        <i class="fa-solid fa-user" aria-hidden="true"></i>
+                    </span>
+                </button>
+                <div class="profile-dropdown-menu" id="profileDropdownMenu">
+                    <a href="perfil.html"><i class="fa-solid fa-user-gear"></i> Mi perfil</a>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i> Discord</a>
+                    <a href="home.html"><i class="fa-solid fa-gauge-high"></i> Acceder al panel</a>
+                    <a href="#" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+                </div>
+            </div>
+
+            <!-- Menú en móvil -->
+            <button type="button" class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navLinks">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 1. Apartado Bienvenido con Carrusel Principal -->
+    <section class="cs-hero" data-carousel style="--carousel-time: 5s;" aria-label="Bienvenida">
+        <div class="cs-hero__track" id="carouselTrack">
+            <div class="cs-hero__slide is-active"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1800&auto=format&fit=crop" alt="Slide 1" fetchpriority="high"></div>
+            <div class="cs-hero__slide"><img src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?q=80&w=1800&auto=format&fit=crop" alt="Slide 2" decoding="async"></div>
+            <div class="cs-hero__slide"><img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=1800&auto=format&fit=crop" alt="Slide 3" decoding="async"></div>
+            <div class="cs-hero__slide"><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1800&auto=format&fit=crop" alt="Slide 4" decoding="async"></div>
+            <div class="cs-hero__slide"><img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1800&auto=format&fit=crop" alt="Slide 5" decoding="async"></div>
+            <div class="cs-hero__slide"><img src="https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=1800&auto=format&fit=crop" alt="Slide 6" decoding="async"></div>
+        </div>
+
+        <div class="cs-hero__inner">
+            <div class="cs-hero__content">
+                <h1 class="cs-hero__title" style="--i: 0;"><span>Bienvenido a</span> <span>ClickSense RP</span></h1>
+                <p class="cs-hero__lead" style="--i: 1;">Descubre todos los rincones y el entorno de Los Santos.</p>
+                <div class="cs-hero__actions" style="--i: 2;">
+                    <a href="login.html" class="cs-btn cs-btn--primary"><i class="fa-solid fa-file-signature" aria-hidden="true"></i> Iniciar la whitelist</a>
+                    <a href="https://discord.gg/KAZzEyhmxW" target="_blank" rel="noopener" class="cs-btn cs-btn--ghost"><i class="fa-brands fa-discord" aria-hidden="true"></i> Entrar al Discord</a>
+                </div>
+            </div>
+
+            <div class="cs-hero__controls">
+                <div class="carousel-indicators" id="carouselIndicators"></div>
+                <div class="cs-arrows">
+                    <button type="button" class="cs-arrow" id="carouselPrev" aria-label="Imagen anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+                    <button type="button" class="cs-arrow" id="carouselNext" aria-label="Imagen siguiente"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenedor general -->
+    <main class="scratch-container" id="scratchContainer">
+
+        <!-- 2. Apartado Tienda Oficial -->
+        <section class="cs-store">
+            <div class="cs-store__info cs-reveal">
+                <h2 class="cs-title">Explora nuestra Tienda Oficial</h2>
+                <p class="cs-lead">Destaca dentro de la ciudad y apoya el mantenimiento del servidor.</p>
+                <ul class="cs-perks">
+                    <li><i class="fa-solid fa-car-side" aria-hidden="true"></i> Vehículos exclusivos</li>
+                    <li><i class="fa-solid fa-crown" aria-hidden="true"></i> Colas prioritarias</li>
+                    <li><i class="fa-solid fa-box-open" aria-hidden="true"></i> Paquetes de accesorios</li>
+                    <li><i class="fa-solid fa-palette" aria-hidden="true"></i> Personalizaciones</li>
+                </ul>
+                <a href="tienda.html" class="cs-btn cs-btn--primary"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> Ir a la Tienda</a>
+            </div>
+
+            <div class="cs-shot cs-reveal" data-carousel style="--carousel-time: 4s; --d: 120ms;">
+                <div class="cs-shot__viewport">
+                    <div class="cs-shot__track" id="miniTrack">
+                        <div class="cs-shot__slide"><img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1200&auto=format&fit=crop" alt="Store 1" loading="lazy" decoding="async"></div>
+                        <div class="cs-shot__slide"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200&auto=format&fit=crop" alt="Store 2" loading="lazy" decoding="async"></div>
+                        <div class="cs-shot__slide"><img src="https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=1200&auto=format&fit=crop" alt="Store 3" loading="lazy" decoding="async"></div>
+                    </div>
+                </div>
+                <div class="cs-shot__bar">
+                    <div class="carousel-indicators" id="miniIndicators"></div>
+                    <div class="cs-arrows">
+                        <button type="button" class="cs-arrow" id="miniPrev" aria-label="Imagen anterior de la tienda"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+                        <button type="button" class="cs-arrow" id="miniNext" aria-label="Imagen siguiente de la tienda"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Apartado Iniciar Whitelist -->
+        <section class="cs-whitelist">
+            <div class="cs-whitelist__media cs-reveal">
+                <img src="https://i.imgur.com/hvrzjQS.png" alt="Whitelist de ClickSense RP" loading="lazy" decoding="async">
+            </div>
+            <div class="cs-whitelist__body cs-reveal" style="--d: 120ms;">
+                <img src="https://i.imgur.com/dWeufze.png" alt="" class="cs-whitelist__icon" loading="lazy">
+                <h2 class="cs-title">Tu pasado, tu futuro</h2>
+                <p>En ClickSense, cada personaje decide su propio camino: un camarero cuyo hobby es participar en carreras ilegales, un ciudadano que va a opositar a la policía, un agente que se deja la piel cada día...</p>
+                <p>Todo tiene sus puntos positivos y negativos: una alianza, una traición o cualquier falta de respeto puede meterte en serios problemas.</p>
+                <a href="login.html" class="cs-btn cs-btn--primary">Iniciar la whitelist</a>
+            </div>
+        </section>
+
+        <!-- 4. Apartado Directorio de Facciones -->
+        <section id="factionsSection">
+            <div class="cs-head cs-reveal">
+                <h2 class="cs-title">Directorio de Facciones</h2>
+                <p class="cs-lead">Conoce los cuerpos del orden, los servicios médicos de emergencia y las organizaciones que mueven los hilos en la ciudad.</p>
+            </div>
+
+            <div class="cs-factions">
+                <article class="cs-faction cs-reveal" style="--fx: #ff4d6d;">
+                    <img class="cs-faction__bg" src="https://i.imgur.com/JZSGZA2.jpeg" alt="" loading="lazy" decoding="async">
+                    <span class="cs-faction__icon" aria-hidden="true"><i class="fa-solid fa-kit-medical"></i></span>
+                    <h3 class="cs-faction__title">SAED - EMS</h3>
+                    <p class="cs-faction__text">Los servicios médicos de San Andreas. Atienden emergencias, estabilizan a los heridos y mantienen el hospital en pie cuando la ciudad se complica.</p>
+                    <a href="facciones/ems.html" class="cs-faction__btn"><span>Ver facción</span> <i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+                </article>
+
+                <article class="cs-faction cs-reveal" style="--fx: #4c8dff; --d: 90ms;">
+                    <img class="cs-faction__bg" src="https://i.imgur.com/qltvmW6.jpeg" alt="" loading="lazy" decoding="async">
+                    <span class="cs-faction__icon" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span>
+                    <h3 class="cs-faction__title">SASP - LSPD y LSSD</h3>
+                    <p class="cs-faction__text">Policía y sheriff bajo un mismo mando. Patrullan la ciudad y el condado, investigan y responden a cada aviso que entra por radio.</p>
+                    <a href="facciones/sasp.html" class="cs-faction__btn"><span>Ver facción</span> <i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+                </article>
+
+                <article class="cs-faction cs-reveal" style="--fx: #facc15;">
+                    <img class="cs-faction__bg" src="https://i.imgur.com/Z2q2QDP.jpeg" alt="" loading="lazy" decoding="async">
+                    <span class="cs-faction__icon" aria-hidden="true"><i class="fa-solid fa-users"></i></span>
+                    <h3 class="cs-faction__title">CREWS</h3>
+                    <p class="cs-faction__text">Grupos con identidad propia que se ganan su sitio en la ciudad: su gente, su zona y sus propias reglas.</p>
+                    <a href="facciones/crews.html" class="cs-faction__btn"><span>Ver facción</span> <i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+                </article>
+
+                <article class="cs-faction cs-reveal" style="--fx: #b26bff; --d: 90ms;">
+                    <img class="cs-faction__bg" src="https://i.imgur.com/GOB0X9Q.jpeg" alt="" loading="lazy" decoding="async">
+                    <span class="cs-faction__icon" aria-hidden="true"><i class="fa-solid fa-skull"></i></span>
+                    <h3 class="cs-faction__title">BANDAS</h3>
+                    <p class="cs-faction__text">Las organizaciones que operan al margen de la ley. Territorio, negocios y alianzas que pueden romperse en cualquier momento.</p>
+                    <a href="facciones/ilegales.html" class="cs-faction__btn"><span>Ver facción</span> <i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+                </article>
+
+                <article class="cs-faction cs-reveal" style="--fx: #fb923c; --d: 180ms;">
+                    <img class="cs-faction__bg" src="https://i.imgur.com/R8kdb0h.png" alt="" loading="lazy" decoding="async">
+                    <span class="cs-faction__icon" aria-hidden="true"><i class="fa-solid fa-newspaper"></i></span>
+                    <h3 class="cs-faction__title">WEAZEL NEWS</h3>
+                    <p class="cs-faction__text">El medio de comunicación de la ciudad. Reporteros y cámaras que cuentan lo que pasa en Los Santos, en directo.</p>
+                    <a href="facciones/weazelnews.html" class="cs-faction__btn"><span>Ver facción</span> <i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+                </article>
+            </div>
+        </section>
+
+        <!-- 5. Apartado Nuestra Comunidad -->
+        <section>
+            <div class="cs-head cs-reveal">
+                <h2 class="cs-title">Nuestra comunidad</h2>
+                <p class="cs-lead">Observa los momentos capturados por los ciudadanos de San Andreas.</p>
+            </div>
+
+            <div class="cs-gallery cs-reveal" id="communityGallery">
+                <button type="button" class="cs-gallery__item" aria-label="Ampliar imagen 1"><img src="https://i.imgur.com/dY8HmCb.jpeg" alt="Comunidad 1" loading="lazy" decoding="async"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+                <button type="button" class="cs-gallery__item" aria-label="Ampliar imagen 2"><img src="https://i.imgur.com/8HoQS38.jpeg" alt="Comunidad 2" loading="lazy" decoding="async"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+                <button type="button" class="cs-gallery__item" aria-label="Ampliar imagen 3"><img src="https://i.imgur.com/bXo4YDw.jpeg" alt="Comunidad 3" loading="lazy" decoding="async"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+                <button type="button" class="cs-gallery__item" aria-label="Ampliar imagen 4"><img src="https://i.imgur.com/FmV3Rbg.jpeg" alt="Comunidad 4" loading="lazy" decoding="async"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+                <button type="button" class="cs-gallery__item" aria-label="Ampliar imagen 5"><img src="https://i.imgur.com/GSqq7c7.jpeg" alt="Comunidad 5" loading="lazy" decoding="async"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+                <button type="button" class="cs-gallery__item" aria-label="Ampliar imagen 6"><img src="https://i.imgur.com/Z52cN4u.jpeg" alt="Comunidad 6" loading="lazy" decoding="async"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+                <button type="button" class="cs-gallery__item" aria-label="Ampliar imagen 7"><img src="https://i.imgur.com/qub102R.png" alt="Comunidad 7" loading="lazy" decoding="async"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+                <button type="button" class="cs-gallery__item" aria-label="Ampliar imagen 8"><img src="https://i.imgur.com/JnPJup9.jpeg" alt="Comunidad 8" loading="lazy" decoding="async"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+                <button type="button" class="cs-gallery__item" aria-label="Ampliar imagen 9"><img src="https://i.imgur.com/5EhZnX0.jpeg" alt="Negocios / Comercios" loading="lazy" decoding="async"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+                <button type="button" class="cs-gallery__item" aria-label="Ampliar imagen 10"><img src="https://i.imgur.com/GOB0X9Q.jpeg" alt="Ilegales" loading="lazy" decoding="async"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+            </div>
+
+            <div class="cs-links">
+                <a href="normativa.html" class="cs-link cs-reveal">
+                    <img class="cs-link__bg" src="https://images.unsplash.com/photo-1453928582365-b6ad33cbcf64?q=80&w=800&auto=format&fit=crop" alt="" loading="lazy" decoding="async">
+                    <span>
+                        <span class="cs-link__title">Normativa</span>
+                        <span class="cs-link__sub">Lee las normas antes de entrar a la ciudad.</span>
+                    </span>
+                    <span class="cs-link__go" aria-hidden="true"><i class="fa-solid fa-gavel"></i></span>
+                </a>
+
+                <a href="equipo.html" class="cs-link cs-reveal" style="--d: 90ms;">
+                    <img class="cs-link__bg" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop" alt="" loading="lazy" decoding="async">
+                    <span>
+                        <span class="cs-link__title">Staff</span>
+                        <span class="cs-link__sub">Conoce al equipo que cuida el servidor.</span>
+                    </span>
+                    <span class="cs-link__go" aria-hidden="true"><i class="fa-solid fa-users"></i></span>
+                </a>
+
+                <a href="https://discord.gg/KAZzEyhmxW" target="_blank" rel="noopener" class="cs-link cs-reveal" style="--d: 180ms;">
+                    <img class="cs-link__bg" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop" alt="" loading="lazy" decoding="async">
+                    <span>
+                        <span class="cs-link__title">Comunidad</span>
+                        <span class="cs-link__sub">Únete a nuestro Discord.</span>
+                    </span>
+                    <span class="cs-link__go" aria-hidden="true"><i class="fa-brands fa-discord"></i></span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Visor de la galería -->
+    <dialog class="cs-lightbox" id="csLightbox" aria-label="Imágenes de la comunidad">
+        <button type="button" class="cs-lightbox__close" id="csLightboxClose" aria-label="Cerrar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <button type="button" class="cs-lightbox__nav cs-lightbox__nav--prev" id="csLightboxPrev" aria-label="Imagen anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+        <img class="cs-lightbox__img" id="csLightboxImg" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
+        <button type="button" class="cs-lightbox__nav cs-lightbox__nav--next" id="csLightboxNext" aria-label="Imagen siguiente"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+        <p class="cs-lightbox__count" id="csLightboxCount" aria-live="polite"></p>
+    </dialog>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <div class="footer-brand-col">
+                <img src="https://i.imgur.com/ibt9508.png" alt="ClickSense Logo" class="footer-brand-logo" loading="lazy">
+                <p class="footer-brand-desc">Servidor FiveM de roleplay serio en español. Una comunidad construida por y para jugadores comprometidos con el rol de calidad.</p>
+            </div>
+            <div class="footer-links-col">
+                <h4>Información</h4>
+                <a href="normativa.html">Normativa del servidor</a>
+                <a href="#">Política de privacidad</a>
+                <a href="#">Política de cookies</a>
+                <a href="términos.html">Términos y condiciones</a>
+                <a href="terminos-donaciones.html">Términos y condiciones de compra</a>
+                <a href="#">Información VIP</a>
+                <a href="#">Información VIP Comercios</a>
+            </div>
+            <div class="footer-links-col">
+                <h4>Comunidad</h4>
+                <a href="https://discord.gg/KAZzEyhmxW" target="_blank" rel="noopener">Discord</a>
+                <a href="#">Twitter / X</a>
+                <a href="equipo.html">Staff</a>
+                <a href="whitelist.html">Whitelist</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 ClickSense RP. Todos los derechos reservados.</span>
+            <span>Developed by Gallegoo</span>
+        </div>
+    </footer>
+
+    <!-- Script de control interactivo y animaciones -->
+    <script>
+        if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.scrollTo(0, 0);
+            const root = document.documentElement;
+
+            /* ---------- Perfil y sesión ---------- */
+            const storedUser = localStorage.getItem('discord_user');
+            const avatarContainer = document.getElementById('avatarContainer');
+            const profileTrigger = document.getElementById('userProfileTrigger');
+            const profileMenu = document.getElementById('profileDropdownMenu');
+            const logoutBtn = document.getElementById('logoutBtn');
+            let isLoggedIn = false;
+            let discordIdActual = null;
+
+            if (storedUser) {
+                try {
+                    const discordUser = JSON.parse(storedUser);
+                    if (discordUser.avatarUrl) {
+                        const avatar = document.createElement('img');
+                        avatar.src = discordUser.avatarUrl;
+                        avatar.alt = 'Avatar Discord';
+                        avatarContainer.replaceChildren(avatar);
+                        isLoggedIn = true;
+                        profileTrigger.setAttribute('aria-haspopup', 'true');
+                        profileTrigger.setAttribute('aria-expanded', 'false');
+                    }
+                    discordIdActual = discordUser.id || null;
+                } catch (e) {
+                    console.error('Error al cargar sesión de Discord', e);
+                }
+            }
+
+            /* ---------- Barra: fondo sólido al bajar ---------- */
+            const navbar = document.getElementById('landingNavbar');
+            const onScroll = () => navbar.classList.toggle('is-scrolled', window.scrollY > 24);
+            window.addEventListener('scroll', onScroll, { passive: true });
+            onScroll();
+
+            /* ---------- Aparición al hacer scroll ---------- */
+            const revealEls = document.querySelectorAll('.cs-reveal');
+            if ('IntersectionObserver' in window) {
+                const revealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (!entry.isIntersecting) return;
+                        entry.target.classList.add('visible', 'is-visible');
+                        revealObserver.unobserve(entry.target);
+                    });
+                }, { root: null, rootMargin: '0px 0px -6% 0px', threshold: 0.12 });
+                revealEls.forEach(el => revealObserver.observe(el));
+            } else {
+                revealEls.forEach(el => el.classList.add('is-visible'));
+            }
+
+            /* ---------- Carruseles ----------
+               El avance automático lo marca la animación del indicador activo:
+               cuando termina de rellenarse, pasa a la siguiente imagen.
+               El tiempo se cambia con --carousel-time en el HTML. */
+            function initCarousel({ track, prev, next, indicators, mode, label, pauseOnHover }) {
+                if (!track || !indicators) return;
+                const slides = Array.from(track.children);
+                if (!slides.length) return;
+                const host = track.closest('[data-carousel]') || track.parentElement;
+                let index = 0;
+
+                const dots = slides.map((slide, idx) => {
+                    const dot = document.createElement('button');
+                    dot.type = 'button';
+                    dot.className = 'indicator-dot';
+                    dot.setAttribute('aria-label', `${label} ${idx + 1} de ${slides.length}`);
+                    dot.appendChild(document.createElement('i'));
+                    dot.addEventListener('click', () => go(idx));
+                    indicators.appendChild(dot);
+                    return dot;
+                });
+
+                function render() {
+                    if (mode === 'fade') {
+                        slides.forEach((slide, idx) => slide.classList.toggle('is-active', idx === index));
+                    } else {
+                        track.style.transform = `translateX(-${index * 100}%)`;
+                    }
+                    dots.forEach((dot, idx) => {
+                        dot.classList.toggle('active', idx === index);
+                        if (idx === index) dot.setAttribute('aria-current', 'true');
+                        else dot.removeAttribute('aria-current');
+                    });
+                }
+
+                function go(target) {
+                    index = (target + slides.length) % slides.length;
+                    render();
+                }
+
+                if (prev) prev.addEventListener('click', () => go(index - 1));
+                if (next) next.addEventListener('click', () => go(index + 1));
+
+                // Avance automático
+                indicators.addEventListener('animationend', (e) => {
+                    if (e.target.parentElement === dots[index]) go(index + 1);
+                });
+
+                // Pausas: con el ratón encima (opcional) y al navegar con teclado
+                if (pauseOnHover) {
+                    host.addEventListener('mouseenter', () => host.classList.add('is-paused'));
+                    host.addEventListener('mouseleave', () => host.classList.remove('is-paused'));
+                }
+                host.addEventListener('focusin', (e) => {
+                    if (e.target.matches && e.target.matches(':focus-visible')) host.classList.add('is-paused');
+                });
+                host.addEventListener('focusout', () => host.classList.remove('is-paused'));
+
+                // Deslizar con el dedo
+                let startX = null;
+                host.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+                host.addEventListener('touchend', (e) => {
+                    if (startX === null) return;
+                    const dx = e.changedTouches[0].clientX - startX;
+                    if (Math.abs(dx) > 45) go(index + (dx < 0 ? 1 : -1));
+                    startX = null;
+                }, { passive: true });
+
+                render();
+            }
+
+            // 1. Carrusel principal
+            initCarousel({
+                track: document.getElementById('carouselTrack'),
+                prev: document.getElementById('carouselPrev'),
+                next: document.getElementById('carouselNext'),
+                indicators: document.getElementById('carouselIndicators'),
+                mode: 'fade',
+                label: 'Imagen',
+                pauseOnHover: false
+            });
+
+            // 2. Mini carrusel de la tienda
+            initCarousel({
+                track: document.getElementById('miniTrack'),
+                prev: document.getElementById('miniPrev'),
+                next: document.getElementById('miniNext'),
+                indicators: document.getElementById('miniIndicators'),
+                mode: 'slide',
+                label: 'Imagen de la tienda',
+                pauseOnHover: true
+            });
+
+            /* ---------- Menús desplegables ---------- */
+            const factionsTrigger = document.getElementById('factionsTrigger');
+            const factionsMenu = document.getElementById('factionsDropdownMenu');
+            const langTrigger = document.getElementById('langSelectedTrigger');
+            const langOptions = document.getElementById('langOptionsDropdown');
+            const currentLangFlag = document.getElementById('currentLangFlag');
+            const currentLangText = document.getElementById('currentLangText');
+            const navToggle = document.getElementById('navToggle');
+
+            const menus = [
+                [factionsMenu, factionsTrigger],
+                [langOptions, langTrigger],
+                [profileMenu, profileTrigger]
+            ];
+
+            function setOpen(menu, trigger, open) {
+                if (!menu) return;
+                menu.classList.toggle('show', open);
+                if (trigger && trigger.hasAttribute('aria-expanded')) {
+                    trigger.setAttribute('aria-expanded', String(open));
+                }
+            }
+            function closeMenus(except) {
+                menus.forEach(([menu, trigger]) => { if (menu !== except) setOpen(menu, trigger, false); });
+            }
+            function setMobileMenu(open) {
+                navbar.classList.toggle('menu-open', open);
+                navToggle.setAttribute('aria-expanded', String(open));
+                navToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+                navToggle.firstElementChild.className = open ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+            }
+
+            // Cerrar menús al hacer clic fuera
+            document.addEventListener('click', (e) => {
+                closeMenus();
+                if (!navbar.contains(e.target)) setMobileMenu(false);
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') { closeMenus(); setMobileMenu(false); }
+            });
+
+            // Menú móvil
+            navToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeMenus();
+                setMobileMenu(!navbar.classList.contains('menu-open'));
+            });
+
+            // Facciones dropdown por clic
+            factionsTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeMenus(factionsMenu);
+                setOpen(factionsMenu, factionsTrigger, !factionsMenu.classList.contains('show'));
+            });
+
+            // Perfil dropdown por clic
+            profileTrigger.addEventListener('click', (e) => {
+                if (!isLoggedIn) {
+                    window.location.href = 'login.html';
+                } else {
+                    e.stopPropagation();
+                    closeMenus(profileMenu);
+                    setOpen(profileMenu, profileTrigger, !profileMenu.classList.contains('show'));
+                }
+            });
+
+            // Selector de idioma dropdown por clic
+            langTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeMenus(langOptions);
+                setOpen(langOptions, langTrigger, !langOptions.classList.contains('show'));
+            });
+
+            // Selección de idioma
+            document.querySelectorAll('.lang-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    currentLangFlag.src = option.getAttribute('data-flag');
+                    currentLangText.textContent = option.getAttribute('data-text');
+                    setOpen(langOptions, langTrigger, false);
+                });
+            });
+
+            /* ---------- Visor de la galería ---------- */
+            const lightbox = document.getElementById('csLightbox');
+            const lightboxImg = document.getElementById('csLightboxImg');
+            const lightboxCount = document.getElementById('csLightboxCount');
+            const galleryItems = Array.from(document.querySelectorAll('#communityGallery .cs-gallery__item'));
+            let lightboxIndex = 0;
+
+            function showInLightbox(target) {
+                lightboxIndex = (target + galleryItems.length) % galleryItems.length;
+                const source = galleryItems[lightboxIndex].querySelector('img');
+                lightboxImg.src = source.currentSrc || source.src;
+                lightboxImg.alt = source.alt;
+                lightboxCount.textContent = `${lightboxIndex + 1} / ${galleryItems.length}`;
+            }
+
+            if (lightbox && typeof lightbox.showModal === 'function') {
+                galleryItems.forEach((item, idx) => {
+                    item.addEventListener('click', () => {
+                        showInLightbox(idx);
+                        lightbox.showModal();
+                        root.classList.add('cs-no-scroll');
+                    });
+                });
+                document.getElementById('csLightboxClose').addEventListener('click', () => lightbox.close());
+                document.getElementById('csLightboxPrev').addEventListener('click', () => showInLightbox(lightboxIndex - 1));
+                document.getElementById('csLightboxNext').addEventListener('click', () => showInLightbox(lightboxIndex + 1));
+                lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.close(); });
+                lightbox.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight') showInLightbox(lightboxIndex + 1);
+                    if (e.key === 'ArrowLeft') showInLightbox(lightboxIndex - 1);
+                });
+                lightbox.addEventListener('close', () => root.classList.remove('cs-no-scroll'));
+            }
+
+            /* ---------- Cerrar sesión con notificación al bot ---------- */
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    if (discordIdActual) {
+                        try {
+                            await fetch('/api/auth/logout', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ discord_id: discordIdActual }),
+                            });
+                        } catch (err) {
+                            console.error('No se pudo avisar del cierre de sesión:', err);
+                        }
+                    }
+                    localStorage.removeItem('discord_user');
+                    window.location.reload();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
